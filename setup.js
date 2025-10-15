@@ -225,5 +225,4 @@ export class AuthService {
 }
 `);
 
-console.log("\\n🚀 Estrutura completa criada com sucesso!");
-console.log("👉 Agora entre em backend-barbearia e frontend-barbearia para instalar dependências.");
+
