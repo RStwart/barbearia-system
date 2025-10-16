@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environments'; // caminho padrão
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  private apiUrl = 'http://localhost:5000/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) {}
 
@@ -12,11 +15,7 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/login`, { email, senha });
   }
 
-  logout() {
-    localStorage.removeItem('token');
-  }
-
-  getToken() {
-    return localStorage.getItem('token');
+  register(nome: string, email: string, senha: string, tipo: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, { nome, email, senha, tipo });
   }
 }

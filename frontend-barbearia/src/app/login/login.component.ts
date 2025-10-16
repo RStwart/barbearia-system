@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environments';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +12,8 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
+
+
 
 export class LoginComponent {
   etapa: 'bemvindo' | 'login' = 'bemvindo';
@@ -21,6 +24,10 @@ export class LoginComponent {
   erro = '';
 
   constructor(private auth: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    console.log('🌐 API em uso:', environment.apiUrl);
+  }
 
   selecionarTipo(tipo: 'CLIENTE' | 'FUNCIONARIO') {
     this.tipoUsuario = tipo;

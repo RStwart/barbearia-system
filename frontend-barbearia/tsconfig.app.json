@@ -1,15 +1,38 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+/* Configuração TypeScript da aplicação Angular 18 */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    /* Diretório onde os arquivos compilados vão parar */
     "outDir": "./out-tsc/app",
-    "types": []
+
+    /* Tipos globais */
+    "types": [],
+
+    /* Permite usar imports absolutos a partir de src/ */
+    "baseUrl": "./src",
+
+    /* Atalhos úteis para organizar imports */
+    "paths": {
+      "@app/*": ["app/*"],
+      "@assets/*": ["assets/*"],
+      "@env": ["environments/environment"]
+    }
   },
+
+  /* Arquivos principais do projeto */
   "files": [
     "src/main.ts"
   ],
+
+  /* Inclui todos os .ts e .d.ts da aplicação */
   "include": [
+    "src/**/*.ts",
     "src/**/*.d.ts"
+  ],
+
+  /* Exclui testes e configurações não necessárias */
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/test.ts"
   ]
 }

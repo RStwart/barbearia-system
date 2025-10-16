@@ -8,18 +8,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+//Middleware global
 app.use(cors());
 app.use(express.json());
 
-// Testa conexão ao iniciar
-db.connect((err) => {
-  if (err) {
-    console.error("❌ Erro ao conectar ao banco:", err);
-  } else {
-    console.log("✅ Conectado ao MySQL com sucesso!");
-  }
+//Teste simples para confirmar que o backend está ativo
+app.get("/", (req, res) => {
+  res.send("💈 API da Barbearia está rodando!");
 });
 
+//Rotas principais
 app.use("/api/auth", authRoutes);
 
-app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
+//Inicia o servidor
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});

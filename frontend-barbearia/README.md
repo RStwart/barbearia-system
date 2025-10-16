@@ -1,27 +1,128 @@
-# FrontendBarbearia
+# 💈 Frontend Barbearia
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.21.
+Este projeto é o **frontend do sistema de gestão de barbearia**, desenvolvido com **Angular 18**.  
+O objetivo é oferecer uma plataforma onde **clientes, funcionários e administradores** possam interagir com o sistema de forma simples e intuitiva, permitindo **agendamentos, controle de serviços e administração de unidades**.
 
-## Development server
+---
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## 🧩 Tecnologias Utilizadas
 
-## Code scaffolding
+- **Angular 18**
+- **TypeScript**
+- **HTML5 / CSS3**
+- **Node.js + Express (backend integrado)**
+- **MySQL (banco de dados)**
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+---
 
-## Build
+## ⚙️ Configuração do Ambiente
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Antes de iniciar, certifique-se de ter instalado:
 
-## Running unit tests
+- [Node.js](https://nodejs.org/) (versão 18 ou superior)  
+- [Angular CLI](https://angular.dev/tools/cli)  
+- [MySQL Server](https://dev.mysql.com/downloads/mysql/)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+---
 
-## Running end-to-end tests
+## 🚀 Executando o Projeto
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### 1️⃣ Instalar dependências
+No diretório do frontend, execute:
+```bash
+npm install
 
-## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 🧱 Estrutura do Projeto
+
+frontend-barbearia/
+├── src/
+│   ├── app/
+│   │   ├── login/              → Tela inicial e autenticação
+│   │   ├── services/           → Comunicação com o backend (AuthService)
+│   │   ├── components/         → Componentes reutilizáveis
+│   │   └── ...                 
+│   ├── assets/                 → Imagens e recursos estáticos
+│   ├── environments/           → Configurações de ambiente (dev/prod)
+│   └── styles.css              → Estilos globais
+└── angular.json                → Configurações do Angular CLI
+
+
+       🧍‍♂️ CLIENTE (Frontend - Angular 18)
+       ──────────────────────────────────────
+              ↓ faz login / cadastro
+          (email, senha, tipo, etc.)
+                    │
+                    │
+                    ▼
+        🌐 HTTP Request (POST /api/auth/login)
+                    │
+                    ▼
+┌──────────────────────────────────────────┐
+│     ⚙️ BACKEND - Node.js + Express        │
+│──────────────────────────────────────────│
+│  📄 server.js                            │
+│     • Sobe o servidor Express            │
+│     • Configura middlewares (CORS, JSON) │
+│     • Registra rotas                     │
+│        └── "/api/auth" → auth.routes.js  │
+└──────────────────────────────────────────┘
+                    │
+                    ▼
+┌──────────────────────────────────────────┐
+│    🧭 routes/auth.routes.js               │
+│──────────────────────────────────────────│
+│  • Define os caminhos da API             │
+│     ├─ POST /login → authController.login│
+│     └─ POST /register → authController.register│
+└──────────────────────────────────────────┘
+                    │
+                    ▼
+┌──────────────────────────────────────────┐
+│   🧠 controllers/auth.controller.js       │
+│──────────────────────────────────────────│
+│  • Recebe os dados do frontend           │
+│  • Valida email/senha                    │
+│  • Executa query no MySQL via db.js      │
+│  • Gera token JWT e devolve resposta     │
+└──────────────────────────────────────────┘
+                    │
+                    ▼
+┌──────────────────────────────────────────┐
+│     🗄️ config/db.js (MySQL Connection)    │
+│──────────────────────────────────────────│
+│  • Conecta no banco barbearia_db         │
+│  • Usa mysql2 e variáveis do .env        │
+│  • Envia queries ao banco                │
+└──────────────────────────────────────────┘
+                    │
+                    ▼
+        💾 BANCO DE DADOS (MySQL)
+        ─────────────────────────
+        Tabela: usuarios
+        Campos:
+        ├─ id
+        ├─ nome
+        ├─ email
+        ├─ senha
+        ├─ telefone
+        ├─ tipo (CLIENTE / FUNCIONARIO / ADM)
+        └─ criado_em
+
+                    │
+                    ▼
+          🔁 Resposta JSON pro Frontend
+          {
+            "message": "Login bem-sucedido",
+            "token": "...JWT...",
+            "user": {
+                "id": 1,
+                "nome": "João Silva",
+                "tipo": "CLIENTE"
+            }
+          }
+
+                    │
+                    ▼
+       ✅ Angular recebe, guarda token
+          e redireciona pro dashboard
