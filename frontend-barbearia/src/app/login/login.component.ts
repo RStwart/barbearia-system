@@ -57,7 +57,11 @@ export class LoginComponent {
   }
 
   abrirCadastro() {
-    alert('Tela de cadastro em desenvolvimento');
+    if (this.tipoUsuario === 'CLIENTE') {
+      this.router.navigate(['/cadastro-cliente']);
+    } else if (this.tipoUsuario === 'FUNCIONARIO') {
+      this.router.navigate(['/cadastro-estabelecimento']);
+    }
   }
   
 }

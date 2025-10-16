@@ -1,0 +1,34 @@
+.cadastro-container {
+  max-width: 350px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.08);
+  text-align: center;
+}
+.cadastro-container h2 {
+  margin-bottom: 20px;
+}
+.cadastro-container input {
+  width: 90%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1.5px solid #ccc;
+  font-size: 14px;
+}
+.cadastro-container button {
+  width: 100%;
+  padding: 12px;
+  background: #6C63FF;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+}
+.cadastro-container button:hover {
+  background: #5a54f0;
+}

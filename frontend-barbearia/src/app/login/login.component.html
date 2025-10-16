@@ -11,7 +11,6 @@
     <div class="botoes">
       <button class="btn branco" (click)="selecionarTipo('CLIENTE')">Cliente</button>
       <button class="btn branco" (click)="selecionarTipo('FUNCIONARIO')">Estabelecimento</button>
-      <button class="btn azul"   (click)="abrirCadastro()">Cadastre-se</button>
     </div>
   </div>
 </div>
@@ -25,8 +24,9 @@
     <input [(ngModel)]="email" placeholder="E-mail" type="email" />
     <input [(ngModel)]="senha" placeholder="Senha" type="password" />
 
-    <button (click)="login()" [disabled]="carregando">{{ carregando ? 'Entrando...' : 'Entrar' }}</button>
-    <button (click)="voltar()">← Voltar</button>
-    <p *ngIf="erro" class="erro">{{ erro }}</p>
+  <button class="btn-entrar" (click)="login()" [disabled]="carregando">{{ carregando ? 'Entrando...' : 'Entrar' }}</button>
+  <button class="btn-cadastrar" *ngIf="tipoUsuario" (click)="abrirCadastro()">Cadastre-se</button>
+  <button class="btn-voltar" (click)="voltar()">← Voltar</button>
+  <p *ngIf="erro" class="erro">{{ erro }}</p>
   </div>
 </div>

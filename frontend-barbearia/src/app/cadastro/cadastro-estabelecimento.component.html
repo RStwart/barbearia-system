@@ -1,0 +1,11 @@
+<div class="cadastro-container">
+  <h2>Cadastro de Estabelecimento</h2>
+  <form (ngSubmit)="cadastrar()">
+    <input [(ngModel)]="nome" name="nome" placeholder="Nome do Estabelecimento" required />
+    <input [(ngModel)]="email" name="email" placeholder="E-mail" type="email" required />
+    <input [(ngModel)]="senha" name="senha" placeholder="Senha" type="password" required />
+    <input [(ngModel)]="cnpj" name="cnpj" placeholder="CNPJ" required />
+    <input [(ngModel)]="telefone" name="telefone" placeholder="Telefone" required />
+    <button type="submit">Cadastrar</button>
+  </form>
+</div>
