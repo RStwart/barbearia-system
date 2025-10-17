@@ -1,11 +1,32 @@
 <div class="cadastro-container">
   <h2>Cadastro de Estabelecimento</h2>
-  <form (ngSubmit)="cadastrar()">
-    <input [(ngModel)]="nome" name="nome" placeholder="Nome do Estabelecimento" required />
-    <input [(ngModel)]="email" name="email" placeholder="E-mail" type="email" required />
-    <input [(ngModel)]="senha" name="senha" placeholder="Senha" type="password" required />
-    <input [(ngModel)]="cnpj" name="cnpj" placeholder="CNPJ" required />
-    <input [(ngModel)]="telefone" name="telefone" placeholder="Telefone" required />
-    <button type="submit">Cadastrar</button>
+  <form #cadForm="ngForm" (ngSubmit)="cadastrar(cadForm)">
+    <div>
+  <input [(ngModel)]="nome" name="nome" placeholder="Nome do Estabelecimento" required #nomeRef="ngModel" />
+  <div class="field-error" *ngIf="(nomeRef.invalid && nomeRef.touched) || (submitted && nomeRef.invalid)">Nome é obrigatório.</div>
+    </div>
+
+    <div>
+  <input [(ngModel)]="email" name="email" placeholder="E-mail" type="email" required #emailRef="ngModel" />
+  <div class="field-error" *ngIf="(emailRef.invalid && emailRef.touched) || (submitted && emailRef.invalid)">E-mail válido é obrigatório.</div>
+    </div>
+
+    <div>
+  <input [(ngModel)]="senha" name="senha" placeholder="Senha" type="password" required #senhaRef="ngModel" />
+  <div class="field-error" *ngIf="(senhaRef.invalid && senhaRef.touched) || (submitted && senhaRef.invalid)">Senha é obrigatória.</div>
+    </div>
+
+    <div>
+  <input [(ngModel)]="cnpj" name="cnpj" placeholder="CNPJ" required #cnpjRef="ngModel" />
+  <div class="field-error" *ngIf="(cnpjRef.invalid && cnpjRef.touched) || (submitted && cnpjRef.invalid)">CNPJ é obrigatório.</div>
+    </div>
+
+    <div>
+  <input [(ngModel)]="telefone" name="telefone" placeholder="Telefone" required #telRef="ngModel" />
+  <div class="field-error" *ngIf="(telRef.invalid && telRef.touched) || (submitted && telRef.invalid)">Telefone é obrigatório.</div>
+    </div>
+
+  <button type="submit">Cadastrar</button>
+    <button type="button" class="voltar-btn" (click)="voltar()">← Voltar</button>
   </form>
 </div>
