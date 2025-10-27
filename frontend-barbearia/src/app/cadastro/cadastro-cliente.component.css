@@ -32,3 +32,9 @@
 .cadastro-container button:hover {
   background: #5a54f0;
 }
+
+@media (max-width: 600px) {
+  .cadastro-container { max-width: 92%; margin: 20px auto; padding: 20px; }
+  .cadastro-container input { width: 100%; }
+  .cadastro-container button { width: 100%; }
+}

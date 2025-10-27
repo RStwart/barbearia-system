@@ -1,0 +1,11 @@
+<div class="admin-login-container">
+  <div class="login-box">
+    <h2>LOGIN ADMIN</h2>
+
+    <input [(ngModel)]="email" placeholder="E-mail" type="email" />
+    <input [(ngModel)]="senha" placeholder="Senha" type="password" />
+
+    <button (click)="login()" [disabled]="carregando">{{ carregando ? 'Entrando...' : 'Entrar' }}</button>
+    <p *ngIf="erro" class="erro">{{ erro }}</p>
+  </div>
+</div>

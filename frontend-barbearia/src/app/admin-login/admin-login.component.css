@@ -1,0 +1,46 @@
+.admin-login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f9f9f9;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 360px;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 18px;
+}
+
+.login-box input {
+  width: 90%;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1.5px solid #ccc;
+}
+
+.login-box button {
+  width: 92%;
+  margin-top: 12px;
+  padding: 10px;
+  background: #6C63FF;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.erro {
+  color: #ff4d4d;
+  margin-top: 10px;
+}

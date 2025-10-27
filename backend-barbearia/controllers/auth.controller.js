@@ -69,3 +69,72 @@ exports.login = (req, res) => {
     });
   });
 };
+
+// Rota secreta para login do administrador.
+// Recebe { secret } no body. O segredo deve ser igual a process.env.ADMIN_SECRET.
+// Se existir um usuário com tipo 'ADM' e ativo, retorna o JWT para ele.
+// Se não existir, tenta criar um usuário administrador baseado em vars de ambiente
+// (ADMIN_EMAIL e ADMIN_PASS) e retorna o token.
+exports.adminSecretLogin = (req, res) => {
+  const { secret } = req.body;
+
+  if (!process.env.ADMIN_SECRET) {
+    return res.status(500).json({ error: 'Admin secret não configurado no servidor' });
+  }
+
+  if (!secret || secret !== process.env.ADMIN_SECRET) {
+    return res.status(403).json({ error: 'Segredo inválido' });
+  }
+
+  // Procura usuário admin existente
+  const sql = `SELECT * FROM usuarios WHERE tipo = 'ADM' AND ativo = TRUE LIMIT 1`;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar admin:', err);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+
+    const proceedWithUser = (user) => {
+      const token = jwt.sign(
+        { id: user.id, tipo: user.tipo },
+        process.env.JWT_SECRET,
+        { expiresIn: '8h' }
+      );
+
+      res.json({ message: 'Login admin realizado com sucesso', token, user: { id: user.id, nome: user.nome, email: user.email, tipo: user.tipo } });
+    };
+
+    if (results && results.length > 0) {
+      // Já existe admin
+      return proceedWithUser(results[0]);
+    }
+
+  // Se não existe admin, tentar criar a partir de variáveis de ambiente
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPass = process.env.ADMIN_PASS;
+    const adminNome = process.env.ADMIN_NAME || 'Administrador';
+
+    if (!adminEmail || !adminPass) {
+      return res.status(500).json({ error: 'Credenciais de admin não configuradas no servidor' });
+    }
+
+    const hashed = bcrypt.hashSync(adminPass, 10);
+  const insertSql = `INSERT INTO usuarios (nome, email, senha, telefone, tipo, ativo) VALUES (?, ?, ?, ?, 'ADM', TRUE)`;
+    db.query(insertSql, [adminNome, adminEmail, hashed, null], (insertErr, insertRes) => {
+      if (insertErr) {
+        console.error('Erro ao criar admin:', insertErr);
+        return res.status(500).json({ error: 'Erro interno ao criar admin' });
+      }
+
+      // Recupera o usuário criado
+      const getSql = `SELECT * FROM usuarios WHERE id = ?`;
+      db.query(getSql, [insertRes.insertId], (getErr, getRes) => {
+        if (getErr || !getRes || getRes.length === 0) {
+          console.error('Erro ao recuperar admin criado:', getErr);
+          return res.status(500).json({ error: 'Erro interno ao recuperar admin' });
+        }
+        return proceedWithUser(getRes[0]);
+      });
+    });
+  });
+};

@@ -1,0 +1,29 @@
+<div class="app-shell">
+  <aside class="sidebar" [class.collapsed]="isCollapsed">
+    <div class="brand">
+      <button class="collapse-btn" (click)="toggle()">☰</button>
+      <span class="brand-text">BARBEARIA</span>
+    </div>
+
+    <nav class="nav">
+      <a routerLink="/app" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="icon">🏠</span>
+        <span class="label">Dashboard</span>
+      </a>
+      <a routerLink="/app/produtos" routerLinkActive="active">
+        <span class="icon">📦</span>
+        <span class="label">Produtos</span>
+      </a>
+      <!-- categorias e banners removidos temporariamente -->
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout">Sair</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <button *ngIf="isCollapsed" class="open-sidebar-btn" (click)="toggle()">☰</button>
+    <router-outlet></router-outlet>
+  </main>
+</div>

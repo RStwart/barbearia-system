@@ -1,0 +1,148 @@
+:root{
+  --sidebar-width: 300px; /* aumentado conforme solicitado */
+  --sidebar-collapsed: 64px;
+  --primary: #2f2dff;
+}
+
+*{box-sizing:border-box}
+
+.app-shell{
+  display:flex;
+  min-height:100vh;
+  background:#f4f6f9;
+}
+
+.sidebar{
+  width:var(--sidebar-width);
+  background:#2c3e50;
+  color:#fff;
+  padding:20px 16px;
+  display:flex;
+  flex-direction:column;
+  transition: width 240ms ease;
+  overflow: hidden;
+}
+
+.sidebar.collapsed{
+  width: 0;
+  padding: 0;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+  font-size:18px;
+  margin-bottom:18px;
+}
+
+.collapse-btn{
+  background:transparent;
+  border:none;
+  color:inherit;
+  font-size:18px;
+  cursor:pointer;
+  padding:6px;
+}
+
+.brand-text{
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.sidebar.collapsed .brand-text{ display: none; }
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  flex:1;
+}
+
+.nav a{
+  color:rgba(255,255,255,0.95);
+  text-decoration:none;
+  padding:8px 10px;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.nav a .icon{ width:28px; text-align:center }
+.nav a .label{ transition: opacity 160ms ease; }
+.sidebar.collapsed .label{ display:none }
+.sidebar.collapsed .icon{ display:none }
+.sidebar.collapsed .collapse-btn{ display:none }
+
+/* botão flutuante para abrir a sidebar quando estiver totalmente colapsada */
+.open-sidebar-btn{
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 1001;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Ensure main content shifts smoothly when sidebar collapses/expands */
+.content{ transition: margin-left 240ms ease; }
+.sidebar + .content{ margin-left: 0; }
+
+/* Responsive behavior: mobile screens */
+@media (max-width: 900px) {
+  :root { --sidebar-width: 260px; }
+
+  .sidebar{
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  /* when collapsed (default on mobile) it stays hidden; when not collapsed it slides in */
+  .sidebar:not(.collapsed){
+    transform: translateX(0);
+  }
+
+  /* show floating button when collapsed */
+  .open-sidebar-btn{ display:block; }
+
+  .content{ padding: 18px; }
+}
+
+@media (min-width: 901px) {
+  /* hide floating open button on desktop since we have the collapse button inside sidebar */
+  .open-sidebar-btn{ display:none; }
+}
+.nav a.active{
+  background:rgba(255,255,255,0.06);
+}
+.nav a.active{
+  background:rgba(255,255,255,0.06);
+}
+
+.sidebar-footer{
+  margin-top:12px;
+}
+
+.logout{
+  width:100%;
+  padding:10px;
+  background:#e74c3c;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.content{
+  flex:1;
+  padding:28px;
+}

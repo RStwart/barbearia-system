@@ -47,7 +47,7 @@ export class LoginComponent {
       next: (res: any) => {
         localStorage.setItem('token', res.token);
         alert(`Login bem-sucedido como ${res.tipo_usuario}`);
-        this.router.navigate(['/']);
+        this.router.navigate(['/app']);
       },
       error: err => {
         this.erro = err.error?.message || 'Erro ao fazer login';

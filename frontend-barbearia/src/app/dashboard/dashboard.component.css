@@ -1,0 +1,7 @@
+.dash-grid h1{margin:0 0 6px}
+.cards{display:flex;gap:18px;margin-top:18px}
+.card{background:white;padding:18px;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.05);flex:1}
+
+@media (max-width: 640px) {
+	.cards{flex-direction:column}
+}
