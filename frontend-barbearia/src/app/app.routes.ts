@@ -6,18 +6,23 @@ import { CadastroEstabelecimentoComponent } from './cadastro/cadastro-estabeleci
 import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { MainLayoutComponent } from './layout/main-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProdutosComponent } from './produtos/produtos.component';
+import { AgendamentosComponent } from './agendamentos/agendamentos.component';
+import { LojaComponent } from './loja/loja.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   { path: 'cadastro-cliente', component: CadastroClienteComponent },
   { path: 'cadastro-estabelecimento', component: CadastroEstabelecimentoComponent },
-  { path: 'admin/secret-login', component: AdminLoginComponent },
+  { path: 'login/admin', component: AdminLoginComponent },
   {
     path: 'app',
     component: MainLayoutComponent,
     children: [
       { path: '', component: DashboardComponent },
-      // futuras rotas internas: produtos, categorias etc
+      { path: 'produtos', component: ProdutosComponent },
+      { path: 'agendamentos', component: AgendamentosComponent },
+      { path: 'loja', component: LojaComponent }
     ]
   },
   { path: '**', redirectTo: '' }

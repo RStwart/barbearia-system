@@ -1,0 +1,25 @@
+<div class="produtos-container">
+  <div class="header">
+    <h1>Gestão de Produtos</h1>
+    <button class="btn-primary" (click)="adicionarProduto()">+ Novo Produto</button>
+  </div>
+
+  <div class="produtos-grid">
+    <div class="produto-card" *ngFor="let produto of produtos">
+      <div class="produto-info">
+        <h3>{{ produto.nome }}</h3>
+        <p class="categoria">{{ produto.categoria }}</p>
+        <p class="preco">R$ {{ produto.preco | number:'1.2-2' }}</p>
+      </div>
+      <div class="produto-actions">
+        <button class="btn-edit" (click)="editarProduto(produto.id)">Editar</button>
+        <button class="btn-delete" (click)="removerProduto(produto.id)">Remover</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="produtos.length === 0">
+    <p>Nenhum produto cadastrado ainda.</p>
+    <button class="btn-primary" (click)="adicionarProduto()">Cadastrar Primeiro Produto</button>
+  </div>
+</div>

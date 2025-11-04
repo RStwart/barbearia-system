@@ -78,18 +78,26 @@
   left: 12px;
   top: 12px;
   z-index: 1001;
-  background: var(--primary);
+  background: #2c3e50;
   color: white;
   border: none;
   border-radius: 6px;
   padding: 8px 10px;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  display: block;
 }
 
 /* Ensure main content shifts smoothly when sidebar collapses/expands */
-.content{ transition: margin-left 240ms ease; }
+.content{ 
+  transition: margin-left 240ms ease, padding-top 240ms ease; 
+}
 .sidebar + .content{ margin-left: 0; }
+
+/* Adiciona espaçamento no topo quando sidebar estiver colapsada para não sobrepor o botão flutuante */
+.sidebar.collapsed + .content{
+  padding-top: 70px;
+}
 
 /* Responsive behavior: mobile screens */
 @media (max-width: 900px) {
@@ -118,8 +126,8 @@
 }
 
 @media (min-width: 901px) {
-  /* hide floating open button on desktop since we have the collapse button inside sidebar */
-  .open-sidebar-btn{ display:none; }
+  /* no desktop, escondemos o botão flutuante apenas quando a sidebar estiver visível */
+  .sidebar:not(.collapsed) + .content .open-sidebar-btn{ display:none; }
 }
 .nav a.active{
   background:rgba(255,255,255,0.06);

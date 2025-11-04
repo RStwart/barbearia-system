@@ -1,0 +1,36 @@
+<div class="agendamentos-container">
+  <div class="header">
+    <h1>Agendamentos</h1>
+    <button class="btn-primary" (click)="novoAgendamento()">+ Novo Agendamento</button>
+  </div>
+
+  <div class="agendamentos-table">
+    <div class="table-header">
+      <div>Cliente</div>
+      <div>Serviço</div>
+      <div>Data</div>
+      <div>Hora</div>
+      <div>Status</div>
+      <div>Ações</div>
+    </div>
+    
+    <div class="table-row" *ngFor="let agendamento of agendamentos">
+      <div class="cliente">{{ agendamento.cliente }}</div>
+      <div class="servico">{{ agendamento.servico }}</div>
+      <div class="data">{{ agendamento.data }}</div>
+      <div class="hora">{{ agendamento.hora }}</div>
+      <div class="status">
+        <span [class]="getStatusClass(agendamento.status)">{{ agendamento.status | titlecase }}</span>
+      </div>
+      <div class="actions">
+        <button class="btn-edit" (click)="editarAgendamento(agendamento.id)">Editar</button>
+        <button class="btn-cancel" (click)="cancelarAgendamento(agendamento.id)">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="agendamentos.length === 0">
+    <p>Nenhum agendamento encontrado.</p>
+    <button class="btn-primary" (click)="novoAgendamento()">Criar Primeiro Agendamento</button>
+  </div>
+</div>

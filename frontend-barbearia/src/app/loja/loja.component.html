@@ -1,0 +1,39 @@
+<div class="loja-container">
+  <div class="header">
+    <h1>Loja</h1>
+    <div class="filtros">
+      <select [(ngModel)]="filtroCategoria" class="filtro-categoria">
+        <option value="todas">Todas as categorias</option>
+        <option *ngFor="let categoria of categorias.slice(1)" [value]="categoria">{{ categoria }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="produtos-grid">
+    <div class="produto-card" *ngFor="let produto of produtosFiltrados">
+      <div class="produto-imagem">
+        <div class="placeholder-img">📦</div>
+      </div>
+      <div class="produto-info">
+        <h3>{{ produto.nome }}</h3>
+        <p class="categoria">{{ produto.categoria }}</p>
+        <div class="preco-estoque">
+          <span class="preco">R$ {{ produto.preco | number:'1.2-2' }}</span>
+          <span class="estoque" [class.baixo-estoque]="produto.estoque < 10">
+            {{ produto.estoque }} em estoque
+          </span>
+        </div>
+      </div>
+      <div class="produto-actions">
+        <button class="btn-detalhes" (click)="verDetalhes(produto.id)">Detalhes</button>
+        <button class="btn-carrinho" (click)="adicionarAoCarrinho(produto.id)">
+          🛒 Adicionar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="produtosFiltrados.length === 0">
+    <p>Nenhum produto encontrado para esta categoria.</p>
+  </div>
+</div>
