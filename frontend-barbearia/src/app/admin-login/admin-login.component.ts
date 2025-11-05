@@ -22,8 +22,11 @@ export class AdminLoginComponent {
   ngOnInit() {
     // Verificar se já existe token válido e redirecionar
     if (this.auth.isAuthenticated()) {
-      this.router.navigate(['/app']);
-      return;
+      const tokenData = this.auth.getUserFromToken();
+      if (tokenData && tokenData.tipo === 'ADM') {
+        this.router.navigate(['/admin']);
+        return;
+      }
     }
     
     // Limpar estado anterior
@@ -45,7 +48,7 @@ export class AdminLoginComponent {
           }
           
           console.log('✅ Login admin realizado com sucesso:', res.user);
-          this.router.navigate(['/app']);
+          this.router.navigate(['/admin']);
         } else {
           this.erro = 'Acesso negado: usuário não é administrador.';
         }

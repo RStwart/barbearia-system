@@ -30,8 +30,11 @@ export class LoginComponent {
     
     // Verificar se já existe token válido e redirecionar
     if (this.auth.isAuthenticated()) {
-      this.router.navigate(['/app']);
-      return;
+      const tokenData = this.auth.getUserFromToken();
+      if (tokenData) {
+        this.redirectByUserType(tokenData.tipo);
+        return;
+      }
     }
     
     // Limpar qualquer estado anterior que possa ter ficado
@@ -65,7 +68,9 @@ export class LoginComponent {
         }
         
         console.log('✅ Login realizado com sucesso:', res.user);
-        this.router.navigate(['/app']);
+        
+        // Redirecionar baseado no tipo de usuário
+        this.redirectByUserType(res.user.tipo);
       },
       error: err => {
         console.error('❌ Erro no login:', err);
@@ -73,6 +78,22 @@ export class LoginComponent {
         this.carregando = false;
       }
     });
+  }
+
+  private redirectByUserType(tipo: string) {
+    switch(tipo) {
+      case 'ADM':
+        this.router.navigate(['/admin']);
+        break;
+      case 'CLIENTE':
+        this.router.navigate(['/cliente']);
+        break;
+      case 'FUNCIONARIO':
+        this.router.navigate(['/estabelecimento']);
+        break;
+      default:
+        this.router.navigate(['/cliente']); // Fallback
+    }
   }
 
   abrirCadastro() {

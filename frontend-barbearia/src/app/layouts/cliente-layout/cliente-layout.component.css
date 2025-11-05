@@ -1,7 +1,8 @@
 :root{
-  --sidebar-width: 300px; /* aumentado conforme solicitado */
+  --sidebar-width: 300px;
   --sidebar-collapsed: 64px;
-  --primary: #2f2dff;
+  --cliente-primary: #27ae60;
+  --cliente-dark: #219a52;
 }
 
 *{box-sizing:border-box}
@@ -33,8 +34,9 @@
   align-items:center;
   gap:8px;
   font-weight:700;
-  font-size:18px;
+  font-size:16px;
   margin-bottom:18px;
+  color: #27ae60;
 }
 
 .collapse-btn{
@@ -50,6 +52,7 @@
   transition: opacity 180ms ease, transform 180ms ease;
 }
 .sidebar.collapsed .brand-text{ display: none; }
+
 .nav{
   display:flex;
   flex-direction:column;
@@ -60,25 +63,35 @@
 .nav a{
   color:rgba(255,255,255,0.95);
   text-decoration:none;
-  padding:8px 10px;
+  padding:12px 10px;
   border-radius:6px;
   display:flex;
   align-items:center;
   gap:10px;
+  transition: all 0.2s ease;
 }
-.nav a .icon{ width:28px; text-align:center }
+
+.nav a:hover{
+  background:rgba(39,174,96,0.1);
+}
+
+.nav a.active{
+  background:var(--cliente-primary);
+  color: white;
+}
+
+.nav a .icon{ width:28px; text-align:center; font-size: 16px; }
 .nav a .label{ transition: opacity 160ms ease; }
 .sidebar.collapsed .label{ display:none }
 .sidebar.collapsed .icon{ display:none }
 .sidebar.collapsed .collapse-btn{ display:none }
 
-/* botão flutuante para abrir a sidebar quando estiver totalmente colapsada */
 .open-sidebar-btn{
   position: fixed;
   left: 12px;
   top: 12px;
   z-index: 1001;
-  background: #2c3e50;
+  background: var(--cliente-primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -88,66 +101,15 @@
   display: block;
 }
 
-/* Ensure main content shifts smoothly when sidebar collapses/expands */
 .content{ 
   transition: margin-left 240ms ease, padding-top 240ms ease; 
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
-.sidebar + .content{ margin-left: 0; }
 
-/* Adiciona espaçamento no topo quando sidebar estiver colapsada para não sobrepor o botão flutuante */
 .sidebar.collapsed + .content .main-content{
   padding-top: 28px;
-}
-
-/* Responsive behavior: mobile screens */
-@media (max-width: 900px) {
-  :root { --sidebar-width: 260px; }
-
-  .sidebar{
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    width: var(--sidebar-width);
-    transform: translateX(-100%);
-    z-index: 1000;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  }
-
-  /* when collapsed (default on mobile) it stays hidden; when not collapsed it slides in */
-  .sidebar:not(.collapsed){
-    transform: translateX(0);
-  }
-
-  /* show floating button when collapsed */
-  .open-sidebar-btn{ display:block; }
-
-  .main-content{ padding: 18px; }
-}
-
-@media (min-width: 901px) {
-  /* no desktop, escondemos o botão flutuante apenas quando a sidebar estiver visível */
-  .sidebar:not(.collapsed) + .content .open-sidebar-btn{ display:none; }
-}
-
-@media (max-width: 640px) {
-  .user-details {
-    display: none;
-  }
-  
-  .top-header {
-    padding: 12px 18px;
-  }
-  
-  .main-content {
-    padding: 18px;
-  }
-}
-.nav a.active{
-  background:rgba(255,255,255,0.06);
-}
-.nav a.active{
-  background:rgba(255,255,255,0.06);
 }
 
 .sidebar-footer{
@@ -157,18 +119,16 @@
 .logout{
   width:100%;
   padding:10px;
-  background:#e74c3c;
+  background:var(--cliente-primary);
   color:white;
   border:none;
   border-radius:6px;
   cursor:pointer;
+  transition: background 0.2s ease;
 }
 
-.content{
-  flex:1;
-  padding:0;
-  display: flex;
-  flex-direction: column;
+.logout:hover{
+  background:var(--cliente-dark);
 }
 
 .top-header {
@@ -179,10 +139,21 @@
   justify-content: space-between;
   align-items: center;
   min-height: 60px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   flex: 1;
+}
+
+.page-title {
+  margin: 0;
+  color: var(--cliente-primary);
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .main-content {
@@ -206,7 +177,12 @@
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cliente-avatar {
+  background: var(--cliente-primary);
 }
 
 .user-details {
@@ -222,12 +198,52 @@
 
 .user-type {
   font-size: 12px;
-  color: #7f8c8d;
+  color: var(--cliente-primary);
   text-transform: uppercase;
+  font-weight: 600;
 }
 
-/* Ajustar posição do botão flutuante quando temos header */
-.open-sidebar-btn {
-  position: relative;
-  margin-right: auto;
+/* Responsive behavior */
+@media (max-width: 900px) {
+  :root { --sidebar-width: 260px; }
+
+  .sidebar{
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  .sidebar:not(.collapsed){
+    transform: translateX(0);
+  }
+
+  .open-sidebar-btn{ display:block; }
+  .main-content{ padding: 18px; }
+}
+
+@media (min-width: 901px) {
+  .sidebar:not(.collapsed) + .content .open-sidebar-btn{ display:none; }
+}
+
+@media (max-width: 640px) {
+  .user-details {
+    display: none;
+  }
+  
+  .top-header {
+    padding: 12px 18px;
+  }
+  
+  .main-content {
+    padding: 18px;
+  }
+
+  .page-title {
+    font-size: 16px;
+  }
 }

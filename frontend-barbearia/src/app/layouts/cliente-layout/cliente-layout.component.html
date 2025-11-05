@@ -2,25 +2,33 @@
   <aside class="sidebar" [class.collapsed]="isCollapsed">
     <div class="brand">
       <button class="collapse-btn" (click)="toggle()">☰</button>
-      <span class="brand-text">BARBEARIA</span>
+      <span class="brand-text">💇‍♂️ CLIENTE</span>
     </div>
 
     <nav class="nav">
-      <a routerLink="/app" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <a routerLink="/cliente" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <span class="icon">🏠</span>
-        <span class="label">Dashboard</span>
+        <span class="label">Início</span>
       </a>
-      <a routerLink="/app/produtos" routerLinkActive="active">
-        <span class="icon">📦</span>
-        <span class="label">Produtos</span>
-      </a>
-      <a routerLink="/app/agendamentos" routerLinkActive="active">
+      <a routerLink="/cliente/agendamentos" routerLinkActive="active">
         <span class="icon">📅</span>
-        <span class="label">Agendamentos</span>
+        <span class="label">Meus Agendamentos</span>
       </a>
-      <a routerLink="/app/loja" routerLinkActive="active">
+      <a routerLink="/cliente/lojas" routerLinkActive="active">
+        <span class="icon">📍</span>
+        <span class="label">Lojas Próximas</span>
+      </a>
+      <a routerLink="/cliente/favoritos" routerLinkActive="active">
+        <span class="icon">⭐</span>
+        <span class="label">Favoritos</span>
+      </a>
+      <a routerLink="/cliente/carrinho" routerLinkActive="active">
         <span class="icon">🛒</span>
-        <span class="label">Loja</span>
+        <span class="label">Carrinho</span>
+      </a>
+      <a routerLink="/cliente/historico" routerLinkActive="active">
+        <span class="icon">📋</span>
+        <span class="label">Histórico</span>
       </a>
     </nav>
 
@@ -33,9 +41,10 @@
     <header class="top-header">
       <div class="header-left">
         <button *ngIf="isCollapsed" class="open-sidebar-btn" (click)="toggle()">☰</button>
+        <h2 class="page-title">Área do Cliente</h2>
       </div>
       <div class="user-info">
-        <div class="avatar">
+        <div class="avatar cliente-avatar">
           {{ getUserInitials() }}
         </div>
         <div class="user-details">

@@ -1,20 +1,19 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-main-layout',
+  selector: 'app-cliente-layout',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './main-layout.component.html',
-  styleUrls: ['./main-layout.component.css']
+  templateUrl: './cliente-layout.component.html',
+  styleUrls: ['./cliente-layout.component.css']
 })
-export class MainLayoutComponent implements OnInit {
-  // controla estado do menu (colapsado ou não)
+export class ClienteLayoutComponent implements OnInit {
   isCollapsed = false;
   isMobile = false;
-  usuario: any = { nome: 'Usuário', tipo: 'CLIENTE' }; // Dados temporários, depois virá do token
+  usuario: any = { nome: 'Cliente', tipo: 'CLIENTE' };
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -31,11 +30,10 @@ export class MainLayoutComponent implements OnInit {
         },
         error: (error) => {
           console.error('Erro ao carregar dados do usuário:', error);
-          // Fallback para dados do token se a API falhar
           const tokenData = this.authService.getUserFromToken();
           if (tokenData) {
             this.usuario = {
-              nome: 'Usuário',
+              nome: 'Cliente',
               tipo: tokenData.tipo
             };
           }
@@ -45,7 +43,7 @@ export class MainLayoutComponent implements OnInit {
   }
 
   getUserInitials(): string {
-    if (!this.usuario?.nome) return 'U';
+    if (!this.usuario?.nome) return 'C';
     return this.usuario.nome.split(' ')
       .map((name: string) => name.charAt(0))
       .join('')
@@ -60,7 +58,6 @@ export class MainLayoutComponent implements OnInit {
 
   private checkWindow() {
     this.isMobile = window.innerWidth <= 900;
-    // se for mobile, deixamos a sidebar colapsada por padrão
     if (this.isMobile) {
       this.isCollapsed = true;
     }
@@ -71,15 +68,9 @@ export class MainLayoutComponent implements OnInit {
   }
 
   logout() {
-    // Usar o método do AuthService para logout completo
     this.authService.logout();
-    
-    // Limpar dados do usuário no componente
-    this.usuario = { nome: 'Usuário', tipo: 'CLIENTE' };
-    
-    // Redirecionar para a tela inicial (escolha cliente/estabelecimento)
+    this.usuario = { nome: 'Cliente', tipo: 'CLIENTE' };
     this.router.navigate(['/']).then(() => {
-      // Força o reload da página para garantir que todos os dados sejam limpos
       window.location.reload();
     });
   }

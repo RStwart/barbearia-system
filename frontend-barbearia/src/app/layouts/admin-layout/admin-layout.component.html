@@ -1,0 +1,62 @@
+<div class="app-shell">
+  <aside class="sidebar" [class.collapsed]="isCollapsed">
+    <div class="brand">
+      <button class="collapse-btn" (click)="toggle()">☰</button>
+      <span class="brand-text">🔧 ADMIN PANEL</span>
+    </div>
+
+    <nav class="nav">
+      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="icon">📊</span>
+        <span class="label">Dashboard</span>
+      </a>
+      <a routerLink="/admin/usuarios" routerLinkActive="active">
+        <span class="icon">👥</span>
+        <span class="label">Gerenciar Usuários</span>
+      </a>
+      <a routerLink="/admin/estabelecimentos" routerLinkActive="active">
+        <span class="icon">🏪</span>
+        <span class="label">Estabelecimentos</span>
+      </a>
+      <a routerLink="/admin/relatorios" routerLinkActive="active">
+        <span class="icon">📈</span>
+        <span class="label">Relatórios</span>
+      </a>
+      <a routerLink="/admin/configuracoes" routerLinkActive="active">
+        <span class="icon">⚙️</span>
+        <span class="label">Configurações</span>
+      </a>
+      <a routerLink="/admin/logs" routerLinkActive="active">
+        <span class="icon">📋</span>
+        <span class="label">Logs do Sistema</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout" (click)="logout()">
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="top-header">
+      <div class="header-left">
+        <button *ngIf="isCollapsed" class="open-sidebar-btn" (click)="toggle()">☰</button>
+      </div>
+      <div class="user-info">
+        <div class="avatar admin-avatar">
+          <span class="admin-icon" *ngIf="showCrownIcon; else showInitials">👑</span>
+          <ng-template #showInitials>{{ getUserInitials() }}</ng-template>
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ usuario.nome }}</span>
+          <span class="user-type">{{ usuario.tipo }}</span>
+        </div>
+      </div>
+    </header>
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
