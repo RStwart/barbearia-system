@@ -71,7 +71,16 @@ export class MainLayoutComponent implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('token');
-    this.router.navigate(['/login']);
+    // Usar o método do AuthService para logout completo
+    this.authService.logout();
+    
+    // Limpar dados do usuário no componente
+    this.usuario = { nome: 'Usuário', tipo: 'CLIENTE' };
+    
+    // Redirecionar para a tela inicial (escolha cliente/estabelecimento)
+    this.router.navigate(['/']).then(() => {
+      // Força o reload da página para garantir que todos os dados sejam limpos
+      window.location.reload();
+    });
   }
 }

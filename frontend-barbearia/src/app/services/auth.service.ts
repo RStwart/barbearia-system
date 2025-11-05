@@ -46,4 +46,18 @@ export class AuthService {
       return null;
     }
   }
+
+  logout(): void {
+    // Limpar todos os dados de autenticação
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userType');
+    
+    // Limpar outros dados que possam ter sido salvos
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('auth_') || key.startsWith('user_')) {
+        localStorage.removeItem(key);
+      }
+    });
+  }
 }

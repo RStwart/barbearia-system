@@ -19,13 +19,32 @@ export class AdminLoginComponent {
 
   constructor(private auth: AuthService, private router: Router) {}
 
+  ngOnInit() {
+    // Verificar se já existe token válido e redirecionar
+    if (this.auth.isAuthenticated()) {
+      this.router.navigate(['/app']);
+      return;
+    }
+    
+    // Limpar estado anterior
+    this.email = '';
+    this.senha = '';
+    this.erro = '';
+  }
+
   login() {
     this.carregando = true;
     this.erro = '';
     this.auth.login(this.email, this.senha).subscribe({
       next: (res: any) => {
         if (res && res.user && res.user.tipo === 'ADM') {
+          // Salvar token e dados do usuário
           localStorage.setItem('token', res.token);
+          if (res.user) {
+            localStorage.setItem('user', JSON.stringify(res.user));
+          }
+          
+          console.log('✅ Login admin realizado com sucesso:', res.user);
           this.router.navigate(['/app']);
         } else {
           this.erro = 'Acesso negado: usuário não é administrador.';
@@ -33,6 +52,7 @@ export class AdminLoginComponent {
         this.carregando = false;
       },
       error: err => {
+        console.error('❌ Erro no login admin:', err);
         this.erro = err.error?.error || err.error?.message || 'Erro ao fazer login';
         this.carregando = false;
       }

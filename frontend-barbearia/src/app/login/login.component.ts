@@ -27,6 +27,19 @@ export class LoginComponent {
 
   ngOnInit() {
     console.log('🌐 API em uso:', environment.apiUrl);
+    
+    // Verificar se já existe token válido e redirecionar
+    if (this.auth.isAuthenticated()) {
+      this.router.navigate(['/app']);
+      return;
+    }
+    
+    // Limpar qualquer estado anterior que possa ter ficado
+    this.etapa = 'bemvindo';
+    this.tipoUsuario = null;
+    this.email = '';
+    this.senha = '';
+    this.erro = '';
   }
 
   selecionarTipo(tipo: 'CLIENTE' | 'FUNCIONARIO') {
@@ -45,12 +58,18 @@ export class LoginComponent {
     this.erro = '';
     this.auth.login(this.email, this.senha).subscribe({
       next: (res: any) => {
+        // Salvar token e dados do usuário
         localStorage.setItem('token', res.token);
-        alert(`Login bem-sucedido como ${res.tipo_usuario}`);
+        if (res.user) {
+          localStorage.setItem('user', JSON.stringify(res.user));
+        }
+        
+        console.log('✅ Login realizado com sucesso:', res.user);
         this.router.navigate(['/app']);
       },
       error: err => {
-        this.erro = err.error?.message || 'Erro ao fazer login';
+        console.error('❌ Erro no login:', err);
+        this.erro = err.error?.error || err.error?.message || 'Erro ao fazer login';
         this.carregando = false;
       }
     });
