@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -9,13 +10,47 @@ import { RouterModule } from '@angular/router';
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.css']
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements OnInit {
   // controla estado do menu (colapsado ou não)
   isCollapsed = false;
   isMobile = false;
+  usuario: any = { nome: 'Usuário', tipo: 'CLIENTE' }; // Dados temporários, depois virá do token
+
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.checkWindow();
+    this.loadUserData();
+  }
+
+  private loadUserData() {
+    if (this.authService.isAuthenticated()) {
+      this.authService.getProfile().subscribe({
+        next: (response) => {
+          this.usuario = response.user;
+        },
+        error: (error) => {
+          console.error('Erro ao carregar dados do usuário:', error);
+          // Fallback para dados do token se a API falhar
+          const tokenData = this.authService.getUserFromToken();
+          if (tokenData) {
+            this.usuario = {
+              nome: 'Usuário',
+              tipo: tokenData.tipo
+            };
+          }
+        }
+      });
+    }
+  }
+
+  getUserInitials(): string {
+    if (!this.usuario?.nome) return 'U';
+    return this.usuario.nome.split(' ')
+      .map((name: string) => name.charAt(0))
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
   }
 
   @HostListener('window:resize')
@@ -33,5 +68,10 @@ export class MainLayoutComponent {
 
   toggle() {
     this.isCollapsed = !this.isCollapsed;
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
   }
 }

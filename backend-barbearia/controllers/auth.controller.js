@@ -2,6 +2,45 @@ const db = require("../config/db.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// Middleware para verificar token JWT
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Token não fornecido' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+};
+
+// Obter perfil do usuário
+exports.getProfile = (req, res) => {
+  const userId = req.user.id;
+
+  const sql = `SELECT id, nome, email, telefone, tipo FROM usuarios WHERE id = ? AND ativo = TRUE`;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar perfil:", err);
+      return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+
+    res.json({ user: results[0] });
+  });
+};
+
+exports.verifyToken = verifyToken;
+
 // Registro de usuário
 exports.register = (req, res) => {
   const { nome, email, senha, telefone, tipo } = req.body;

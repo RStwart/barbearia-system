@@ -25,12 +25,27 @@
     </nav>
 
     <div class="sidebar-footer">
-      <button class="logout">Sair</button>
+      <button class="logout" (click)="logout()">Sair</button>
     </div>
   </aside>
 
   <main class="content">
-    <button *ngIf="isCollapsed" class="open-sidebar-btn" (click)="toggle()">☰</button>
-    <router-outlet></router-outlet>
+    <header class="top-header">
+      <div class="header-left">
+        <button *ngIf="isCollapsed" class="open-sidebar-btn" (click)="toggle()">☰</button>
+      </div>
+      <div class="user-info">
+        <div class="avatar">
+          {{ getUserInitials() }}
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ usuario.nome }}</span>
+          <span class="user-type">{{ usuario.tipo }}</span>
+        </div>
+      </div>
+    </header>
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>
