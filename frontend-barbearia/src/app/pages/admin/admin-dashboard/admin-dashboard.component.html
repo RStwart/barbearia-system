@@ -195,34 +195,37 @@
     
     <form class="modal-form" (ngSubmit)="salvarUsuario()">
       <div class="form-row">
-        <div class="form-group">
-          <label>Nome *</label>
+        <div class="form-group required">
+          <label>Nome</label>
           <input 
             type="text" 
             [(ngModel)]="usuarioForm.nome" 
             name="nome"
             required
+            placeholder="Digite o nome completo"
             class="form-input">
         </div>
-        <div class="form-group">
-          <label>Email *</label>
+        <div class="form-group required">
+          <label>Email</label>
           <input 
             type="email" 
             [(ngModel)]="usuarioForm.email" 
             name="email"
             required
+            placeholder="exemplo@email.com"
             class="form-input">
         </div>
       </div>
       
       <div class="form-row">
-        <div class="form-group">
-          <label>{{ editando ? 'Nova Senha (deixe vazio para manter)' : 'Senha *' }}</label>
+        <div class="form-group" [class.required]="!editando">
+          <label>{{ editando ? 'Nova Senha (deixe vazio para manter)' : 'Senha' }}</label>
           <input 
             type="password" 
             [(ngModel)]="usuarioForm.senha" 
             name="senha"
             [required]="!editando"
+            placeholder="Digite a senha"
             class="form-input">
         </div>
         <div class="form-group">
@@ -231,18 +234,20 @@
             type="text" 
             [(ngModel)]="usuarioForm.telefone" 
             name="telefone"
+            placeholder="(11) 99999-9999"
             class="form-input">
         </div>
       </div>
       
       <div class="form-row">
-        <div class="form-group">
-          <label>Tipo *</label>
+        <div class="form-group required">
+          <label>Tipo</label>
           <select 
             [(ngModel)]="usuarioForm.tipo" 
             name="tipo"
             required
             class="form-select">
+            <option value="">Selecione um tipo</option>
             <option value="CLIENTE">Cliente</option>
             <option value="FUNCIONARIO">Funcionário</option>
             <option value="ADM">Administrador</option>
@@ -254,19 +259,20 @@
             type="number" 
             [(ngModel)]="usuarioForm.unidade_id" 
             name="unidade_id"
+            placeholder="ID da unidade"
+            min="1"
             class="form-input">
         </div>
       </div>
       
-      <div class="form-row">
+      <div class="form-row full-width">
         <div class="form-group checkbox-group">
-          <label>
-            <input 
-              type="checkbox" 
-              [(ngModel)]="usuarioForm.ativo" 
-              name="ativo">
-            Usuário Ativo
-          </label>
+          <input 
+            type="checkbox" 
+            [(ngModel)]="usuarioForm.ativo" 
+            name="ativo"
+            id="usuario-ativo">
+          <label for="usuario-ativo">Usuário Ativo</label>
         </div>
       </div>
       

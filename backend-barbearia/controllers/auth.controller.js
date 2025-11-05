@@ -20,71 +20,69 @@ const verifyToken = (req, res, next) => {
 };
 
 // Obter perfil do usuário
-exports.getProfile = (req, res) => {
-  const userId = req.user.id;
+exports.getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-  const sql = `SELECT id, nome, email, telefone, tipo FROM usuarios WHERE id = ? AND ativo = TRUE`;
+    const sql = `SELECT id, nome, email, telefone, tipo FROM usuarios WHERE id = ? AND ativo = TRUE`;
 
-  db.query(sql, [userId], (err, results) => {
-    if (err) {
-      console.error("Erro ao buscar perfil:", err);
-      return res.status(500).json({ error: "Erro interno do servidor" });
-    }
+    const [results] = await db.execute(sql, [userId]);
 
     if (results.length === 0) {
       return res.status(404).json({ error: "Usuário não encontrado" });
     }
 
     res.json({ user: results[0] });
-  });
+  } catch (error) {
+    console.error("Erro ao buscar perfil:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
 };
 
 exports.verifyToken = verifyToken;
 
 // Registro de usuário
-exports.register = (req, res) => {
-  const { nome, email, senha, telefone, tipo } = req.body;
+exports.register = async (req, res) => {
+  try {
+    const { nome, email, senha, telefone, tipo } = req.body;
 
-  if (!nome || !email || !senha) {
-    return res.status(400).json({ error: "Preencha todos os campos obrigatórios" });
-  }
-
-  const hashedPassword = bcrypt.hashSync(senha, 10);
-
-  const sql = `INSERT INTO usuarios (nome, email, senha, telefone, tipo)
-               VALUES (?, ?, ?, ?, ?)`;
-
-  db.query(sql, [nome, email, hashedPassword, telefone || null, tipo || "CLIENTE"], (err, result) => {
-    if (err) {
-      console.error("Erro ao registrar usuário:", err);
-      return res.status(500).json({ error: "Erro interno do servidor" });
+    if (!nome || !email || !senha) {
+      return res.status(400).json({ error: "Preencha todos os campos obrigatórios" });
     }
+
+    const hashedPassword = await bcrypt.hash(senha, 12);
+
+    const sql = `INSERT INTO usuarios (nome, email, senha, telefone, tipo)
+                 VALUES (?, ?, ?, ?, ?)`;
+
+    await db.execute(sql, [nome, email, hashedPassword, telefone || null, tipo || "CLIENTE"]);
+    
     res.status(201).json({ message: "Usuário registrado com sucesso!" });
-  });
+  } catch (error) {
+    console.error("Erro ao registrar usuário:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
 };
 
 // Login
-exports.login = (req, res) => {
-  const { email, senha } = req.body;
+exports.login = async (req, res) => {
+  try {
+    const { email, senha } = req.body;
 
-  if (!email || !senha) {
-    return res.status(400).json({ error: "Informe e-mail e senha" });
-  }
-
-  const sql = `SELECT * FROM usuarios WHERE email = ? AND ativo = TRUE`;
-
-  db.query(sql, [email], (err, results) => {
-    if (err) {
-      console.error("Erro ao buscar usuário:", err);
-      return res.status(500).json({ error: "Erro interno do servidor" });
+    if (!email || !senha) {
+      return res.status(400).json({ error: "Informe e-mail e senha" });
     }
+
+    const sql = `SELECT * FROM usuarios WHERE email = ? AND ativo = TRUE`;
+
+    const [results] = await db.execute(sql, [email]);
 
     if (results.length === 0) {
       return res.status(404).json({ error: "Usuário não encontrado ou inativo" });
     }
 
     const user = results[0];
-    const senhaValida = bcrypt.compareSync(senha, user.senha);
+    const senhaValida = await bcrypt.compare(senha, user.senha);
 
     if (!senhaValida) {
       return res.status(401).json({ error: "Senha incorreta" });
@@ -106,32 +104,28 @@ exports.login = (req, res) => {
         tipo: user.tipo,
       },
     });
-  });
+  } catch (error) {
+    console.error("Erro ao fazer login:", error);
+    return res.status(500).json({ error: "Erro interno do servidor" });
+  }
 };
 
 // Rota secreta para login do administrador.
-// Recebe { secret } no body. O segredo deve ser igual a process.env.ADMIN_SECRET.
-// Se existir um usuário com tipo 'ADM' e ativo, retorna o JWT para ele.
-// Se não existir, tenta criar um usuário administrador baseado em vars de ambiente
-// (ADMIN_EMAIL e ADMIN_PASS) e retorna o token.
-exports.adminSecretLogin = (req, res) => {
-  const { secret } = req.body;
+exports.adminSecretLogin = async (req, res) => {
+  try {
+    const { secret } = req.body;
 
-  if (!process.env.ADMIN_SECRET) {
-    return res.status(500).json({ error: 'Admin secret não configurado no servidor' });
-  }
-
-  if (!secret || secret !== process.env.ADMIN_SECRET) {
-    return res.status(403).json({ error: 'Segredo inválido' });
-  }
-
-  // Procura usuário admin existente
-  const sql = `SELECT * FROM usuarios WHERE tipo = 'ADM' AND ativo = TRUE LIMIT 1`;
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error('Erro ao buscar admin:', err);
-      return res.status(500).json({ error: 'Erro interno do servidor' });
+    if (!process.env.ADMIN_SECRET) {
+      return res.status(500).json({ error: 'Admin secret não configurado no servidor' });
     }
+
+    if (!secret || secret !== process.env.ADMIN_SECRET) {
+      return res.status(403).json({ error: 'Segredo inválido' });
+    }
+
+    // Procura usuário admin existente
+    const sql = `SELECT * FROM usuarios WHERE tipo = 'ADM' AND ativo = TRUE LIMIT 1`;
+    const [results] = await db.execute(sql);
 
     const proceedWithUser = (user) => {
       const token = jwt.sign(
@@ -140,7 +134,16 @@ exports.adminSecretLogin = (req, res) => {
         { expiresIn: '8h' }
       );
 
-      res.json({ message: 'Login admin realizado com sucesso', token, user: { id: user.id, nome: user.nome, email: user.email, tipo: user.tipo } });
+      res.json({ 
+        message: 'Login admin realizado com sucesso', 
+        token, 
+        user: { 
+          id: user.id, 
+          nome: user.nome, 
+          email: user.email, 
+          tipo: user.tipo 
+        } 
+      });
     };
 
     if (results && results.length > 0) {
@@ -148,7 +151,7 @@ exports.adminSecretLogin = (req, res) => {
       return proceedWithUser(results[0]);
     }
 
-  // Se não existe admin, tentar criar a partir de variáveis de ambiente
+    // Se não existe admin, tentar criar a partir de variáveis de ambiente
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPass = process.env.ADMIN_PASS;
     const adminNome = process.env.ADMIN_NAME || 'Administrador';
@@ -157,23 +160,22 @@ exports.adminSecretLogin = (req, res) => {
       return res.status(500).json({ error: 'Credenciais de admin não configuradas no servidor' });
     }
 
-    const hashed = bcrypt.hashSync(adminPass, 10);
-  const insertSql = `INSERT INTO usuarios (nome, email, senha, telefone, tipo, ativo) VALUES (?, ?, ?, ?, 'ADM', TRUE)`;
-    db.query(insertSql, [adminNome, adminEmail, hashed, null], (insertErr, insertRes) => {
-      if (insertErr) {
-        console.error('Erro ao criar admin:', insertErr);
-        return res.status(500).json({ error: 'Erro interno ao criar admin' });
-      }
+    const hashed = await bcrypt.hash(adminPass, 12);
+    const insertSql = `INSERT INTO usuarios (nome, email, senha, telefone, tipo, ativo) VALUES (?, ?, ?, ?, 'ADM', TRUE)`;
+    
+    const [insertRes] = await db.execute(insertSql, [adminNome, adminEmail, hashed, null]);
 
-      // Recupera o usuário criado
-      const getSql = `SELECT * FROM usuarios WHERE id = ?`;
-      db.query(getSql, [insertRes.insertId], (getErr, getRes) => {
-        if (getErr || !getRes || getRes.length === 0) {
-          console.error('Erro ao recuperar admin criado:', getErr);
-          return res.status(500).json({ error: 'Erro interno ao recuperar admin' });
-        }
-        return proceedWithUser(getRes[0]);
-      });
-    });
-  });
+    // Recupera o usuário criado
+    const getSql = `SELECT * FROM usuarios WHERE id = ?`;
+    const [getRes] = await db.execute(getSql, [insertRes.insertId]);
+    
+    if (!getRes || getRes.length === 0) {
+      throw new Error('Erro ao recuperar admin criado');
+    }
+    
+    return proceedWithUser(getRes[0]);
+  } catch (error) {
+    console.error('Erro no login admin:', error);
+    return res.status(500).json({ error: 'Erro interno do servidor' });
+  }
 };

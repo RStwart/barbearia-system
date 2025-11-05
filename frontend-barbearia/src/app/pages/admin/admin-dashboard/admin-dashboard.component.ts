@@ -105,12 +105,27 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   carregarEstatisticas() {
-    // Simulação das estatísticas por enquanto
-    this.stats = {
-      totalUsuarios: this.usuarios.length,
-      usuariosAtivos: this.usuarios.filter(u => u.ativo).length,
-      estabelecimentos: this.usuarios.filter(u => u.tipo === 'FUNCIONARIO').length
-    };
+    this.http.get<any>(`${environment.apiUrl}/admin/estatisticas`, { headers: this.getHeaders() })
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.estatisticas) {
+            this.stats = {
+              totalUsuarios: response.estatisticas.totalUsuarios,
+              usuariosAtivos: response.estatisticas.usuariosAtivos,
+              estabelecimentos: response.estatisticas.estabelecimentos
+            };
+          }
+        },
+        error: (error) => {
+          console.error('Erro ao carregar estatísticas:', error);
+          // Manter valores padrão em caso de erro
+          this.stats = {
+            totalUsuarios: this.usuarios.length,
+            usuariosAtivos: this.usuarios.filter(u => u.ativo).length,
+            estabelecimentos: this.usuarios.filter(u => u.tipo === 'FUNCIONARIO').length
+          };
+        }
+      });
   }
 
   aplicarFiltros() {

@@ -8,4 +8,5 @@ const db = mysql.createConnection({
   database: process.env.DB_DATABASE,
 });
 
-module.exports = db;
+// Usar versão promise para async/await
+module.exports = db.promise();
