@@ -1,6 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
 /* === RESET GLOBAL === */
-html, body {
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -8,6 +17,7 @@ html, body {
   background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
   font-family: "Poppins", sans-serif;
   overflow-x: hidden;
+  position: relative;
 }
 
 /* Garante que o container da app ocupe tudo */
@@ -15,4 +25,133 @@ app-root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* === SCROLLBAR CUSTOMIZADA === */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Scrollbar horizontal mais visível */
+::-webkit-scrollbar:horizontal {
+  height: 12px;
+}
+
+/* === RESPONSIVE IMAGES === */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* === TOUCH FRIENDLY === */
+@media (hover: none) and (pointer: coarse) {
+  /* Aumenta área de toque em dispositivos móveis */
+  button,
+  a,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+  }
+  
+  /* Previne zoom em inputs no iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* === RESPONSIVE UTILITIES === */
+.hide-mobile {
+  display: initial;
+}
+
+.show-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  .show-mobile {
+    display: initial !important;
+  }
+}
+
+/* === TEXT TRUNCATE UTILITIES === */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-break {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* === RESPONSIVE CONTAINERS === */
+.container-fluid {
+  width: 100%;
+  max-width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 576px) {
+  .container-fluid {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container-fluid {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container-fluid {
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+}
+
+/* === GARANTIR SCROLL HORIZONTAL === */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* === PREVENT HORIZONTAL OVERFLOW === */
+.overflow-hidden-x {
+  overflow-x: hidden !important;
+}
+
+.overflow-auto-x {
+  overflow-x: auto !important;
 }

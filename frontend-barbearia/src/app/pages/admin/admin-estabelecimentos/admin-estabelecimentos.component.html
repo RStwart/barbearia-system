@@ -76,6 +76,9 @@
     </div>
 
     <!-- Tabela de Unidades -->
+    <div class="scroll-hint" *ngIf="!carregando && unidadesPaginadas.length > 0">
+      👉 Deslize horizontalmente para ver mais colunas
+    </div>
     <div class="table-container">
       <table class="unidades-table" *ngIf="!carregando && unidadesPaginadas.length > 0">
         <thead>

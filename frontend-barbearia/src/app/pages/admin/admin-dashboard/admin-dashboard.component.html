@@ -71,6 +71,9 @@
     </div>
 
     <!-- Tabela de Usuários -->
+    <div class="scroll-hint" *ngIf="!carregando && usuariosPaginados.length > 0">
+      👉 Deslize horizontalmente para ver mais colunas
+    </div>
     <div class="table-container">
       <div class="table-loading" *ngIf="carregando">
         <div class="loading-spinner"></div>
