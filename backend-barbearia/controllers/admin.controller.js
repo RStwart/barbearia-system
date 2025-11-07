@@ -327,8 +327,8 @@ const obterEstatisticas = async (req, res) => {
     const [ativosResult] = await db.execute("SELECT COUNT(*) as ativos FROM usuarios WHERE ativo = 1");
     const usuariosAtivos = ativosResult[0].ativos;
     
-    // Estabelecimentos (usuários funcionários)
-    const [estabelecimentosResult] = await db.execute("SELECT COUNT(*) as estabelecimentos FROM usuarios WHERE tipo = 'FUNCIONARIO'");
+    // Estabelecimentos (unidades ativas da tabela unidades)
+    const [estabelecimentosResult] = await db.execute("SELECT COUNT(*) as estabelecimentos FROM unidades WHERE ativo = 1");
     const estabelecimentos = estabelecimentosResult[0].estabelecimentos;
     
     // Novos cadastros (últimos 30 dias)

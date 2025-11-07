@@ -122,7 +122,7 @@ export class AdminDashboardComponent implements OnInit {
           this.stats = {
             totalUsuarios: this.usuarios.length,
             usuariosAtivos: this.usuarios.filter(u => u.ativo).length,
-            estabelecimentos: this.usuarios.filter(u => u.tipo === 'FUNCIONARIO').length
+            estabelecimentos: 0 // Será carregado da API de unidades
           };
         }
       });

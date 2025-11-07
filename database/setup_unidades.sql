@@ -97,7 +97,7 @@ INSERT IGNORE INTO unidades (
   '18:00:00',
   -23.5935400,
   -46.6581050,
-  1,
+  0,
   'atrasado',
   'aguardando'
 ),
@@ -119,7 +119,7 @@ INSERT IGNORE INTO unidades (
   '19:00:00',
   -23.6548290,
   -46.5342760,
-  1,
+  0,
   'pago',
   'aprovado'
 ),
@@ -141,7 +141,7 @@ INSERT IGNORE INTO unidades (
   '20:00:00',
   -23.5582640,
   -46.6344960,
-  1,
+  0,
   'atrasado',
   'aguardando'
 ),
@@ -185,7 +185,7 @@ INSERT IGNORE INTO unidades (
   '22:00:00',
   -23.5633570,
   -46.6971440,
-  1,
+  0,
   'pago',
   'aprovado'
 );
