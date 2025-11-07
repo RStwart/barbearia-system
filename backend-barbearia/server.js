@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const db = require("./config/db.js");
 const authRoutes = require("./routes/auth.routes.js");
 const adminRoutes = require("./routes/admin.routes.js");
+const cadastroRoutes = require("./routes/cadastro.routes.js");
 
 dotenv.config();
 const app = express();
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 //Rotas principais
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/cadastro", cadastroRoutes);
 
 //Inicia o servidor
 app.listen(PORT, () => {

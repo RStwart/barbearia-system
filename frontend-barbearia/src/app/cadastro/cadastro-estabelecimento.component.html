@@ -1,32 +1,310 @@
 <div class="cadastro-container">
-  <h2>Cadastro de Estabelecimento</h2>
+  <div class="header-cadastro">
+    <h2>📋 Cadastro de Estabelecimento</h2>
+    <p class="subtitle">Preencha os dados abaixo para solicitar o cadastro no nosso sistema</p>
+  </div>
+
   <form #cadForm="ngForm" (ngSubmit)="cadastrar(cadForm)">
-    <div>
-  <input [(ngModel)]="nome" name="nome" placeholder="Nome do Estabelecimento" required #nomeRef="ngModel" />
-  <div class="field-error" *ngIf="(nomeRef.invalid && nomeRef.touched) || (submitted && nomeRef.invalid)">Nome é obrigatório.</div>
+    
+    <!-- ===== SEÇÃO: DADOS BÁSICOS ===== -->
+    <div class="form-section">
+      <h3 class="section-title">🏪 Dados Básicos</h3>
+      
+      <div class="form-group">
+        <label for="nome">Nome do Estabelecimento <span class="required">*</span></label>
+        <input 
+          id="nome"
+          [(ngModel)]="nome" 
+          name="nome" 
+          placeholder="Ex: Barbearia Central"
+          required 
+          #nomeRef="ngModel"
+          class="form-input" />
+        <div class="field-error" *ngIf="(nomeRef.invalid && nomeRef.touched) || (submitted && nomeRef.invalid)">
+          Nome do estabelecimento é obrigatório
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="responsavel">Nome do Responsável</label>
+        <input 
+          id="responsavel"
+          [(ngModel)]="responsavel" 
+          name="responsavel" 
+          placeholder="Nome completo do proprietário"
+          #responsavelRef="ngModel"
+          class="form-input" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cnpj">CNPJ</label>
+          <input 
+            id="cnpj"
+            [(ngModel)]="cnpj" 
+            name="cnpj" 
+            placeholder="00.000.000/0000-00"
+            (input)="formatarCNPJ($event)"
+            maxlength="18"
+            #cnpjRef="ngModel"
+            class="form-input" />
+          <small class="hint">Caso tenha CNPJ, informe aqui</small>
+        </div>
+
+        <div class="form-group">
+          <label for="cpf">CPF</label>
+          <input 
+            id="cpf"
+            [(ngModel)]="cpf" 
+            name="cpf" 
+            placeholder="000.000.000-00"
+            (input)="formatarCPF($event)"
+            maxlength="14"
+            #cpfRef="ngModel"
+            class="form-input" />
+          <small class="hint">Caso não tenha CNPJ</small>
+        </div>
+      </div>
     </div>
 
-    <div>
-  <input [(ngModel)]="email" name="email" placeholder="E-mail" type="email" required #emailRef="ngModel" />
-  <div class="field-error" *ngIf="(emailRef.invalid && emailRef.touched) || (submitted && emailRef.invalid)">E-mail válido é obrigatório.</div>
+    <!-- ===== SEÇÃO: CONTATO ===== -->
+    <div class="form-section">
+      <h3 class="section-title">📞 Contato</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="telefone">Telefone <span class="required">*</span></label>
+          <input 
+            id="telefone"
+            [(ngModel)]="telefone" 
+            name="telefone" 
+            placeholder="(11) 99999-9999"
+            (input)="formatarTelefone($event)"
+            maxlength="15"
+            required
+            #telefoneRef="ngModel"
+            class="form-input" />
+          <div class="field-error" *ngIf="(telefoneRef.invalid && telefoneRef.touched) || (submitted && telefoneRef.invalid)">
+            Telefone é obrigatório
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-mail <span class="required">*</span></label>
+          <input 
+            id="email"
+            [(ngModel)]="email" 
+            name="email" 
+            type="email"
+            placeholder="contato@estabelecimento.com"
+            required
+            #emailRef="ngModel"
+            class="form-input" />
+          <div class="field-error" *ngIf="(emailRef.invalid && emailRef.touched) || (submitted && emailRef.invalid)">
+            E-mail válido é obrigatório
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div>
-  <input [(ngModel)]="senha" name="senha" placeholder="Senha" type="password" required #senhaRef="ngModel" />
-  <div class="field-error" *ngIf="(senhaRef.invalid && senhaRef.touched) || (submitted && senhaRef.invalid)">Senha é obrigatória.</div>
+    <!-- ===== SEÇÃO: ENDEREÇO ===== -->
+    <div class="form-section">
+      <h3 class="section-title">📍 Endereço</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cep">CEP</label>
+          <input 
+            id="cep"
+            [(ngModel)]="cep" 
+            name="cep" 
+            placeholder="00000-000"
+            (input)="formatarCEP($event)"
+            maxlength="9"
+            #cepRef="ngModel"
+            class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="estado">Estado <span class="required">*</span></label>
+          <select 
+            id="estado"
+            [(ngModel)]="estado" 
+            name="estado"
+            required
+            #estadoRef="ngModel"
+            class="form-select">
+            <option value="">Selecione</option>
+            <option *ngFor="let uf of estados" [value]="uf.sigla">
+              {{ uf.nome }} ({{ uf.sigla }})
+            </option>
+          </select>
+          <div class="field-error" *ngIf="(estadoRef.invalid && estadoRef.touched) || (submitted && estadoRef.invalid)">
+            Estado é obrigatório
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cidade">Cidade <span class="required">*</span></label>
+        <input 
+          id="cidade"
+          [(ngModel)]="cidade" 
+          name="cidade" 
+          placeholder="Nome da cidade"
+          required
+          #cidadeRef="ngModel"
+          class="form-input" />
+        <div class="field-error" *ngIf="(cidadeRef.invalid && cidadeRef.touched) || (submitted && cidadeRef.invalid)">
+          Cidade é obrigatória
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="bairro">Bairro <span class="required">*</span></label>
+        <input 
+          id="bairro"
+          [(ngModel)]="bairro" 
+          name="bairro" 
+          placeholder="Nome do bairro"
+          required
+          #bairroRef="ngModel"
+          class="form-input" />
+        <div class="field-error" *ngIf="(bairroRef.invalid && bairroRef.touched) || (submitted && bairroRef.invalid)">
+          Bairro é obrigatório
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-2">
+          <label for="endereco">Endereço <span class="required">*</span></label>
+          <input 
+            id="endereco"
+            [(ngModel)]="endereco" 
+            name="endereco" 
+            placeholder="Rua, Avenida, etc."
+            required
+            #enderecoRef="ngModel"
+            class="form-input" />
+          <div class="field-error" *ngIf="(enderecoRef.invalid && enderecoRef.touched) || (submitted && enderecoRef.invalid)">
+            Endereço é obrigatório
+          </div>
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="numero">Número <span class="required">*</span></label>
+          <input 
+            id="numero"
+            [(ngModel)]="numero" 
+            name="numero" 
+            placeholder="123"
+            required
+            #numeroRef="ngModel"
+            class="form-input" />
+          <div class="field-error" *ngIf="(numeroRef.invalid && numeroRef.touched) || (submitted && numeroRef.invalid)">
+            Número é obrigatório
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="complemento">Complemento</label>
+        <input 
+          id="complemento"
+          [(ngModel)]="complemento" 
+          name="complemento" 
+          placeholder="Apartamento, sala, andar, etc."
+          class="form-input" />
+      </div>
     </div>
 
-    <div>
-  <input [(ngModel)]="cnpj" name="cnpj" placeholder="CNPJ" required #cnpjRef="ngModel" />
-  <div class="field-error" *ngIf="(cnpjRef.invalid && cnpjRef.touched) || (submitted && cnpjRef.invalid)">CNPJ é obrigatório.</div>
+    <!-- ===== SEÇÃO: FUNCIONAMENTO ===== -->
+    <div class="form-section">
+      <h3 class="section-title">🕐 Horário de Funcionamento</h3>
+      
+      <div class="form-group">
+        <label for="horario_funcionamento">Descrição do Funcionamento</label>
+        <input 
+          id="horario_funcionamento"
+          [(ngModel)]="horario_funcionamento" 
+          name="horario_funcionamento" 
+          placeholder="Ex: Segunda a Sexta: 8h às 18h, Sábado: 8h às 12h"
+          class="form-input" />
+        <small class="hint">Descreva os horários de funcionamento</small>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="horario_abertura">Horário de Abertura</label>
+          <input 
+            id="horario_abertura"
+            [(ngModel)]="horario_abertura" 
+            name="horario_abertura" 
+            type="time"
+            class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="horario_fechamento">Horário de Fechamento</label>
+          <input 
+            id="horario_fechamento"
+            [(ngModel)]="horario_fechamento" 
+            name="horario_fechamento" 
+            type="time"
+            class="form-input" />
+        </div>
+      </div>
     </div>
 
-    <div>
-  <input [(ngModel)]="telefone" name="telefone" placeholder="Telefone" required #telRef="ngModel" />
-  <div class="field-error" *ngIf="(telRef.invalid && telRef.touched) || (submitted && telRef.invalid)">Telefone é obrigatório.</div>
+    <!-- ===== SEÇÃO: LOCALIZAÇÃO (OPCIONAL) ===== -->
+    <div class="form-section optional-section">
+      <h3 class="section-title">🗺️ Localização GPS (Opcional)</h3>
+      <p class="section-description">Adicione as coordenadas para facilitar a localização no mapa</p>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="latitude">Latitude</label>
+          <input 
+            id="latitude"
+            [(ngModel)]="latitude" 
+            name="latitude" 
+            type="number"
+            step="0.00000001"
+            placeholder="-23.5505199"
+            class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="longitude">Longitude</label>
+          <input 
+            id="longitude"
+            [(ngModel)]="longitude" 
+            name="longitude" 
+            type="number"
+            step="0.00000001"
+            placeholder="-46.6333094"
+            class="form-input" />
+        </div>
+      </div>
     </div>
 
-  <button type="submit">Cadastrar</button>
-    <button type="button" class="voltar-btn" (click)="voltar()">← Voltar</button>
+    <!-- ===== AVISO ===== -->
+    <div class="info-box">
+      <div class="info-icon">ℹ️</div>
+      <div class="info-content">
+        <strong>Importante:</strong> Seu cadastro será analisado por nossa equipe. Após a aprovação, entraremos em contato através dos dados informados para finalizar o processo.
+      </div>
+    </div>
+
+    <!-- ===== BOTÕES ===== -->
+    <div class="form-actions">
+      <button type="submit" class="btn-cadastrar" [disabled]="carregando">
+        <span *ngIf="!carregando">✅ Enviar Cadastro</span>
+        <span *ngIf="carregando">⏳ Cadastrando...</span>
+      </button>
+      <button type="button" class="btn-voltar" (click)="voltar()" [disabled]="carregando">
+        ← Voltar
+      </button>
+    </div>
   </form>
 </div>
