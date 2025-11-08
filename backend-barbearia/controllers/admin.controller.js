@@ -14,7 +14,8 @@ const listarUsuarios = async (req, res) => {
         tipo, 
         unidade_id, 
         ativo, 
-        criado_em 
+        criado_em,
+        primeiro_acesso
       FROM usuarios 
       ORDER BY criado_em DESC
     `;
@@ -82,7 +83,7 @@ const buscarUsuarioPorId = async (req, res) => {
 // ================ CRIAR USUÁRIO ================
 const criarUsuario = async (req, res) => {
   try {
-    const { nome, email, senha, telefone, tipo, unidade_id, ativo = true } = req.body;
+    const { nome, email, senha, telefone, foto_perfil, tipo, unidade_id, ativo = true, primeiro_acesso = true } = req.body;
     
     // Validações
     if (!nome || !email || !senha || !tipo) {
@@ -109,18 +110,20 @@ const criarUsuario = async (req, res) => {
     const senhaHash = await bcrypt.hash(senha, 12);
     
     const query = `
-      INSERT INTO usuarios (nome, email, senha, telefone, tipo, unidade_id, ativo) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO usuarios (nome, email, senha, telefone, foto_perfil, tipo, unidade_id, ativo, primeiro_acesso) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const [result] = await db.execute(query, [
       nome, 
       email, 
       senhaHash, 
-      telefone || null, 
+      telefone || null,
+      foto_perfil || null,
       tipo, 
       unidade_id || null, 
-      ativo
+      ativo,
+      primeiro_acesso
     ]);
     
     res.status(201).json({
@@ -131,9 +134,11 @@ const criarUsuario = async (req, res) => {
         nome,
         email,
         telefone,
+        foto_perfil,
         tipo,
         unidade_id,
-        ativo
+        ativo,
+        primeiro_acesso
       }
     });
   } catch (error) {
@@ -150,7 +155,7 @@ const criarUsuario = async (req, res) => {
 const atualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, email, senha, telefone, tipo, unidade_id, ativo } = req.body;
+    const { nome, email, senha, telefone, foto_perfil, tipo, unidade_id, ativo, primeiro_acesso } = req.body;
     
     // Verificar se usuário existe
     const [usuarioExiste] = await db.execute(
@@ -204,6 +209,11 @@ const atualizarUsuario = async (req, res) => {
       campos.push("telefone = ?");
       valores.push(telefone || null);
     }
+
+    if (foto_perfil !== undefined) {
+      campos.push("foto_perfil = ?");
+      valores.push(foto_perfil || null);
+    }
     
     if (tipo) {
       campos.push("tipo = ?");
@@ -218,6 +228,11 @@ const atualizarUsuario = async (req, res) => {
     if (ativo !== undefined) {
       campos.push("ativo = ?");
       valores.push(ativo);
+    }
+
+    if (primeiro_acesso !== undefined) {
+      campos.push("primeiro_acesso = ?");
+      valores.push(primeiro_acesso);
     }
     
     if (campos.length === 0) {

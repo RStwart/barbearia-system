@@ -90,6 +90,7 @@
             <th>Tipo</th>
             <th>Unidade ID</th>
             <th>Status</th>
+            <th>1º Acesso</th>
             <th>Criado em</th>
             <th>Ações</th>
           </tr>
@@ -121,6 +122,11 @@
                 (click)="alternarStatus(usuario)">
                 {{ usuario.ativo ? 'Ativo' : 'Inativo' }}
               </button>
+            </td>
+            <td>
+              <span class="badge" [class.badge-sim]="usuario.primeiro_acesso" [class.badge-nao]="!usuario.primeiro_acesso">
+                {{ usuario.primeiro_acesso ? 'Sim' : 'Não' }}
+              </span>
             </td>
             <td>{{ usuario.criado_em | date:'dd/MM/yyyy HH:mm' }}</td>
             <td>
@@ -253,6 +259,7 @@
             <option value="">Selecione um tipo</option>
             <option value="CLIENTE">Cliente</option>
             <option value="FUNCIONARIO">Funcionário</option>
+            <option value="GERENTE">Gerente</option>
             <option value="ADM">Administrador</option>
           </select>
         </div>
@@ -267,8 +274,20 @@
             class="form-input">
         </div>
       </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Foto de Perfil (URL)</label>
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioForm.foto_perfil" 
+            name="foto_perfil"
+            placeholder="https://exemplo.com/foto.jpg"
+            class="form-input">
+        </div>
+      </div>
       
-      <div class="form-row full-width">
+      <div class="form-row checkboxes-row">
         <div class="form-group checkbox-group">
           <input 
             type="checkbox" 
@@ -277,6 +296,18 @@
             id="usuario-ativo">
           <label for="usuario-ativo">Usuário Ativo</label>
         </div>
+        <div class="form-group checkbox-group">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="usuarioForm.primeiro_acesso" 
+            name="primeiro_acesso"
+            id="primeiro-acesso">
+          <label for="primeiro-acesso">Primeiro Acesso</label>
+        </div>
+      </div>
+
+      <div class="info-note">
+        <strong>ℹ️ Primeiro Acesso:</strong> Quando marcado, o usuário será obrigado a trocar a senha no primeiro login.
       </div>
       
       <div class="modal-actions">

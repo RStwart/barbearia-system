@@ -10,10 +10,11 @@ interface Usuario {
   email: string;
   telefone?: string;
   foto_perfil?: string;
-  tipo: 'CLIENTE' | 'FUNCIONARIO' | 'ADM';
+  tipo: 'CLIENTE' | 'FUNCIONARIO' | 'GERENTE' | 'ADM';
   unidade_id?: number;
   ativo: boolean;
   criado_em: string;
+  primeiro_acesso: boolean;
 }
 
 interface UsuarioForm {
@@ -22,9 +23,11 @@ interface UsuarioForm {
   email: string;
   senha?: string;
   telefone?: string;
-  tipo: 'CLIENTE' | 'FUNCIONARIO' | 'ADM';
+  foto_perfil?: string;
+  tipo: 'CLIENTE' | 'FUNCIONARIO' | 'GERENTE' | 'ADM';
   unidade_id?: number;
   ativo: boolean;
+  primeiro_acesso: boolean;
 }
 
 @Component({
@@ -68,9 +71,11 @@ export class AdminDashboardComponent implements OnInit {
     email: '',
     senha: '',
     telefone: '',
+    foto_perfil: '',
     tipo: 'CLIENTE',
     unidade_id: undefined,
-    ativo: true
+    ativo: true,
+    primeiro_acesso: true
   };
 
   constructor(private http: HttpClient) {}
@@ -175,9 +180,11 @@ export class AdminDashboardComponent implements OnInit {
       email: '',
       senha: '',
       telefone: '',
+      foto_perfil: '',
       tipo: 'CLIENTE',
       unidade_id: undefined,
-      ativo: true
+      ativo: true,
+      primeiro_acesso: true
     };
     this.mostrarModal = true;
   }
@@ -189,9 +196,11 @@ export class AdminDashboardComponent implements OnInit {
       nome: usuario.nome,
       email: usuario.email,
       telefone: usuario.telefone,
+      foto_perfil: usuario.foto_perfil,
       tipo: usuario.tipo,
       unidade_id: usuario.unidade_id,
-      ativo: usuario.ativo
+      ativo: usuario.ativo,
+      primeiro_acesso: usuario.primeiro_acesso
     };
     this.mostrarModal = true;
   }
@@ -265,15 +274,18 @@ export class AdminDashboardComponent implements OnInit {
       email: '',
       senha: '',
       telefone: '',
+      foto_perfil: '',
       tipo: 'CLIENTE',
       unidade_id: undefined,
-      ativo: true
+      ativo: true,
+      primeiro_acesso: true
     };
   }
 
   getTipoBadgeClass(tipo: string): string {
     switch(tipo) {
       case 'ADM': return 'badge-admin';
+      case 'GERENTE': return 'badge-gerente';
       case 'FUNCIONARIO': return 'badge-funcionario';
       case 'CLIENTE': return 'badge-cliente';
       default: return 'badge-default';

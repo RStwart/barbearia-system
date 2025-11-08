@@ -280,6 +280,11 @@
   color: white;
 }
 
+.badge-gerente {
+  background: #9b59b6;
+  color: white;
+}
+
 .badge-funcionario {
   background: #3498db;
   color: white;
@@ -291,6 +296,16 @@
 }
 
 .badge-default {
+  background: #95a5a6;
+  color: white;
+}
+
+.badge-sim {
+  background: #f39c12;
+  color: white;
+}
+
+.badge-nao {
   background: #95a5a6;
   color: white;
 }
@@ -620,6 +635,31 @@
   margin-bottom: 0;
   cursor: pointer;
   font-weight: 400;
+}
+
+.checkboxes-row {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 24px;
+  align-items: center;
+  justify-content: start;
+}
+
+.info-note {
+  background: #e8f4f8;
+  border-left: 4px solid #3498db;
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+.info-note strong {
+  color: #3498db;
+  display: inline-block;
+  margin-right: 4px;
 }
 
 .modal-actions {
