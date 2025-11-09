@@ -1,36 +1,278 @@
 <div class="agendamentos-container">
-  <div class="header">
-    <h1>Agendamentos</h1>
-    <button class="btn-primary" (click)="novoAgendamento()">+ Novo Agendamento</button>
+  <div class="header-agendamentos">
+    <h1>📅 Agenda de Atendimentos</h1>
+    <button class="btn-novo" (click)="abrirModalNovo()">
+      <span class="icon">➕</span>
+      Novo Agendamento
+    </button>
   </div>
 
-  <div class="agendamentos-table">
-    <div class="table-header">
-      <div>Cliente</div>
-      <div>Serviço</div>
-      <div>Data</div>
-      <div>Hora</div>
-      <div>Status</div>
-      <div>Ações</div>
+  <div class="calendario-wrapper">
+    <!-- Controles do Calendário -->
+    <div class="calendario-header">
+      <button class="btn-nav" (click)="mesAnterior()">‹</button>
+      <h2>{{ meses[mesAtual.getMonth()] }} {{ mesAtual.getFullYear() }}</h2>
+      <button class="btn-nav" (click)="proximoMes()">›</button>
     </div>
-    
-    <div class="table-row" *ngFor="let agendamento of agendamentos">
-      <div class="cliente">{{ agendamento.cliente }}</div>
-      <div class="servico">{{ agendamento.servico }}</div>
-      <div class="data">{{ agendamento.data }}</div>
-      <div class="hora">{{ agendamento.hora }}</div>
-      <div class="status">
-        <span [class]="getStatusClass(agendamento.status)">{{ agendamento.status | titlecase }}</span>
-      </div>
-      <div class="actions">
-        <button class="btn-edit" (click)="editarAgendamento(agendamento.id)">Editar</button>
-        <button class="btn-cancel" (click)="cancelarAgendamento(agendamento.id)">Cancelar</button>
+
+    <!-- Grid do Calendário -->
+    <div class="calendario-grid">
+      <!-- Dias da Semana -->
+      <div class="dia-semana" *ngFor="let dia of diasSemana">{{ dia }}</div>
+      
+      <!-- Dias do Mês -->
+      <div 
+        *ngFor="let diaObj of diasCalendario"
+        class="dia-celula"
+        [class.vazio]="diaObj.vazio"
+        [class.hoje]="diaObj.hoje"
+        [class.selecionado]="diaObj.selecionado"
+        [class.com-agendamentos]="diaObj.agendamentos > 0"
+        (click)="!diaObj.vazio && selecionarDia(diaObj.data)"
+      >
+        <span class="dia-numero" *ngIf="!diaObj.vazio">{{ diaObj.dia }}</span>
+        <span class="badge-agendamentos" *ngIf="diaObj.agendamentos > 0">
+          {{ diaObj.agendamentos }}
+        </span>
       </div>
     </div>
   </div>
 
-  <div class="empty-state" *ngIf="agendamentos.length === 0">
-    <p>Nenhum agendamento encontrado.</p>
-    <button class="btn-primary" (click)="novoAgendamento()">Criar Primeiro Agendamento</button>
+  <!-- Lista de Agendamentos do Dia Selecionado -->
+  <div class="agendamentos-dia" *ngIf="diaSelecionado">
+    <h3>
+      Agendamentos - {{ formatarDataExibicao(formatarData(diaSelecionado)) }}
+      <span class="total-dia">({{ agendamentosDia.length }})</span>
+    </h3>
+
+    <div class="lista-agendamentos">
+      <div 
+        *ngFor="let agendamento of agendamentosDia"
+        class="agendamento-card"
+        (click)="abrirModalDetalhes(agendamento)"
+      >
+        <div class="agendamento-hora">
+          <span class="hora-inicio">{{ agendamento.hora_inicio }}</span>
+          <span class="divisor">-</span>
+          <span class="hora-fim">{{ agendamento.hora_fim }}</span>
+        </div>
+        
+        <div class="agendamento-info">
+          <div class="info-principal">
+            <span class="cliente-nome">👤 {{ agendamento.cliente_nome }}</span>
+            <span class="servico-nome">✂️ {{ agendamento.servico_nome }}</span>
+          </div>
+          <div class="info-secundaria">
+            <span class="funcionario-nome">👨‍💼 {{ agendamento.funcionario_nome }}</span>
+            <span class="valor">💰 R$ {{ agendamento.valor_total?.toFixed(2) }}</span>
+          </div>
+        </div>
+        
+        <div class="agendamento-status">
+          <span [class]="'badge ' + getStatusClass(agendamento.status)">
+            {{ getStatusLabel(agendamento.status) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="sem-agendamentos" *ngIf="agendamentosDia.length === 0">
+        <span class="icone">📭</span>
+        <p>Nenhum agendamento para este dia</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhes -->
+<div class="modal-overlay" *ngIf="mostrarModalDetalhes" (click)="fecharModais()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()" *ngIf="agendamentoSelecionado">
+    <div class="modal-header">
+      <h2>📋 Detalhes do Agendamento</h2>
+      <button class="btn-fechar" (click)="fecharModais()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detalhe-grupo">
+        <label>Cliente</label>
+        <p>{{ agendamentoSelecionado.cliente_nome }}</p>
+        <small>{{ agendamentoSelecionado.cliente_telefone }} | {{ agendamentoSelecionado.cliente_email }}</small>
+      </div>
+
+      <div class="detalhe-grupo">
+        <label>Serviço</label>
+        <p>{{ agendamentoSelecionado.servico_nome }}</p>
+        <small>Duração: {{ agendamentoSelecionado.servico_duracao }} minutos</small>
+      </div>
+
+      <div class="detalhe-grupo">
+        <label>Funcionário</label>
+        <p>{{ agendamentoSelecionado.funcionario_nome }}</p>
+      </div>
+
+      <div class="detalhe-linha">
+        <div class="detalhe-grupo">
+          <label>Data</label>
+          <p>{{ formatarDataExibicao(agendamentoSelecionado.data_agendamento) }}</p>
+        </div>
+
+        <div class="detalhe-grupo">
+          <label>Horário</label>
+          <p>{{ agendamentoSelecionado.hora_inicio }} - {{ agendamentoSelecionado.hora_fim }}</p>
+        </div>
+      </div>
+
+      <div class="detalhe-linha">
+        <div class="detalhe-grupo">
+          <label>Valor</label>
+          <p class="valor-destaque">R$ {{ agendamentoSelecionado.valor_total?.toFixed(2) }}</p>
+        </div>
+
+        <div class="detalhe-grupo">
+          <label>Status</label>
+          <span [class]="'badge ' + getStatusClass(agendamentoSelecionado.status)">
+            {{ getStatusLabel(agendamentoSelecionado.status) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="detalhe-grupo" *ngIf="agendamentoSelecionado.observacoes">
+        <label>Observações</label>
+        <p>{{ agendamentoSelecionado.observacoes }}</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button 
+        class="btn btn-editar" 
+        (click)="abrirModalEditar(agendamentoSelecionado)"
+        *ngIf="agendamentoSelecionado.status !== 'cancelado' && agendamentoSelecionado.status !== 'concluido'"
+      >
+        ✏️ Editar
+      </button>
+      <button 
+        class="btn btn-cancelar" 
+        (click)="cancelarAgendamento(agendamentoSelecionado.id!)"
+        *ngIf="agendamentoSelecionado.status !== 'cancelado' && agendamentoSelecionado.status !== 'concluido'"
+      >
+        ❌ Cancelar
+      </button>
+      <button class="btn btn-fechar-modal" (click)="fecharModais()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Novo/Editar Agendamento -->
+<div class="modal-overlay" *ngIf="mostrarModalNovo || mostrarModalEditar" (click)="fecharModais()">
+  <div class="modal-conteudo modal-form" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ mostrarModalEditar ? '✏️ Editar Agendamento' : '➕ Novo Agendamento' }}</h2>
+      <button class="btn-fechar" (click)="fecharModais()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="erro-mensagem" *ngIf="erro">{{ erro }}</div>
+
+      <div class="form-grupo">
+        <label>Cliente *</label>
+        <input 
+          type="number" 
+          [(ngModel)]="formulario.cliente_id" 
+          placeholder="ID do Cliente"
+          required
+        />
+        <small>Digite o ID do cliente ou implemente busca</small>
+      </div>
+
+      <div class="form-grupo">
+        <label>Serviço *</label>
+        <select [(ngModel)]="formulario.servico_id" (change)="calcularHoraFim()" required>
+          <option value="">Selecione um serviço</option>
+          <option *ngFor="let servico of servicos" [value]="servico.id">
+            {{ servico.nome }} - R$ {{ servico.preco.toFixed(2) }} ({{ servico.duracao }}min)
+          </option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <label>Funcionário *</label>
+        <select [(ngModel)]="formulario.funcionario_id" required>
+          <option value="">Selecione um funcionário</option>
+          <option *ngFor="let funcionario of funcionarios" [value]="funcionario.id">
+            {{ funcionario.nome }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-linha">
+        <div class="form-grupo">
+          <label>Data *</label>
+          <input 
+            type="date" 
+            [(ngModel)]="formulario.data_agendamento" 
+            required
+          />
+        </div>
+
+        <div class="form-grupo">
+          <label>Hora Início *</label>
+          <input 
+            type="time" 
+            [(ngModel)]="formulario.hora_inicio" 
+            (change)="calcularHoraFim()"
+            required
+          />
+        </div>
+
+        <div class="form-grupo">
+          <label>Hora Fim *</label>
+          <input 
+            type="time" 
+            [(ngModel)]="formulario.hora_fim" 
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-linha">
+        <div class="form-grupo">
+          <label>Valor *</label>
+          <input 
+            type="number" 
+            step="0.01"
+            [(ngModel)]="formulario.valor_total" 
+            placeholder="0.00"
+            required
+          />
+        </div>
+
+        <div class="form-grupo">
+          <label>Status</label>
+          <select [(ngModel)]="formulario.status">
+            <option value="pendente">Pendente</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="em_andamento">Em Andamento</option>
+            <option value="concluido">Concluído</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label>Observações</label>
+        <textarea 
+          [(ngModel)]="formulario.observacoes" 
+          rows="3"
+          placeholder="Observações adicionais..."
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cancelar-form" (click)="fecharModais()" [disabled]="carregando">
+        Cancelar
+      </button>
+      <button class="btn btn-salvar" (click)="salvarAgendamento()" [disabled]="carregando">
+        {{ carregando ? 'Salvando...' : 'Salvar' }}
+      </button>
+    </div>
   </div>
 </div>

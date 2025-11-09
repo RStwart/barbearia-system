@@ -5,6 +5,7 @@ const db = require("./config/db.js");
 const authRoutes = require("./routes/auth.routes.js");
 const adminRoutes = require("./routes/admin.routes.js");
 const cadastroRoutes = require("./routes/cadastro.routes.js");
+const agendamentosRoutes = require("./routes/agendamentos.routes.js");
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/cadastro", cadastroRoutes);
+app.use("/api/agendamentos", agendamentosRoutes);
 
 //Inicia o servidor
 app.listen(PORT, () => {
