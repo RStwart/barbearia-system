@@ -1,0 +1,244 @@
+<div class="funcionarios-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>👥 Gerenciar Funcionários</h1>
+    <button class="btn btn-primary" (click)="abrirModalNovo()">
+      <span class="icon">➕</span>
+      Novo Funcionário
+    </button>
+  </div>
+
+  <!-- Mensagens -->
+  <div class="mensagem sucesso" *ngIf="sucesso">
+    ✅ {{ sucesso }}
+  </div>
+
+  <div class="mensagem erro" *ngIf="erro && !mostrarModalForm && !mostrarModalExcluir">
+    ❌ {{ erro }}
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-container">
+    <div class="busca-box">
+      <span class="icone-busca">🔍</span>
+      <input 
+        type="text" 
+        [(ngModel)]="termoBusca" 
+        (input)="aplicarFiltros(); paginaAtual = 1"
+        placeholder="Buscar por nome, email ou telefone..."
+        class="input-busca">
+      <button class="btn-limpar" (click)="limparFiltros()" *ngIf="termoBusca">✖</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando && funcionarios.length === 0">
+    <div class="spinner"></div>
+    <p>Carregando funcionários...</p>
+  </div>
+
+  <!-- Tabela -->
+  <div class="table-container" *ngIf="!carregando || funcionarios.length > 0">
+    <table class="funcionarios-table">
+      <thead>
+        <tr>
+          <th>Funcionário</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Status</th>
+          <th>1º Acesso</th>
+          <th>Cadastrado em</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let funcionario of funcionariosPaginados">
+          <td>
+            <div class="user-info">
+              <div class="avatar">
+                <img [src]="funcionario.foto_perfil" *ngIf="funcionario.foto_perfil" alt="Foto">
+                <span *ngIf="!funcionario.foto_perfil">{{ getIniciais(funcionario.nome) }}</span>
+              </div>
+              <span class="nome">{{ funcionario.nome }}</span>
+            </div>
+          </td>
+          <td>{{ funcionario.email }}</td>
+          <td>{{ funcionario.telefone || '-' }}</td>
+          <td>
+            <button 
+              class="status-badge"
+              [class.ativo]="funcionario.ativo"
+              [class.inativo]="!funcionario.ativo"
+              (click)="alternarStatus(funcionario)">
+              {{ funcionario.ativo ? 'Ativo' : 'Inativo' }}
+            </button>
+          </td>
+          <td>
+            <span class="badge" [class.sim]="funcionario.primeiro_acesso" [class.nao]="!funcionario.primeiro_acesso">
+              {{ funcionario.primeiro_acesso ? 'Sim' : 'Não' }}
+            </span>
+          </td>
+          <td>{{ formatarData(funcionario.criado_em!) }}</td>
+          <td>
+            <div class="acoes">
+              <button class="btn-acao editar" (click)="abrirModalEditar(funcionario)" title="Editar">
+                ✏️
+              </button>
+              <button class="btn-acao resetar" (click)="resetarSenha(funcionario)" title="Resetar Senha">
+                🔑
+              </button>
+              <button class="btn-acao excluir" (click)="confirmarExclusao(funcionario)" title="Excluir">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Sem resultados -->
+    <div class="sem-resultados" *ngIf="funcionariosPaginados.length === 0">
+      <span class="icone">📭</span>
+      <h3>Nenhum funcionário encontrado</h3>
+      <p *ngIf="termoBusca">Tente ajustar os filtros de busca</p>
+      <p *ngIf="!termoBusca">Clique em "Novo Funcionário" para cadastrar</p>
+    </div>
+  </div>
+
+  <!-- Paginação -->
+  <div class="paginacao" *ngIf="totalPaginas > 1">
+    <button 
+      class="btn-pagina"
+      [disabled]="paginaAtual === 1"
+      (click)="irParaPagina(paginaAtual - 1)">
+      ‹
+    </button>
+
+    <button 
+      *ngFor="let pagina of paginasVisiveis"
+      class="btn-pagina"
+      [class.ativo]="pagina === paginaAtual"
+      [disabled]="pagina === -1"
+      (click)="pagina !== -1 && irParaPagina(pagina)">
+      {{ pagina === -1 ? '...' : pagina }}
+    </button>
+
+    <button 
+      class="btn-pagina"
+      [disabled]="paginaAtual === totalPaginas"
+      (click)="irParaPagina(paginaAtual + 1)">
+      ›
+    </button>
+  </div>
+
+  <!-- Informações -->
+  <div class="info-paginacao" *ngIf="funcionariosFiltrados.length > 0">
+    Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} - 
+    {{ Math.min(paginaAtual * itensPorPagina, funcionariosFiltrados.length) }} 
+    de {{ funcionariosFiltrados.length }} funcionários
+  </div>
+</div>
+
+<!-- Modal Formulário -->
+<div class="modal-overlay" *ngIf="mostrarModalForm" (click)="fecharModais()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editando ? '✏️ Editar Funcionário' : '➕ Novo Funcionário' }}</h2>
+      <button class="btn-fechar" (click)="fecharModais()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mensagem erro" *ngIf="erro">
+        ❌ {{ erro }}
+      </div>
+
+      <div class="form-grupo">
+        <label>Nome Completo *</label>
+        <input 
+          type="text" 
+          [(ngModel)]="formulario.nome"
+          placeholder="Digite o nome completo"
+          required>
+      </div>
+
+      <div class="form-grupo">
+        <label>Email *</label>
+        <input 
+          type="email" 
+          [(ngModel)]="formulario.email"
+          placeholder="exemplo@email.com"
+          required>
+      </div>
+
+      <div class="form-linha">
+        <div class="form-grupo">
+          <label>Telefone</label>
+          <input 
+            type="text" 
+            [(ngModel)]="formulario.telefone"
+            placeholder="(11) 99999-9999">
+        </div>
+
+        <div class="form-grupo" *ngIf="editando">
+          <label>Status</label>
+          <select [(ngModel)]="formulario.ativo">
+            <option [value]="true">Ativo</option>
+            <option [value]="false">Inativo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label>URL da Foto (opcional)</label>
+        <input 
+          type="text" 
+          [(ngModel)]="formulario.foto_perfil"
+          placeholder="https://exemplo.com/foto.jpg">
+      </div>
+
+      <div class="info-box" *ngIf="!editando">
+        <strong>ℹ️ Informação:</strong>
+        <p>O funcionário receberá a senha padrão: <strong>Funcionario123</strong></p>
+        <p>Ele deverá alterar a senha no primeiro acesso.</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="fecharModais()" [disabled]="carregando">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="salvarFuncionario()" [disabled]="carregando">
+        {{ carregando ? 'Salvando...' : (editando ? 'Salvar Alterações' : 'Cadastrar Funcionário') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmação Exclusão -->
+<div class="modal-overlay" *ngIf="mostrarModalExcluir" (click)="fecharModais()">
+  <div class="modal-conteudo modal-pequeno" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⚠️ Confirmar Exclusão</h2>
+      <button class="btn-fechar" (click)="fecharModais()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mensagem erro" *ngIf="erro">
+        ❌ {{ erro }}
+      </div>
+
+      <p>Tem certeza que deseja excluir o funcionário:</p>
+      <p class="nome-destaque">{{ funcionarioSelecionado?.nome }}</p>
+      <p class="aviso">Esta ação irá desativar o funcionário no sistema.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="fecharModais()" [disabled]="carregando">
+        Cancelar
+      </button>
+      <button class="btn btn-danger" (click)="excluirFuncionario()" [disabled]="carregando">
+        {{ carregando ? 'Excluindo...' : 'Confirmar Exclusão' }}
+      </button>
+    </div>
+  </div>
+</div>

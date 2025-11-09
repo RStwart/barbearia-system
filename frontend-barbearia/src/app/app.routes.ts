@@ -20,6 +20,7 @@ import { DashboardComponent } from './shared/dashboard/dashboard.component';
 import { ProdutosComponent } from './shared/produtos/produtos.component';
 import { AgendamentosComponent } from './shared/agendamentos/agendamentos.component';
 import { LojaComponent } from './shared/loja/loja.component';
+import { FuncionariosComponent } from './shared/funcionarios/funcionarios.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -62,7 +63,7 @@ export const routes: Routes = [
       { path: '', component: DashboardComponent },
       { path: 'agendamentos', component: AgendamentosComponent },
       { path: 'produtos', component: ProdutosComponent },
-      { path: 'funcionarios', component: DashboardComponent }, // Temporário
+      { path: 'funcionarios', component: FuncionariosComponent },
       { path: 'financeiro', component: DashboardComponent }, // Temporário
       { path: 'perfil', component: DashboardComponent } // Temporário
     ]

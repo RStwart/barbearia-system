@@ -21,7 +21,11 @@
         <span class="icon">📦</span>
         <span class="label">Meus Produtos</span>
       </a>
-      <a routerLink="/estabelecimento/funcionarios" routerLinkActive="active" (click)="closeSidebarOnMobile()">
+      <a 
+        *ngIf="usuario.tipo === 'GERENTE'"
+        routerLink="/estabelecimento/funcionarios" 
+        routerLinkActive="active" 
+        (click)="closeSidebarOnMobile()">
         <span class="icon">👥</span>
         <span class="label">Funcionários</span>
       </a>
