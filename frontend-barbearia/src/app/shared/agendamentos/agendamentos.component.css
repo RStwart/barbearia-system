@@ -552,6 +552,12 @@
 }
 
 /* ===== RESPONSIVO ===== */
+@media (max-width: 1200px) {
+  .agendamentos-container {
+    padding: 16px;
+  }
+}
+
 @media (max-width: 1024px) {
   .calendario-grid {
     gap: 6px;
@@ -560,13 +566,71 @@
   .dia-numero {
     font-size: 16px;
   }
+
+  .agendamento-card {
+    grid-template-columns: 100px 1fr auto;
+    gap: 12px;
+  }
 }
 
 @media (max-width: 768px) {
+  .agendamentos-container {
+    padding: 12px;
+  }
+
   .header-agendamentos {
     flex-direction: column;
     gap: 16px;
     align-items: flex-start;
+  }
+
+  .header-agendamentos h1 {
+    font-size: 24px;
+  }
+
+  .btn-novo {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .calendario-wrapper {
+    padding: 16px;
+  }
+
+  .calendario-header h2 {
+    font-size: 20px;
+  }
+
+  .calendario-grid {
+    gap: 4px;
+  }
+
+  .dia-semana {
+    font-size: 11px;
+    padding: 8px 2px;
+  }
+
+  .dia-celula {
+    min-height: 50px;
+  }
+
+  .dia-numero {
+    font-size: 14px;
+  }
+
+  .badge-agendamentos {
+    font-size: 8px;
+    padding: 2px 4px;
+    top: 2px;
+    right: 2px;
+  }
+
+  .agendamentos-dia {
+    padding: 16px;
+  }
+
+  .agendamentos-dia h3 {
+    font-size: 18px;
   }
 
   .agendamento-card {
@@ -575,8 +639,14 @@
 
   .agendamento-hora {
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .hora-inicio,
+  .hora-fim {
+    font-size: 16px;
   }
 
   .detalhe-linha {
@@ -586,9 +656,48 @@
   .form-linha {
     grid-template-columns: 1fr;
   }
+
+  .modal-conteudo {
+    max-width: 95%;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 16px;
+  }
 }
 
 @media (max-width: 640px) {
+  .agendamentos-container {
+    padding: 8px;
+  }
+
+  .header-agendamentos h1 {
+    font-size: 20px;
+  }
+
+  .calendario-wrapper,
+  .agendamentos-dia {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .calendario-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .calendario-header h2 {
+    font-size: 18px;
+  }
+
+  .btn-nav {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+
   .calendario-grid {
     gap: 4px;
   }
@@ -596,6 +705,11 @@
   .dia-semana {
     font-size: 12px;
     padding: 8px 4px;
+  }
+
+  .dia-celula {
+    min-height: 44px;
+    border-width: 1px;
   }
 
   .dia-numero {
@@ -606,4 +720,86 @@
     font-size: 9px;
     padding: 1px 4px;
   }
+
+  .agendamentos-dia h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .agendamento-card {
+    padding: 10px;
+  }
+
+  .info-principal,
+  .info-secundaria {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cliente-nome,
+  .servico-nome,
+  .funcionario-nome,
+  .valor {
+    font-size: 13px;
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+  }
+
+  .btn-fechar {
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
 }
+
+@media (max-width: 480px) {
+  .dia-semana {
+    font-size: 10px;
+    padding: 6px 2px;
+  }
+
+  .dia-celula {
+    min-height: 40px;
+  }
+
+  .dia-numero {
+    font-size: 12px;
+  }
+
+  .badge-agendamentos {
+    font-size: 8px;
+    padding: 1px 3px;
+    min-width: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .dia-semana {
+    font-size: 9px;
+    padding: 4px 1px;
+  }
+
+  .dia-celula {
+    min-height: 36px;
+  }
+
+  .dia-numero {
+    font-size: 11px;
+  }
+}
+

@@ -53,9 +53,15 @@ export class AgendamentosComponent implements OnInit {
 
   obterUnidadeUsuario() {
     const user = this.authService.getUserFromToken();
+    console.log('👤 Usuário do token:', user);
+    
     if (user && user.unidade_id) {
       this.unidade_id = user.unidade_id;
+      console.log('🏪 Unidade ID:', this.unidade_id);
       this.carregarDados();
+    } else {
+      console.error('❌ Usuário sem unidade_id no token!');
+      this.erro = 'Usuário não está vinculado a nenhuma unidade';
     }
   }
 
@@ -66,17 +72,23 @@ export class AgendamentosComponent implements OnInit {
     const primeiroDia = new Date(this.mesAtual.getFullYear(), this.mesAtual.getMonth(), 1);
     const ultimoDia = new Date(this.mesAtual.getFullYear(), this.mesAtual.getMonth() + 1, 0);
 
+    console.log('📅 Buscando agendamentos de', this.formatarData(primeiroDia), 'até', this.formatarData(ultimoDia));
+    console.log('🏪 Para unidade_id:', this.unidade_id);
+
     this.agendamentosService.listarAgendamentos(
       this.unidade_id,
       this.formatarData(primeiroDia),
       this.formatarData(ultimoDia)
     ).subscribe({
       next: (response) => {
+        console.log('✅ Resposta da API:', response);
         this.agendamentos = response.agendamentos || [];
+        console.log('📊 Total de agendamentos carregados:', this.agendamentos.length);
         this.atualizarAgendamentosDia();
+        this.gerarCalendario();
       },
       error: (error) => {
-        console.error('Erro ao carregar agendamentos:', error);
+        console.error('❌ Erro ao carregar agendamentos:', error);
         this.erro = 'Erro ao carregar agendamentos';
       }
     });
@@ -115,9 +127,11 @@ export class AgendamentosComponent implements OnInit {
     // Dias do mês
     for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
       const data = new Date(ano, mes, dia);
-      const agendamentosNoDia = this.agendamentos.filter(a => 
-        a.data_agendamento === this.formatarData(data)
-      );
+      const dataFormatada = this.formatarData(data);
+      const agendamentosNoDia = this.agendamentos.filter(a => {
+        const dataAgendamento = a.data_agendamento.split('T')[0];
+        return dataAgendamento === dataFormatada;
+      });
       
       this.diasCalendario.push({
         dia,
@@ -151,9 +165,18 @@ export class AgendamentosComponent implements OnInit {
     if (!this.diaSelecionado) return;
     
     const dataFormatada = this.formatarData(this.diaSelecionado);
+    console.log('📅 Data selecionada formatada:', dataFormatada);
+    
     this.agendamentosDia = this.agendamentos
-      .filter(a => a.data_agendamento === dataFormatada)
+      .filter(a => {
+        // Extrair apenas a parte da data (YYYY-MM-DD) do timestamp
+        const dataAgendamento = a.data_agendamento.split('T')[0];
+        const match = dataAgendamento === dataFormatada;
+        return match;
+      })
       .sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio));
+    
+    console.log('✅ Agendamentos do dia filtrados:', this.agendamentosDia.length);
   }
 
   abrirModalNovo() {

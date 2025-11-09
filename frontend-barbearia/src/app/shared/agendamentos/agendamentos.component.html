@@ -64,7 +64,7 @@
           </div>
           <div class="info-secundaria">
             <span class="funcionario-nome">👨‍💼 {{ agendamento.funcionario_nome }}</span>
-            <span class="valor">💰 R$ {{ agendamento.valor_total?.toFixed(2) }}</span>
+            <span class="valor">💰 R$ {{ agendamento.valor_total }}</span>
           </div>
         </div>
         
@@ -124,7 +124,7 @@
       <div class="detalhe-linha">
         <div class="detalhe-grupo">
           <label>Valor</label>
-          <p class="valor-destaque">R$ {{ agendamentoSelecionado.valor_total?.toFixed(2) }}</p>
+          <p class="valor-destaque">R$ {{ agendamentoSelecionado.valor_total }}</p>
         </div>
 
         <div class="detalhe-grupo">
@@ -188,7 +188,7 @@
         <select [(ngModel)]="formulario.servico_id" (change)="calcularHoraFim()" required>
           <option value="">Selecione um serviço</option>
           <option *ngFor="let servico of servicos" [value]="servico.id">
-            {{ servico.nome }} - R$ {{ servico.preco.toFixed(2) }} ({{ servico.duracao }}min)
+            {{ servico.nome }} - R$ {{ servico.preco }} ({{ servico.duracao }}min)
           </option>
         </select>
       </div>

@@ -90,7 +90,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, tipo: user.tipo },
+      { id: user.id, tipo: user.tipo, unidade_id: user.unidade_id },
       process.env.JWT_SECRET,
       { expiresIn: "8h" }
     );
@@ -103,6 +103,7 @@ exports.login = async (req, res) => {
         nome: user.nome,
         email: user.email,
         tipo: user.tipo,
+        unidade_id: user.unidade_id,
         primeiro_acesso: user.primeiro_acesso === 1
       },
     });
