@@ -1,4 +1,7 @@
 <div class="app-shell">
+  <!-- Overlay para mobile -->
+  <div class="sidebar-overlay" [class.active]="!isCollapsed" (click)="toggle()"></div>
+  
   <aside class="sidebar" [class.collapsed]="isCollapsed">
     <div class="brand">
       <button class="collapse-btn" (click)="toggle()">☰</button>
@@ -6,42 +9,46 @@
     </div>
 
     <nav class="nav">
-      <a routerLink="/estabelecimento" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <a routerLink="/estabelecimento" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebarOnMobile()">
         <span class="icon">📊</span>
         <span class="label">Dashboard</span>
       </a>
-      <a routerLink="/estabelecimento/agendamentos" routerLinkActive="active">
+      <a routerLink="/estabelecimento/agendamentos" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">📅</span>
         <span class="label">Agendamentos</span>
       </a>
-      <a routerLink="/estabelecimento/produtos" routerLinkActive="active">
+      <a routerLink="/estabelecimento/produtos" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">📦</span>
         <span class="label">Meus Produtos</span>
       </a>
-      <a routerLink="/estabelecimento/funcionarios" routerLinkActive="active">
+      <a routerLink="/estabelecimento/funcionarios" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">👥</span>
         <span class="label">Funcionários</span>
       </a>
-      <a routerLink="/estabelecimento/financeiro" routerLinkActive="active">
+      <a routerLink="/estabelecimento/financeiro" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">💰</span>
         <span class="label">Financeiro</span>
       </a>
-      <a routerLink="/estabelecimento/perfil" routerLinkActive="active">
+      <a routerLink="/estabelecimento/perfil" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">🏪</span>
         <span class="label">Perfil da Loja</span>
       </a>
     </nav>
 
     <div class="sidebar-footer">
-      <button class="logout" (click)="logout()">Sair</button>
+      <button class="logout" (click)="logout()">
+        <span class="logout-icon">🚪</span>
+        <span class="logout-text">Sair</span>
+      </button>
     </div>
   </aside>
 
   <main class="content">
     <header class="top-header">
       <div class="header-left">
-        <button *ngIf="isCollapsed" class="open-sidebar-btn" (click)="toggle()">☰</button>
-        <h2 class="page-title">Gestão do Estabelecimento</h2>
+        <button class="open-sidebar-btn" (click)="toggle()">
+          ☰ Menu
+        </button>
       </div>
       <div class="user-info">
         <div class="avatar estabelecimento-avatar">

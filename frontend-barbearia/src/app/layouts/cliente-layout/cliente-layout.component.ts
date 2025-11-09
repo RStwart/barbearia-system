@@ -67,6 +67,12 @@ export class ClienteLayoutComponent implements OnInit {
     this.isCollapsed = !this.isCollapsed;
   }
 
+  closeSidebarOnMobile() {
+    if (this.isMobile) {
+      this.isCollapsed = true;
+    }
+  }
+
   logout() {
     this.authService.logout();
     this.usuario = { nome: 'Cliente', tipo: 'CLIENTE' };

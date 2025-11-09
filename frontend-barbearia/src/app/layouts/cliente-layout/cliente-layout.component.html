@@ -1,4 +1,7 @@
 <div class="app-shell">
+  <!-- Overlay para mobile -->
+  <div class="sidebar-overlay" [class.active]="!isCollapsed" (click)="toggle()"></div>
+  
   <aside class="sidebar" [class.collapsed]="isCollapsed">
     <div class="brand">
       <button class="collapse-btn" (click)="toggle()">☰</button>
@@ -6,42 +9,46 @@
     </div>
 
     <nav class="nav">
-      <a routerLink="/cliente" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <a routerLink="/cliente" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeSidebarOnMobile()">
         <span class="icon">🏠</span>
         <span class="label">Início</span>
       </a>
-      <a routerLink="/cliente/agendamentos" routerLinkActive="active">
+      <a routerLink="/cliente/agendamentos" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">📅</span>
         <span class="label">Meus Agendamentos</span>
       </a>
-      <a routerLink="/cliente/lojas" routerLinkActive="active">
+      <a routerLink="/cliente/lojas" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">📍</span>
         <span class="label">Lojas Próximas</span>
       </a>
-      <a routerLink="/cliente/favoritos" routerLinkActive="active">
+      <a routerLink="/cliente/favoritos" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">⭐</span>
         <span class="label">Favoritos</span>
       </a>
-      <a routerLink="/cliente/carrinho" routerLinkActive="active">
+      <a routerLink="/cliente/carrinho" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">🛒</span>
         <span class="label">Carrinho</span>
       </a>
-      <a routerLink="/cliente/historico" routerLinkActive="active">
+      <a routerLink="/cliente/historico" routerLinkActive="active" (click)="closeSidebarOnMobile()">
         <span class="icon">📋</span>
         <span class="label">Histórico</span>
       </a>
     </nav>
 
     <div class="sidebar-footer">
-      <button class="logout" (click)="logout()">Sair</button>
+      <button class="logout" (click)="logout()">
+        <span class="logout-icon">🚪</span>
+        <span class="logout-text">Sair</span>
+      </button>
     </div>
   </aside>
 
   <main class="content">
     <header class="top-header">
       <div class="header-left">
-        <button *ngIf="isCollapsed" class="open-sidebar-btn" (click)="toggle()">☰</button>
-        <h2 class="page-title">Área do Cliente</h2>
+        <button class="open-sidebar-btn" (click)="toggle()">
+          ☰ Menu
+        </button>
       </div>
       <div class="user-info">
         <div class="avatar cliente-avatar">
