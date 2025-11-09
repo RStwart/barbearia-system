@@ -149,7 +149,7 @@ export class FuncionariosComponent implements OnInit {
     this.formulario = {
       nome: funcionario.nome,
       email: funcionario.email,
-      telefone: funcionario.telefone,
+      telefone: this.formatarTelefoneExibicao(funcionario.telefone),
       foto_perfil: funcionario.foto_perfil,
       ativo: funcionario.ativo
     };
@@ -168,9 +168,15 @@ export class FuncionariosComponent implements OnInit {
     this.erro = '';
     this.sucesso = '';
 
+    // Remover formatação do telefone antes de enviar
+    const dadosEnvio = {
+      ...this.formulario,
+      telefone: this.formulario.telefone ? this.formulario.telefone.replace(/\D/g, '') : ''
+    };
+
     const operacao = this.editando
-      ? this.funcionariosService.atualizar(this.funcionarioSelecionado!.id!, this.formulario)
-      : this.funcionariosService.criar(this.formulario);
+      ? this.funcionariosService.atualizar(this.funcionarioSelecionado!.id!, dadosEnvio)
+      : this.funcionariosService.criar(dadosEnvio);
 
     operacao.subscribe({
       next: (response) => {
@@ -276,5 +282,30 @@ export class FuncionariosComponent implements OnInit {
       .slice(0, 2)
       .join('')
       .toUpperCase();
+  }
+
+  formatarTelefoneInput() {
+    if (!this.formulario.telefone) return;
+    
+    let valor = this.formulario.telefone.replace(/\D/g, '');
+    if (valor.length <= 10) {
+      valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    } else {
+      valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    }
+    this.formulario.telefone = valor;
+  }
+
+  formatarTelefoneExibicao(telefone: string | undefined): string {
+    if (!telefone) return '-';
+    
+    const numero = telefone.replace(/\D/g, '');
+    if (numero.length === 0) return '-';
+    
+    if (numero.length <= 10) {
+      return numero.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    } else {
+      return numero.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    }
   }
 }

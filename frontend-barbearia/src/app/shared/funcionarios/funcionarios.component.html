@@ -63,7 +63,7 @@
             </div>
           </td>
           <td>{{ funcionario.email }}</td>
-          <td>{{ funcionario.telefone || '-' }}</td>
+          <td>{{ formatarTelefoneExibicao(funcionario.telefone) }}</td>
           <td>
             <button 
               class="status-badge"
@@ -176,6 +176,8 @@
           <input 
             type="text" 
             [(ngModel)]="formulario.telefone"
+            (input)="formatarTelefoneInput()"
+            maxlength="15"
             placeholder="(11) 99999-9999">
         </div>
 
