@@ -40,6 +40,7 @@ export class AdminLoginComponent {
     this.erro = '';
     this.auth.login(this.email, this.senha).subscribe({
       next: (res: any) => {
+        // Validar se o usuário é realmente um administrador
         if (res && res.user && res.user.tipo === 'ADM') {
           // Salvar token e dados do usuário
           localStorage.setItem('token', res.token);
@@ -50,7 +51,21 @@ export class AdminLoginComponent {
           console.log('✅ Login admin realizado com sucesso:', res.user);
           this.router.navigate(['/admin']);
         } else {
-          this.erro = 'Acesso negado: usuário não é administrador.';
+          // Tipo de usuário não compatível
+          const tipoUsuario = res.user?.tipo;
+          let mensagem = '❌ Tipo de usuário não compatível. ';
+          
+          if (tipoUsuario === 'CLIENTE') {
+            mensagem += 'Clientes devem usar a tela de login principal.';
+          } else if (tipoUsuario === 'FUNCIONARIO') {
+            mensagem += 'Funcionários devem usar a tela de login principal.';
+          } else if (tipoUsuario === 'GERENTE') {
+            mensagem += 'Gerentes devem usar a tela de login principal.';
+          } else {
+            mensagem += 'Esta tela é exclusiva para administradores.';
+          }
+          
+          this.erro = mensagem;
         }
         this.carregando = false;
       },

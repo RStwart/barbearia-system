@@ -61,6 +61,34 @@ export class LoginComponent {
     this.erro = '';
     this.auth.login(this.email, this.senha).subscribe({
       next: (res: any) => {
+        // Validar tipo de usuário compatível com a tela
+        const tipoUsuario = res.user?.tipo;
+        
+        // Apenas CLIENTE e FUNCIONARIO podem usar esta tela
+        if (tipoUsuario === 'ADM') {
+          this.erro = '❌ Tipo de usuário não compatível. Administradores devem usar a tela de login admin.';
+          this.carregando = false;
+          return;
+        }
+
+        if (tipoUsuario === 'GERENTE' && this.tipoUsuario === 'CLIENTE') {
+          this.erro = '❌ Tipo de usuário não compatível. Gerentes devem selecionar "Estabelecimento" para fazer login.';
+          this.carregando = false;
+          return;
+        }
+
+        if (tipoUsuario === 'CLIENTE' && this.tipoUsuario === 'FUNCIONARIO') {
+          this.erro = '❌ Tipo de usuário não compatível. Clientes devem selecionar "Cliente" para fazer login.';
+          this.carregando = false;
+          return;
+        }
+
+        if (tipoUsuario === 'FUNCIONARIO' && this.tipoUsuario === 'CLIENTE') {
+          this.erro = '❌ Tipo de usuário não compatível. Funcionários devem selecionar "Estabelecimento" para fazer login.';
+          this.carregando = false;
+          return;
+        }
+        
         // Salvar token e dados do usuário
         localStorage.setItem('token', res.token);
         if (res.user) {
