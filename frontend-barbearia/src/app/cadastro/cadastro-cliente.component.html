@@ -1,10 +1,125 @@
 <div class="cadastro-container">
   <h2>Cadastro de Cliente</h2>
+  <p class="subtitulo">Crie sua conta para acessar o sistema</p>
+  
   <form (ngSubmit)="cadastrar()">
-    <input [(ngModel)]="nome" name="nome" placeholder="Nome" required />
-    <input [(ngModel)]="email" name="email" placeholder="E-mail" type="email" required />
-    <input [(ngModel)]="senha" name="senha" placeholder="Senha" type="password" required />
-    <input [(ngModel)]="telefone" name="telefone" placeholder="Telefone" required />
-    <button type="submit">Cadastrar</button>
+    <!-- Nome Completo -->
+    <div class="form-group">
+      <label>Nome Completo *</label>
+      <input 
+        [(ngModel)]="nome" 
+        name="nome" 
+        placeholder="Digite seu nome completo" 
+        required 
+      />
+    </div>
+
+    <!-- E-mail -->
+    <div class="form-group">
+      <label>E-mail *</label>
+      <input 
+        [(ngModel)]="email" 
+        name="email" 
+        placeholder="seu@email.com" 
+        type="email" 
+        required 
+      />
+    </div>
+
+    <!-- CPF -->
+    <div class="form-group">
+      <label>CPF</label>
+      <input 
+        [(ngModel)]="cpf" 
+        name="cpf" 
+        placeholder="000.000.000-00" 
+        maxlength="14"
+        (input)="formatarCPF()"
+      />
+    </div>
+
+    <!-- Telefone -->
+    <div class="form-group">
+      <label>Telefone</label>
+      <input 
+        [(ngModel)]="telefone" 
+        name="telefone" 
+        placeholder="(00) 00000-0000" 
+        maxlength="15"
+        (input)="formatarTelefone()"
+      />
+    </div>
+
+    <!-- Senha -->
+    <div class="form-group">
+      <label>Senha *</label>
+      <input 
+        [(ngModel)]="senha" 
+        name="senha" 
+        placeholder="Digite sua senha" 
+        type="password" 
+        required 
+        (input)="validarSenha()"
+      />
+      
+      <!-- Validadores de senha -->
+      <div class="senha-validadores">
+        <div class="validador" [class.valido]="senhaMinLength">
+          <span class="icone">{{ senhaMinLength ? '✓' : '○' }}</span>
+          Mínimo 6 caracteres
+        </div>
+        <div class="validador" [class.valido]="senhaHasUpper">
+          <span class="icone">{{ senhaHasUpper ? '✓' : '○' }}</span>
+          Uma letra maiúscula
+        </div>
+        <div class="validador" [class.valido]="senhaHasLower">
+          <span class="icone">{{ senhaHasLower ? '✓' : '○' }}</span>
+          Uma letra minúscula
+        </div>
+        <div class="validador" [class.valido]="senhaHasNumber">
+          <span class="icone">{{ senhaHasNumber ? '✓' : '○' }}</span>
+          Um número
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmar Senha -->
+    <div class="form-group">
+      <label>Confirmar Senha *</label>
+      <input 
+        [(ngModel)]="confirmarSenha" 
+        name="confirmarSenha" 
+        placeholder="Digite a senha novamente" 
+        type="password" 
+        required 
+        (input)="verificarSenhasConferem()"
+      />
+      
+      <!-- Indicador de senhas conferem -->
+      <div class="senha-conferencia" *ngIf="confirmarSenha.length > 0">
+        <span *ngIf="senhasConferem" class="conferem">✓ As senhas conferem</span>
+        <span *ngIf="!senhasConferem" class="nao-conferem">✗ As senhas não conferem</span>
+      </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="form-actions">
+      <button 
+        type="submit" 
+        class="btn-cadastrar"
+        [disabled]="carregando"
+      >
+        {{ carregando ? 'Cadastrando...' : 'Cadastrar' }}
+      </button>
+      
+      <button 
+        type="button" 
+        class="btn-voltar"
+        (click)="voltar()"
+        [disabled]="carregando"
+      >
+        Voltar ao Login
+      </button>
+    </div>
   </form>
 </div>

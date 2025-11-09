@@ -1,0 +1,362 @@
+/* ===== CONTAINER PRINCIPAL ===== */
+.primeiro-acesso-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.card-acesso {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  overflow: hidden;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== HEADER ===== */
+.header-acesso {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 40px 30px 30px;
+  text-align: center;
+}
+
+.icon-acesso {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.header-acesso h2 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 15px;
+  opacity: 0.95;
+  font-weight: 400;
+}
+
+/* ===== INFO USUÁRIO ===== */
+.info-usuario {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 30px;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.avatar-grande {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  flex-shrink: 0;
+}
+
+.dados-usuario h3 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  color: #2c3e50;
+}
+
+.dados-usuario p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.badge-tipo {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #667eea;
+  color: white;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ===== FORMULÁRIO ===== */
+.form-senha {
+  padding: 30px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.required {
+  color: #e74c3c;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 45px 12px 16px;
+  border: 2px solid #e0e6ed;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-toggle-senha {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+
+.btn-toggle-senha:hover {
+  transform: scale(1.1);
+}
+
+/* ===== REQUISITOS DA SENHA ===== */
+.requisitos-senha {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.requisitos-titulo {
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.requisitos-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.requisitos-lista li {
+  padding: 6px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.requisitos-lista li.valido {
+  color: #27ae60;
+}
+
+.requisitos-lista li.invalido {
+  color: #95a5a6;
+}
+
+.icone {
+  font-size: 16px;
+}
+
+/* ===== SENHA MATCH ===== */
+.senha-match {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.match-sim {
+  color: #27ae60;
+}
+
+.match-nao {
+  color: #e74c3c;
+}
+
+/* ===== ALERTA ===== */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-erro {
+  background: #fee;
+  border-left: 4px solid #e74c3c;
+  color: #c0392b;
+}
+
+/* ===== BOTÕES ===== */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn {
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f8f9fa;
+}
+
+/* ===== INFO SEGURANÇA ===== */
+.info-seguranca {
+  background: #e8f4f8;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  border-top: 2px solid #e0e6ed;
+}
+
+.info-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.info-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #2c3e50;
+}
+
+.info-text strong {
+  color: #3498db;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 600px) {
+  .primeiro-acesso-container {
+    padding: 10px;
+  }
+
+  .card-acesso {
+    border-radius: 16px;
+  }
+
+  .header-acesso {
+    padding: 30px 20px 20px;
+  }
+
+  .header-acesso h2 {
+    font-size: 24px;
+  }
+
+  .icon-acesso {
+    font-size: 40px;
+  }
+
+  .info-usuario {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .form-senha {
+    padding: 20px;
+  }
+
+  .form-input {
+    font-size: 16px; /* Previne zoom no iOS */
+  }
+
+  .info-seguranca {
+    padding: 16px;
+    flex-direction: column;
+    text-align: center;
+  }
+}

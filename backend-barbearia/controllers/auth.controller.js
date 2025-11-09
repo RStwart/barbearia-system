@@ -52,8 +52,9 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(senha, 12);
 
-    const sql = `INSERT INTO usuarios (nome, email, senha, telefone, tipo)
-                 VALUES (?, ?, ?, ?, ?)`;
+    // Auto-cadastro: usuário define própria senha, então primeiro_acesso = 0
+    const sql = `INSERT INTO usuarios (nome, email, senha, telefone, tipo, primeiro_acesso)
+                 VALUES (?, ?, ?, ?, ?, 0)`;
 
     await db.execute(sql, [nome, email, hashedPassword, telefone || null, tipo || "CLIENTE"]);
     
@@ -102,6 +103,7 @@ exports.login = async (req, res) => {
         nome: user.nome,
         email: user.email,
         tipo: user.tipo,
+        primeiro_acesso: user.primeiro_acesso === 1
       },
     });
   } catch (error) {
@@ -179,3 +181,111 @@ exports.adminSecretLogin = async (req, res) => {
     return res.status(500).json({ error: 'Erro interno do servidor' });
   }
 };
+
+// Primeiro Acesso - Troca de senha obrigatória
+exports.primeiroAcesso = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { senhaAtual, novaSenha } = req.body;
+
+    if (!senhaAtual || !novaSenha) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Informe a senha atual e a nova senha" 
+      });
+    }
+
+    // Validar requisitos da senha
+    if (novaSenha.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "A nova senha deve ter no mínimo 6 caracteres"
+      });
+    }
+
+    if (!/[A-Z]/.test(novaSenha)) {
+      return res.status(400).json({
+        success: false,
+        message: "A nova senha deve conter pelo menos uma letra maiúscula"
+      });
+    }
+
+    if (!/[a-z]/.test(novaSenha)) {
+      return res.status(400).json({
+        success: false,
+        message: "A nova senha deve conter pelo menos uma letra minúscula"
+      });
+    }
+
+    if (!/[0-9]/.test(novaSenha)) {
+      return res.status(400).json({
+        success: false,
+        message: "A nova senha deve conter pelo menos um número"
+      });
+    }
+
+    // Buscar usuário
+    const [users] = await db.execute(
+      "SELECT * FROM usuarios WHERE id = ? AND ativo = TRUE",
+      [userId]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuário não encontrado"
+      });
+    }
+
+    const user = users[0];
+
+    // Verificar senha atual
+    const senhaValida = await bcrypt.compare(senhaAtual, user.senha);
+
+    if (!senhaValida) {
+      return res.status(401).json({
+        success: false,
+        message: "Senha atual incorreta"
+      });
+    }
+
+    // Verificar se a nova senha é diferente da atual
+    const senhaMesma = await bcrypt.compare(novaSenha, user.senha);
+
+    if (senhaMesma) {
+      return res.status(400).json({
+        success: false,
+        message: "A nova senha deve ser diferente da senha atual"
+      });
+    }
+
+    // Criptografar nova senha
+    const novaSenhaHash = await bcrypt.hash(novaSenha, 12);
+
+    // Atualizar senha e marcar primeiro_acesso como 0
+    await db.execute(
+      "UPDATE usuarios SET senha = ?, primeiro_acesso = 0 WHERE id = ?",
+      [novaSenhaHash, userId]
+    );
+
+    res.json({
+      success: true,
+      message: "Senha alterada com sucesso",
+      user: {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        tipo: user.tipo,
+        primeiro_acesso: false
+      }
+    });
+  } catch (error) {
+    console.error("Erro ao alterar senha:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro interno do servidor",
+      error: error.message
+    });
+  }
+};
+

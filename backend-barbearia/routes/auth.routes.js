@@ -9,5 +9,7 @@ router.post("/login", authController.login);
 router.post("/admin/secret-login", authController.adminSecretLogin);
 // Rota para obter perfil do usuário autenticado
 router.get("/profile", authController.verifyToken, authController.getProfile);
+// Rota para primeiro acesso - troca de senha obrigatória
+router.post("/primeiro-acesso", authController.verifyToken, authController.primeiroAcesso);
 
 module.exports = router;

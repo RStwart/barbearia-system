@@ -69,6 +69,13 @@ export class LoginComponent {
         
         console.log('✅ Login realizado com sucesso:', res.user);
         
+        // Verificar se é primeiro acesso
+        if (res.user.primeiro_acesso) {
+          console.log('🔐 Primeiro acesso detectado - redirecionando para troca de senha');
+          this.router.navigate(['/primeiro-acesso']);
+          return;
+        }
+        
         // Redirecionar baseado no tipo de usuário
         this.redirectByUserType(res.user.tipo);
       },
@@ -84,6 +91,9 @@ export class LoginComponent {
     switch(tipo) {
       case 'ADM':
         this.router.navigate(['/admin']);
+        break;
+      case 'GERENTE':
+        this.router.navigate(['/estabelecimento']);
         break;
       case 'CLIENTE':
         this.router.navigate(['/cliente']);

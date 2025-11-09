@@ -4,6 +4,7 @@ import { LoginComponent } from './login/login.component';
 import { CadastroClienteComponent } from './cadastro/cadastro-cliente.component';
 import { CadastroEstabelecimentoComponent } from './cadastro/cadastro-estabelecimento.component';
 import { AdminLoginComponent } from './admin-login/admin-login.component';
+import { PrimeiroAcessoComponent } from './primeiro-acesso/primeiro-acesso.component';
 
 // Novos Layouts
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'cadastro-cliente', component: CadastroClienteComponent },
   { path: 'cadastro-estabelecimento', component: CadastroEstabelecimentoComponent },
   { path: 'login/admin', component: AdminLoginComponent },
+  { path: 'primeiro-acesso', component: PrimeiroAcessoComponent },
   
   // ================ ROTAS DO ADMIN ================
   {

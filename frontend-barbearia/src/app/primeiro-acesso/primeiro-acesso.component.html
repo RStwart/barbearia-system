@@ -1,0 +1,149 @@
+<div class="primeiro-acesso-container">
+  <div class="card-acesso">
+    <!-- Header -->
+    <div class="header-acesso">
+      <div class="icon-acesso">🔐</div>
+      <h2>Primeiro Acesso</h2>
+      <p class="subtitle">Por segurança, é necessário alterar sua senha</p>
+    </div>
+
+    <!-- Informações do Usuário -->
+    <div class="info-usuario">
+      <div class="avatar-grande">
+        {{ usuario?.nome?.charAt(0)?.toUpperCase() }}
+      </div>
+      <div class="dados-usuario">
+        <h3>{{ usuario?.nome }}</h3>
+        <p>{{ usuario?.email }}</p>
+        <span class="badge badge-tipo">{{ usuario?.tipo }}</span>
+      </div>
+    </div>
+
+    <!-- Formulário -->
+    <form (ngSubmit)="alterarSenha()" class="form-senha">
+      
+      <!-- Senha Atual -->
+      <div class="form-group">
+        <label for="senhaAtual">Senha Atual <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input 
+            [type]="mostrarSenhaAtual ? 'text' : 'password'"
+            id="senhaAtual"
+            [(ngModel)]="senhaAtual"
+            name="senhaAtual"
+            placeholder="Digite a senha fornecida pelo administrador"
+            required
+            class="form-input">
+          <button 
+            type="button" 
+            class="btn-toggle-senha"
+            (click)="mostrarSenhaAtual = !mostrarSenhaAtual">
+            {{ mostrarSenhaAtual ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Nova Senha -->
+      <div class="form-group">
+        <label for="novaSenha">Nova Senha <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input 
+            [type]="mostrarNovaSenha ? 'text' : 'password'"
+            id="novaSenha"
+            [(ngModel)]="novaSenha"
+            name="novaSenha"
+            (input)="validarSenha()"
+            placeholder="Crie uma senha forte"
+            required
+            class="form-input">
+          <button 
+            type="button" 
+            class="btn-toggle-senha"
+            (click)="mostrarNovaSenha = !mostrarNovaSenha">
+            {{ mostrarNovaSenha ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Requisitos da Senha -->
+      <div class="requisitos-senha" *ngIf="novaSenha">
+        <p class="requisitos-titulo">Sua senha deve conter:</p>
+        <ul class="requisitos-lista">
+          <li [class.valido]="senhaValida.tamanho" [class.invalido]="!senhaValida.tamanho">
+            <span class="icone">{{ senhaValida.tamanho ? '✅' : '❌' }}</span>
+            Mínimo de 6 caracteres
+          </li>
+          <li [class.valido]="senhaValida.maiuscula" [class.invalido]="!senhaValida.maiuscula">
+            <span class="icone">{{ senhaValida.maiuscula ? '✅' : '❌' }}</span>
+            Pelo menos uma letra maiúscula
+          </li>
+          <li [class.valido]="senhaValida.minuscula" [class.invalido]="!senhaValida.minuscula">
+            <span class="icone">{{ senhaValida.minuscula ? '✅' : '❌' }}</span>
+            Pelo menos uma letra minúscula
+          </li>
+          <li [class.valido]="senhaValida.numero" [class.invalido]="!senhaValida.numero">
+            <span class="icone">{{ senhaValida.numero ? '✅' : '❌' }}</span>
+            Pelo menos um número
+          </li>
+        </ul>
+      </div>
+
+      <!-- Confirmar Senha -->
+      <div class="form-group">
+        <label for="confirmarSenha">Confirmar Nova Senha <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input 
+            [type]="mostrarConfirmarSenha ? 'text' : 'password'"
+            id="confirmarSenha"
+            [(ngModel)]="confirmarSenha"
+            name="confirmarSenha"
+            placeholder="Digite a senha novamente"
+            required
+            class="form-input">
+          <button 
+            type="button" 
+            class="btn-toggle-senha"
+            (click)="mostrarConfirmarSenha = !mostrarConfirmarSenha">
+            {{ mostrarConfirmarSenha ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+        <small class="senha-match" *ngIf="confirmarSenha && novaSenha">
+          <span *ngIf="novaSenha === confirmarSenha" class="match-sim">✅ As senhas coincidem</span>
+          <span *ngIf="novaSenha !== confirmarSenha" class="match-nao">❌ As senhas não coincidem</span>
+        </small>
+      </div>
+
+      <!-- Mensagem de Erro -->
+      <div class="alert alert-erro" *ngIf="erro">
+        <strong>⚠️ Erro:</strong> {{ erro }}
+      </div>
+
+      <!-- Botões -->
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="carregando || !senhaAtendeCriterios || novaSenha !== confirmarSenha">
+          <span *ngIf="!carregando">🔒 Alterar Senha e Continuar</span>
+          <span *ngIf="carregando">⏳ Processando...</span>
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-secondary"
+          (click)="logout()"
+          [disabled]="carregando">
+          🚪 Sair
+        </button>
+      </div>
+    </form>
+
+    <!-- Informação de Segurança -->
+    <div class="info-seguranca">
+      <div class="info-icon">🛡️</div>
+      <div class="info-text">
+        <strong>Importante:</strong> Escolha uma senha forte e não compartilhe com ninguém. 
+        Você poderá alterá-la novamente a qualquer momento nas configurações da sua conta.
+      </div>
+    </div>
+  </div>
+</div>

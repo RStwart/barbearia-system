@@ -1,40 +1,170 @@
 .cadastro-container {
-  max-width: 350px;
+  max-width: 500px;
   margin: 40px auto;
   background: #fff;
-  padding: 30px 20px;
+  padding: 40px 30px;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.08);
-  text-align: center;
-}
-.cadastro-container h2 {
-  margin-bottom: 20px;
-}
-.cadastro-container input {
-  width: 90%;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1.5px solid #ccc;
-  font-size: 14px;
-}
-.cadastro-container button {
-  width: 100%;
-  padding: 12px;
-  background: #6C63FF;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 15px;
-}
-.cadastro-container button:hover {
-  background: #5a54f0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
+.cadastro-container h2 {
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 28px;
+  text-align: center;
+}
+
+.subtitulo {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: #444;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #ddd;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #6C63FF;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+/* Validadores de Senha */
+.senha-validadores {
+  margin-top: 10px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.validador {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  color: #999;
+  transition: color 0.3s ease;
+}
+
+.validador:last-child {
+  margin-bottom: 0;
+}
+
+.validador.valido {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.validador .icone {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+/* Conferência de Senha */
+.senha-conferencia {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.senha-conferencia .conferem {
+  color: #28a745;
+}
+
+.senha-conferencia .nao-conferem {
+  color: #dc3545;
+}
+
+/* Botões */
+.form-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-cadastrar,
+.btn-voltar {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cadastrar {
+  background: #6C63FF;
+  color: white;
+}
+
+.btn-cadastrar:hover:not(:disabled) {
+  background: #5a54f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+}
+
+.btn-cadastrar:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-voltar {
+  background: #f8f9fa;
+  color: #666;
+  border: 1.5px solid #ddd;
+}
+
+.btn-voltar:hover:not(:disabled) {
+  background: #e9ecef;
+  border-color: #ccc;
+}
+
+.btn-voltar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
-  .cadastro-container { max-width: 92%; margin: 20px auto; padding: 20px; }
-  .cadastro-container input { width: 100%; }
-  .cadastro-container button { width: 100%; }
+  .cadastro-container { 
+    max-width: 92%; 
+    margin: 20px auto; 
+    padding: 30px 20px; 
+  }
+  
+  .cadastro-container h2 {
+    font-size: 24px;
+  }
+  
+  .form-group input {
+    font-size: 16px; /* Previne zoom no iOS */
+  }
 }
