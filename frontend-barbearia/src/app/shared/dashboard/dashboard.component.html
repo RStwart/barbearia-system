@@ -1,10 +1,285 @@
-<div class="dash-grid">
-  <h1>Dashboard</h1>
-  <p>Bem-vindo ao painel. Aqui você verá os dados e navegações.</p>
+<div class="dashboard-container">
+  <!-- HEADER -->
+  <div class="header">
+    <h1>📊 Dashboard</h1>
+    <p class="subtitle">Visão geral do seu negócio</p>
+  </div>
 
-  <section class="cards">
-    <div class="card">Faturamento Semanal<br /><strong>0</strong></div>
-    <div class="card">Faturamento Mensal<br /><strong>0</strong></div>
-    <div class="card">Faturamento Anual<br /><strong>0</strong></div>
-  </section>
+  <!-- MENSAGEM -->
+  <div *ngIf="mensagem" class="mensagem" [class.sucesso]="tipoMensagem === 'sucesso'" [class.erro]="tipoMensagem === 'erro'">
+    {{ mensagem }}
+  </div>
+
+  <!-- LOADING ESTATÍSTICAS -->
+  <div *ngIf="carregandoEstatisticas" class="loading">
+    <div class="spinner"></div>
+    <p>Carregando estatísticas...</p>
+  </div>
+
+  <!-- CARDS DE ESTATÍSTICAS -->
+  <div *ngIf="!carregandoEstatisticas && estatisticas" class="stats-grid">
+    <!-- Card Dia -->
+    <div class="stat-card card-blue">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <h3>Hoje</h3>
+        <p class="stat-value">{{ formatarPreco(estatisticas.vendasDia.valor) }}</p>
+        <p class="stat-label">{{ estatisticas.vendasDia.total }} vendas</p>
+      </div>
+    </div>
+
+    <!-- Card Semana -->
+    <div class="stat-card card-green">
+      <div class="stat-icon">📆</div>
+      <div class="stat-info">
+        <h3>Esta Semana</h3>
+        <p class="stat-value">{{ formatarPreco(estatisticas.vendasSemana.valor) }}</p>
+        <p class="stat-label">{{ estatisticas.vendasSemana.total }} vendas</p>
+      </div>
+    </div>
+
+    <!-- Card Mês -->
+    <div class="stat-card card-purple">
+      <div class="stat-icon">📊</div>
+      <div class="stat-info">
+        <h3>Este Mês</h3>
+        <p class="stat-value">{{ formatarPreco(estatisticas.vendasMes.valor) }}</p>
+        <p class="stat-label">{{ estatisticas.vendasMes.total }} vendas</p>
+      </div>
+    </div>
+
+    <!-- Card Ano -->
+    <div class="stat-card card-orange">
+      <div class="stat-icon">📈</div>
+      <div class="stat-info">
+        <h3>Este Ano</h3>
+        <p class="stat-value">{{ formatarPreco(estatisticas.vendasAno.valor) }}</p>
+        <p class="stat-label">{{ estatisticas.vendasAno.total}} vendas</p>
+      </div>
+    </div>
+
+    <!-- Card NF Pendentes -->
+    <div class="stat-card card-red">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-info">
+        <h3>NF Pendentes</h3>
+        <p class="stat-value">{{ estatisticas.nfPendentes }}</p>
+        <p class="stat-label">Aguardando ajuste</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUTOS E SERVIÇOS MAIS VENDIDOS -->
+  <div *ngIf="!carregandoEstatisticas && estatisticas" class="ranking-grid">
+    <!-- Top Produtos -->
+    <div class="ranking-card">
+      <h3>🏆 Produtos Mais Vendidos (Mês)</h3>
+      <div class="ranking-list">
+        <div *ngFor="let produto of estatisticas.produtosMaisVendidos; let i = index" class="ranking-item">
+          <span class="ranking-position">{{ i + 1 }}º</span>
+          <span class="ranking-nome">{{ produto.produto_nome }}</span>
+          <span class="ranking-quantidade">{{ produto.total_vendido }} un.</span>
+          <span class="ranking-valor">{{ formatarPreco(produto.valor_total) }}</span>
+        </div>
+        <div *ngIf="estatisticas.produtosMaisVendidos.length === 0" class="ranking-vazio">
+          Nenhum produto vendido este mês
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Serviços -->
+    <div class="ranking-card">
+      <h3>⭐ Serviços Mais Vendidos (Mês)</h3>
+      <div class="ranking-list">
+        <div *ngFor="let servico of estatisticas.servicosMaisVendidos; let i = index" class="ranking-item">
+          <span class="ranking-position">{{ i + 1 }}º</span>
+          <span class="ranking-nome">{{ servico.servico_nome }}</span>
+          <span class="ranking-quantidade">{{ servico.total_vendido }} vez(es)</span>
+          <span class="ranking-valor">{{ formatarPreco(servico.valor_total) }}</span>
+        </div>
+        <div *ngIf="estatisticas.servicosMaisVendidos.length === 0" class="ranking-vazio">
+          Nenhum serviço vendido este mês
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTROS DE VENDAS -->
+  <div class="filtros-section">
+    <h2>💰 Histórico de Vendas</h2>
+    
+    <div class="filtros-container">
+      <div class="filtro-grupo">
+        <label>Status NF:</label>
+        <select [(ngModel)]="filtroStatusNF" (change)="aplicarFiltros()">
+          <option value="TODOS">Todos</option>
+          <option value="AGUARDANDO_AJUSTE">Aguardando Ajuste</option>
+          <option value="EMITIDA">NF Emitida</option>
+          <option value="NAO_NECESSARIA">Não Necessária</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo">
+        <label>Tipo:</label>
+        <select [(ngModel)]="filtroTipoVenda" (change)="aplicarFiltros()">
+          <option value="TODOS">Todos</option>
+          <option value="SERVICO">Serviços</option>
+          <option value="PRODUTO">Produtos</option>
+          <option value="MISTO">Misto</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo">
+        <label>Período:</label>
+        <select [(ngModel)]="filtroPeriodo" (change)="aplicarFiltros()">
+          <option value="TODOS">Todos</option>
+          <option value="HOJE">Hoje</option>
+          <option value="SEMANA">Última Semana</option>
+          <option value="MES">Este Mês</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo busca-grupo">
+        <label>Buscar:</label>
+        <input 
+          type="text" 
+          [(ngModel)]="termoBusca" 
+          (input)="aplicarFiltros()"
+          placeholder="Cliente, funcionário, NF..."
+        />
+      </div>
+
+      <button class="btn-limpar-filtros" (click)="limparFiltros()">
+        🗑️ Limpar
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING VENDAS -->
+  <div *ngIf="carregandoVendas" class="loading">
+    <div class="spinner"></div>
+    <p>Carregando vendas...</p>
+  </div>
+
+  <!-- TABELA DE VENDAS -->
+  <div *ngIf="!carregandoVendas" class="table-container">
+    <table class="vendas-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Data/Hora</th>
+          <th>Tipo</th>
+          <th>Cliente</th>
+          <th>Funcionário</th>
+          <th>Valor</th>
+          <th>Pagamento</th>
+          <th>Status NF</th>
+          <th>Nota Fiscal</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let venda of vendasPaginadas">
+          <td>#{{ venda.id }}</td>
+          <td>{{ formatarDataHora(venda.criado_em!) }}</td>
+          <td>
+            <span class="badge-tipo" [ngClass]="getTipoVendaClass(venda.tipo_venda)">
+              {{ venda.tipo_venda }}
+            </span>
+          </td>
+          <td>{{ venda.cliente_nome || 'N/A' }}</td>
+          <td>{{ venda.funcionario_nome }}</td>
+          <td class="valor">{{ formatarPreco(venda.valor_total) }}</td>
+          <td>{{ venda.forma_pagamento }}</td>
+          <td>
+            <span class="badge" [ngClass]="getStatusNFClass(venda.status_nf)">
+              {{ getStatusNFTexto(venda.status_nf) }}
+            </span>
+          </td>
+          <td>{{ venda.nota_fiscal || '-' }}</td>
+          <td>
+            <button 
+              class="btn-acao btn-editar" 
+              (click)="abrirModalNF(venda)"
+              title="Editar Nota Fiscal"
+            >
+              📝
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="vendasFiltradas.length === 0" class="sem-resultados">
+      <span class="icone">🔍</span>
+      <h3>Nenhuma venda encontrada</h3>
+      <p>Tente ajustar os filtros</p>
+    </div>
+  </div>
+
+  <!-- PAGINAÇÃO -->
+  <div *ngIf="vendasFiltradas.length > 0" class="paginacao">
+    <button 
+      class="btn-pagina" 
+      (click)="mudarPagina(paginaAtual - 1)"
+      [disabled]="paginaAtual === 1"
+    >
+      ◀
+    </button>
+    
+    <span class="pagina-info">
+      Página {{ paginaAtual }} de {{ totalPaginas }} ({{ vendasFiltradas.length }} vendas)
+    </span>
+    
+    <button 
+      class="btn-pagina" 
+      (click)="mudarPagina(paginaAtual + 1)"
+      [disabled]="paginaAtual === totalPaginas"
+    >
+      ▶
+    </button>
+  </div>
+
+  <!-- MODAL NOTA FISCAL -->
+  <div *ngIf="mostrarModalNF" class="modal-overlay" (click)="fecharModalNF()">
+    <div class="modal-conteudo" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📝 Editar Nota Fiscal</h2>
+        <button class="btn-fechar" (click)="fecharModalNF()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-venda">
+          <p><strong>Venda ID:</strong> #{{ vendaSelecionada?.id }}</p>
+          <p><strong>Valor Total:</strong> {{ formatarPreco(vendaSelecionada?.valor_total!) }}</p>
+          <p><strong>Cliente:</strong> {{ vendaSelecionada?.cliente_nome || 'N/A' }}</p>
+          <p><strong>Data:</strong> {{ formatarDataHora(vendaSelecionada?.criado_em!) }}</p>
+        </div>
+
+        <div class="form-grupo">
+          <label>Número da Nota Fiscal *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="notaFiscal"
+            placeholder="Ex: 12345"
+            required
+          />
+        </div>
+
+        <div class="form-grupo">
+          <label>Status da NF *</label>
+          <select [(ngModel)]="statusNF">
+            <option value="EMITIDA">NF Emitida</option>
+            <option value="NAO_NECESSARIA">Não Necessária</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="fecharModalNF()">Cancelar</button>
+        <button class="btn btn-primary" (click)="salvarNotaFiscal()">Salvar</button>
+      </div>
+    </div>
+  </div>
 </div>
+

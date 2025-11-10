@@ -8,6 +8,7 @@ const cadastroRoutes = require("./routes/cadastro.routes.js");
 const agendamentosRoutes = require("./routes/agendamentos.routes.js");
 const funcionariosRoutes = require("./routes/funcionarios.routes.js");
 const produtosRoutes = require("./routes/produtos.routes.js");
+const vendasRoutes = require("./routes/vendas.routes.js");
 
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/cadastro", cadastroRoutes);
 app.use("/api/agendamentos", agendamentosRoutes);
 app.use("/api/funcionarios", funcionariosRoutes);
 app.use("/api/produtos", produtosRoutes);
+app.use("/api/vendas", vendasRoutes);
 
 //Inicia o servidor
 app.listen(PORT, () => {
