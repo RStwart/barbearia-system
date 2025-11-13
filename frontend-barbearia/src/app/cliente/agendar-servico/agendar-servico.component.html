@@ -1,0 +1,218 @@
+<div class="agendar-container">
+  <!-- Header -->
+  <div class="header-agendamento">
+    <button class="btn-voltar" (click)="voltar()">
+      ← Voltar
+    </button>
+    
+    <div class="info-servico" *ngIf="servico && barbearia">
+      <h1>Agendar Serviço</h1>
+      <div class="servico-resumo">
+        <h2>{{ servico.nome }}</h2>
+        <p>{{ barbearia.nome }}</p>
+        <div class="servico-detalhes">
+          <span class="badge">⏱️ {{ servico.duracao }} min</span>
+          <span class="badge preco">{{ formatarPreco(servico.preco) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progresso -->
+  <div class="progresso-etapas">
+    <div class="etapa" [class.ativa]="etapaAtual >= 1" [class.concluida]="etapaAtual > 1">
+      <div class="etapa-numero">1</div>
+      <span>Profissional</span>
+    </div>
+    <div class="etapa-linha" [class.ativa]="etapaAtual > 1"></div>
+    <div class="etapa" [class.ativa]="etapaAtual >= 2" [class.concluida]="etapaAtual > 2">
+      <div class="etapa-numero">2</div>
+      <span>Data e Hora</span>
+    </div>
+    <div class="etapa-linha" [class.ativa]="etapaAtual > 2"></div>
+    <div class="etapa" [class.ativa]="etapaAtual >= 3">
+      <div class="etapa-numero">3</div>
+      <span>Pagamento</span>
+    </div>
+  </div>
+
+  <!-- Mensagem de erro -->
+  <div class="mensagem erro" *ngIf="erro">
+    ❌ {{ erro }}
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando">
+    <div class="spinner"></div>
+    <p>Carregando...</p>
+  </div>
+
+  <!-- Etapa 1: Selecionar Funcionário -->
+  <div class="etapa-conteudo" *ngIf="etapaAtual === 1 && !carregando">
+    <h3>Escolha o Profissional</h3>
+    
+    <div class="funcionarios-grid">
+      <div 
+        class="funcionario-card" 
+        *ngFor="let funcionario of funcionarios"
+        [class.selecionado]="funcionarioSelecionado?.id === funcionario.id"
+        (click)="selecionarFuncionario(funcionario)">
+        <div class="funcionario-avatar">
+          <img [src]="funcionario.foto_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80'" 
+               [alt]="funcionario.nome">
+        </div>
+        <h4>{{ funcionario.nome }}</h4>
+        <div class="check-icon" *ngIf="funcionarioSelecionado?.id === funcionario.id">✓</div>
+      </div>
+    </div>
+
+    <div class="acoes">
+      <button 
+        class="btn btn-primary" 
+        (click)="proximaEtapa()"
+        [disabled]="!funcionarioSelecionado">
+        Continuar →
+      </button>
+    </div>
+  </div>
+
+  <!-- Etapa 2: Selecionar Data e Hora -->
+  <div class="etapa-conteudo" *ngIf="etapaAtual === 2">
+    <h3>Escolha a Data e Horário</h3>
+    
+    <div class="calendario-container">
+      <div class="calendario-header">
+        <button class="btn-mes" (click)="mesAnterior()">←</button>
+        <h4>{{ getNomeMes() }}</h4>
+        <button class="btn-mes" (click)="mesSeguinte()">→</button>
+      </div>
+      
+      <div class="calendario">
+        <div class="dia-semana">Dom</div>
+        <div class="dia-semana">Seg</div>
+        <div class="dia-semana">Ter</div>
+        <div class="dia-semana">Qua</div>
+        <div class="dia-semana">Qui</div>
+        <div class="dia-semana">Sex</div>
+        <div class="dia-semana">Sáb</div>
+        
+        <div 
+          *ngFor="let dia of diasDoMes"
+          class="dia"
+          [class.vazio]="isDiaVazio(dia)"
+          [class.passado]="isDiaPassado(dia)"
+          [class.selecionado]="isDiaSelecionado(dia)"
+          (click)="selecionarData(dia)">
+          <span *ngIf="!isDiaVazio(dia)">{{ dia.getDate() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="horarios-container" *ngIf="dataSelecionada">
+      <h4>Horários Disponíveis - {{ formatarData(dataSelecionada) }}</h4>
+      
+      <div class="horarios-grid">
+        <div 
+          *ngFor="let horario of horariosDisponiveis"
+          class="horario-slot"
+          [class.indisponivel]="!horario.disponivel"
+          [class.selecionado]="horarioSelecionado === horario.hora"
+          (click)="selecionarHorario(horario)">
+          {{ horario.hora }}
+        </div>
+      </div>
+    </div>
+
+    <div class="acoes">
+      <button class="btn btn-secondary" (click)="etapaAnterior()">
+        ← Voltar
+      </button>
+      <button 
+        class="btn btn-primary" 
+        (click)="proximaEtapa()"
+        [disabled]="!dataSelecionada || !horarioSelecionado">
+        Continuar →
+      </button>
+    </div>
+  </div>
+
+  <!-- Etapa 3: Pagamento -->
+  <div class="etapa-conteudo" *ngIf="etapaAtual === 3">
+    <h3>Pagamento Antecipado</h3>
+    
+    <div class="resumo-agendamento">
+      <h4>Resumo do Agendamento</h4>
+      <div class="resumo-item">
+        <span>Serviço:</span>
+        <strong>{{ servico?.nome }}</strong>
+      </div>
+      <div class="resumo-item">
+        <span>Profissional:</span>
+        <strong>{{ funcionarioSelecionado?.nome }}</strong>
+      </div>
+      <div class="resumo-item">
+        <span>Data:</span>
+        <strong>{{ formatarData(dataSelecionada!) }}</strong>
+      </div>
+      <div class="resumo-item">
+        <span>Horário:</span>
+        <strong>{{ horarioSelecionado }}</strong>
+      </div>
+      <div class="resumo-item total">
+        <span>Total:</span>
+        <strong>{{ formatarPreco(servico?.preco || 0) }}</strong>
+      </div>
+    </div>
+
+    <div class="metodos-pagamento">
+      <h4>Escolha a forma de pagamento</h4>
+      
+      <div class="pagamento-opcoes">
+        <div 
+          class="pagamento-card"
+          [class.selecionado]="metodoPagamento === 'pix'"
+          (click)="selecionarMetodoPagamento('pix')">
+          <div class="icone-pagamento">📱</div>
+          <h5>PIX</h5>
+          <p>Pagamento instantâneo</p>
+          <div class="check-icon" *ngIf="metodoPagamento === 'pix'">✓</div>
+        </div>
+        
+        <div 
+          class="pagamento-card"
+          [class.selecionado]="metodoPagamento === 'cartao'"
+          (click)="selecionarMetodoPagamento('cartao')">
+          <div class="icone-pagamento">💳</div>
+          <h5>Cartão</h5>
+          <p>Crédito ou Débito</p>
+          <div class="check-icon" *ngIf="metodoPagamento === 'cartao'">✓</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acoes">
+      <button class="btn btn-secondary" (click)="etapaAnterior()" [disabled]="processandoPagamento">
+        ← Voltar
+      </button>
+      <button 
+        class="btn btn-success" 
+        (click)="finalizarAgendamento()"
+        [disabled]="!metodoPagamento || processandoPagamento">
+        <span *ngIf="!processandoPagamento">💰 Confirmar e Pagar</span>
+        <span *ngIf="processandoPagamento">Processando...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Sucesso -->
+  <div class="modal-sucesso" *ngIf="agendamentoConcluido">
+    <div class="modal-conteudo">
+      <div class="icone-sucesso">✅</div>
+      <h2>Agendamento Confirmado!</h2>
+      <p>Seu pagamento foi processado com sucesso.</p>
+      <p>Você receberá uma confirmação por e-mail.</p>
+      <div class="spinner-redirect"></div>
+      <p class="texto-redirect">Redirecionando...</p>
+    </div>
+  </div>
+</div>

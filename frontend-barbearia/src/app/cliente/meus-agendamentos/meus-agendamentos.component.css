@@ -1,0 +1,587 @@
+.agendamentos-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+/* Header */
+.header-agendamentos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.titulo-section h1 {
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin: 0 0 5px 0;
+}
+
+.titulo-section p {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Filtros */
+.filtros-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.filtro-btn {
+  padding: 10px 20px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #475569;
+  transition: all 0.3s ease;
+}
+
+.filtro-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.filtro-btn.ativo {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-color: #2563eb;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: #64748b;
+}
+
+.spinner {
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Erro */
+.mensagem.erro {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #dc2626;
+}
+
+/* Tabela */
+.tabela-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.tabela-agendamentos {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela-agendamentos thead {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.tabela-agendamentos th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.tabela-agendamentos th:nth-child(6), /* Valor */
+.tabela-agendamentos td:nth-child(6) {
+  min-width: 100px;
+  text-align: center;
+}
+
+.tabela-agendamentos th:nth-child(7), /* Status */
+.tabela-agendamentos td:nth-child(7) {
+  min-width: 120px;
+  text-align: center;
+}
+
+.tabela-agendamentos th:nth-child(8), /* Ações */
+.tabela-agendamentos td:nth-child(8) {
+  min-width: 200px;
+  text-align: center;
+}
+
+.tabela-agendamentos td {
+  padding: 15px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+  min-width: 100px;
+}
+
+.linha-agendamento:hover {
+  background: #f8fafc;
+}
+
+.linha-agendamento:last-child td {
+  border-bottom: none;
+}
+
+/* Info nas células */
+.data-info .data-dia {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.horario-info .horario {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.servico-info strong {
+  display: block;
+  color: #1e293b;
+  margin-bottom: 3px;
+}
+
+.servico-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.funcionario-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.funcionario-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #e2e8f0;
+}
+
+.funcionario-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.unidade-info strong {
+  display: block;
+  color: #1e293b;
+  margin-bottom: 3px;
+}
+
+.unidade-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.valor {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #059669;
+  white-space: nowrap;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.status-badge.status-pendente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.status-confirmado {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.status-andamento {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.status-badge.status-concluido {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.status-cancelado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Ações */
+.acoes-grupo {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-acao {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-avaliar {
+  background: #fbbf24;
+  color: white;
+}
+
+.btn-avaliar:hover {
+  background: #f59e0b;
+  transform: translateY(-2px);
+}
+
+.btn-remarcar {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-remarcar:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+.btn-cancelar {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+/* Botões Principais */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.btn-secondary:hover {
+  background: #cbd5e1;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Sem Agendamentos */
+.sem-agendamentos {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.icone-vazio {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  opacity: 0.3;
+}
+
+.sem-agendamentos h3 {
+  color: #1e293b;
+  margin: 0 0 10px 0;
+}
+
+.sem-agendamentos p {
+  color: #64748b;
+  margin: 0 0 30px 0;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-conteudo {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-pequeno {
+  max-width: 450px;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.5rem;
+}
+
+.btn-fechar {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #94a3b8;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.btn-fechar:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px 25px;
+  border-top: 2px solid #e2e8f0;
+}
+
+/* Avaliação */
+.avaliacao-info {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.avaliacao-info h3 {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+}
+
+.avaliacao-info p {
+  margin: 4px 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.avaliacao-estrelas {
+  margin-bottom: 25px;
+}
+
+.avaliacao-estrelas p {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 15px;
+}
+
+.estrelas {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.estrela {
+  font-size: 3rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.estrela:hover,
+.estrela.selecionada {
+  color: #fbbf24;
+  transform: scale(1.1);
+}
+
+.avaliacao-comentario label {
+  display: block;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.avaliacao-comentario textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.avaliacao-comentario textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* Confirmação */
+.confirmacao-info {
+  background: #fef3c7;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.confirmacao-info strong {
+  display: block;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.confirmacao-info p {
+  margin: 4px 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+  .tabela-container {
+    overflow-x: auto;
+  }
+  
+  .tabela-agendamentos {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  .agendamentos-container {
+    padding: 20px;
+  }
+  
+  .header-agendamentos {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filtros-container {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .titulo-section h1 {
+    font-size: 1.5rem;
+  }
+  
+  .modal-conteudo {
+    width: 95%;
+  }
+  
+  .estrela {
+    font-size: 2.5rem;
+  }
+}

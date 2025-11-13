@@ -17,6 +17,8 @@ import { AdminEstabelecimentosComponent } from './pages/admin/admin-estabelecime
 // Componentes do Cliente
 import { InicioClienteComponent } from './cliente/inicio-cliente/inicio-cliente.component';
 import { BarbeariaDetalhesComponent } from './cliente/barbearia-detalhes/barbearia-detalhes.component';
+import { AgendarServicoComponent } from './cliente/agendar-servico/agendar-servico.component';
+import { MeusAgendamentosComponent } from './cliente/meus-agendamentos/meus-agendamentos.component';
 
 // Componentes compartilhados (temporários)
 import { DashboardComponent } from './shared/dashboard/dashboard.component';
@@ -50,7 +52,8 @@ export const routes: Routes = [
     children: [
       { path: '', component: InicioClienteComponent },
       { path: 'barbearia/:id', component: BarbeariaDetalhesComponent },
-      { path: 'agendamentos', component: AgendamentosComponent },
+      { path: 'agendar', component: AgendarServicoComponent },
+      { path: 'agendamentos', component: MeusAgendamentosComponent },
       { path: 'favoritos', component: DashboardComponent }, // TODO: Criar componente
       { path: 'historico', component: DashboardComponent } // TODO: Criar componente
     ]

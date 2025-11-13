@@ -1,0 +1,232 @@
+<div class="agendamentos-container">
+  <!-- Header -->
+  <div class="header-agendamentos">
+    <div class="titulo-section">
+      <h1>📅 Meus Agendamentos</h1>
+      <p>Gerencie seus agendamentos e avalie os serviços</p>
+    </div>
+    <button class="btn btn-primary" (click)="novoAgendamento()">
+      ➕ Novo Agendamento
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-container">
+    <button 
+      class="filtro-btn" 
+      [class.ativo]="filtroStatus === 'todos'"
+      (click)="alterarFiltro('todos')">
+      Todos
+    </button>
+    <button 
+      class="filtro-btn" 
+      [class.ativo]="filtroStatus === 'pendente'"
+      (click)="alterarFiltro('pendente')">
+      Pendentes
+    </button>
+    <button 
+      class="filtro-btn" 
+      [class.ativo]="filtroStatus === 'confirmado'"
+      (click)="alterarFiltro('confirmado')">
+      Confirmados
+    </button>
+    <button 
+      class="filtro-btn" 
+      [class.ativo]="filtroStatus === 'concluido'"
+      (click)="alterarFiltro('concluido')">
+      Concluídos
+    </button>
+    <button 
+      class="filtro-btn" 
+      [class.ativo]="filtroStatus === 'cancelado'"
+      (click)="alterarFiltro('cancelado')">
+      Cancelados
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando">
+    <div class="spinner"></div>
+    <p>Carregando agendamentos...</p>
+  </div>
+
+  <!-- Erro -->
+  <div class="mensagem erro" *ngIf="erro">
+    ❌ {{ erro }}
+  </div>
+
+  <!-- Tabela de Agendamentos -->
+  <div class="tabela-container" *ngIf="!carregando && agendamentosFiltrados.length > 0">
+    <table class="tabela-agendamentos">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Horário</th>
+          <th>Serviço</th>
+          <th>Profissional</th>
+          <th>Unidade</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let agendamento of agendamentosFiltrados" class="linha-agendamento">
+          <td>
+            <div class="data-info">
+              <span class="data-dia">{{ formatarData(agendamento.data_agendamento) }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="horario-info">
+              <span class="horario">{{ agendamento.hora_inicio.substring(0,5) }} - {{ agendamento.hora_fim.substring(0,5) }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="servico-info">
+              <strong>{{ agendamento.servico_nome }}</strong>
+              <p *ngIf="agendamento.servico_descricao">{{ agendamento.servico_descricao }}</p>
+            </div>
+          </td>
+          <td>
+            <div class="funcionario-info">
+              <div class="funcionario-avatar">
+                <img [src]="agendamento.funcionario_foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80'" 
+                     [alt]="agendamento.funcionario_nome">
+              </div>
+              <span>{{ agendamento.funcionario_nome }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="unidade-info">
+              <strong>{{ agendamento.unidade_nome }}</strong>
+              <p *ngIf="agendamento.cidade">{{ agendamento.cidade }}</p>
+            </div>
+          </td>
+          <td>
+            <span class="valor">{{ formatarPreco(agendamento.valor_total) }}</span>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(agendamento.status)">
+              {{ getStatusTexto(agendamento.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="acoes-grupo">
+              <button 
+                *ngIf="podeAvaliar(agendamento)"
+                class="btn-acao btn-avaliar"
+                (click)="abrirModalAvaliacao(agendamento)"
+                title="Avaliar serviço">
+                ⭐ Avaliar
+              </button>
+              
+              <button 
+                *ngIf="podeRemarcar(agendamento)"
+                class="btn-acao btn-remarcar"
+                (click)="remarcarAgendamento(agendamento)"
+                title="Remarcar">
+                🔄 Remarcar
+              </button>
+              
+              <button 
+                *ngIf="podeCancelar(agendamento)"
+                class="btn-acao btn-cancelar"
+                (click)="abrirModalCancelar(agendamento)"
+                title="Cancelar agendamento">
+                ❌ Cancelar
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sem Agendamentos -->
+  <div class="sem-agendamentos" *ngIf="!carregando && agendamentosFiltrados.length === 0">
+    <div class="icone-vazio">📅</div>
+    <h3>Nenhum agendamento encontrado</h3>
+    <p *ngIf="filtroStatus === 'todos'">Você ainda não tem agendamentos</p>
+    <p *ngIf="filtroStatus !== 'todos'">Não há agendamentos com status "{{ getStatusTexto(filtroStatus) }}"</p>
+    <button class="btn btn-primary" (click)="novoAgendamento()">
+      Agendar Agora
+    </button>
+  </div>
+</div>
+
+<!-- Modal de Avaliação -->
+<div class="modal-overlay" *ngIf="mostrarModalAvaliacao" (click)="fecharModalAvaliacao()">
+  <div class="modal-conteudo" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⭐ Avaliar Serviço</h2>
+      <button class="btn-fechar" (click)="fecharModalAvaliacao()">×</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="agendamentoParaAvaliar">
+      <div class="avaliacao-info">
+        <h3>{{ agendamentoParaAvaliar.servico_nome }}</h3>
+        <p>Profissional: {{ agendamentoParaAvaliar.funcionario_nome }}</p>
+        <p>{{ formatarData(agendamentoParaAvaliar.data_agendamento) }}</p>
+      </div>
+
+      <div class="avaliacao-estrelas">
+        <p>Como você avalia o serviço?</p>
+        <div class="estrelas">
+          <span 
+            *ngFor="let i of [1,2,3,4,5]"
+            class="estrela"
+            [class.selecionada]="i <= notaAvaliacao"
+            (click)="selecionarNota(i)">
+            ★
+          </span>
+        </div>
+      </div>
+
+      <div class="avaliacao-comentario">
+        <label>Deixe seu comentário (opcional)</label>
+        <textarea 
+          [(ngModel)]="comentarioAvaliacao"
+          placeholder="Conte-nos sobre sua experiência..."
+          rows="4"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="fecharModalAvaliacao()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="enviarAvaliacao()" [disabled]="notaAvaliacao === 0">
+        Enviar Avaliação
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Cancelamento -->
+<div class="modal-overlay" *ngIf="mostrarModalCancelar" (click)="fecharModalCancelar()">
+  <div class="modal-conteudo modal-pequeno" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⚠️ Cancelar Agendamento</h2>
+      <button class="btn-fechar" (click)="fecharModalCancelar()">×</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="agendamentoParaCancelar">
+      <p>Tem certeza que deseja cancelar este agendamento?</p>
+      <div class="confirmacao-info">
+        <strong>{{ agendamentoParaCancelar.servico_nome }}</strong>
+        <p>{{ formatarData(agendamentoParaCancelar.data_agendamento) }} às {{ agendamentoParaCancelar.hora_inicio.substring(0,5) }}</p>
+        <p>Profissional: {{ agendamentoParaCancelar.funcionario_nome }}</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="fecharModalCancelar()">
+        Não, manter
+      </button>
+      <button class="btn btn-danger" (click)="confirmarCancelamento()">
+        Sim, cancelar
+      </button>
+    </div>
+  </div>
+</div>
