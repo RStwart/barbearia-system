@@ -74,7 +74,14 @@ export class BarbeariaDetalhesComponent implements OnInit {
   carregarServicos() {
     this.barbeariasService.listarServicosPorBarbearia(this.barbeariaId).subscribe({
       next: (response: any) => {
-        this.servicos = response.servicos || [];
+        console.log('Resposta completa de serviços:', response);
+        // Converter preço de string para number
+        this.servicos = (response.servicos || []).map((s: any) => ({
+          ...s,
+          preco: parseFloat(s.preco) || 0,
+          duracao: parseInt(s.duracao) || 0
+        }));
+        console.log('Serviços processados:', this.servicos);
       },
       error: (error: any) => {
         console.error('Erro ao carregar serviços:', error);
@@ -107,10 +114,30 @@ export class BarbeariaDetalhesComponent implements OnInit {
   }
 
   formatarPreco(preco: number): string {
+    if (!preco && preco !== 0) return '0,00';
     return preco.toFixed(2).replace('.', ',');
   }
 
+  formatarPrecoReal(preco: number): string {
+    if (!preco && preco !== 0) return 'R$ 0,00';
+    return 'R$ ' + preco.toFixed(2).replace('.', ',');
+  }
+
   getImagemUrl(foto: string | null | undefined): string {
-    return foto || 'https://via.placeholder.com/300x200?text=Serviço';
+    return foto || 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80';
+  }
+
+  getServicoImagemUrl(foto: string | null | undefined): string {
+    // Imagens específicas para serviços de barbearia
+    if (foto) return foto;
+    
+    const imagensServicos = [
+      'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&q=80', // Corte de cabelo
+      'https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=400&q=80', // Barba
+      'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&q=80', // Barbearia moderna
+      'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400&q=80'  // Tesouras
+    ];
+    
+    return imagensServicos[Math.floor(Math.random() * imagensServicos.length)];
   }
 }

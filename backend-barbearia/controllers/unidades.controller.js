@@ -584,12 +584,11 @@ const listarServicosPorUnidade = async (req, res) => {
     const { id } = req.params;
 
     const query = `
-      SELECT p.id, p.nome, p.descricao, p.preco, p.foto_url, p.ativo,
-             c.nome as categoria_nome
-      FROM produtos p
-      LEFT JOIN categorias c ON p.categoria_id = c.id
-      WHERE p.estabelecimento_id = ? AND p.ativo = 1
-      ORDER BY p.nome ASC
+      SELECT id, nome, descricao, preco, duracao, ativo,
+             created_at, updated_at
+      FROM servicos
+      WHERE unidade_id = ? AND ativo = 1
+      ORDER BY nome ASC
     `;
 
     const [servicos] = await db.execute(query, [id]);
@@ -614,17 +613,23 @@ const listarFuncionariosPorUnidade = async (req, res) => {
     const { id } = req.params;
 
     const query = `
-      SELECT id, nome, email, telefone, foto_url
+      SELECT id, nome, email, telefone, foto_perfil
       FROM usuarios
-      WHERE estabelecimento_id = ? AND tipo IN ('FUNCIONARIO', 'GERENTE') AND ativo = 1
+      WHERE unidade_id = ? AND tipo IN ('FUNCIONARIO', 'GERENTE') AND ativo = 1
       ORDER BY nome ASC
     `;
 
     const [funcionarios] = await db.execute(query, [id]);
 
+    // Mapear foto_perfil para foto_url para compatibilidade com frontend
+    const funcionariosFormatados = funcionarios.map(func => ({
+      ...func,
+      foto_url: func.foto_perfil
+    }));
+
     res.json({
       success: true,
-      funcionarios
+      funcionarios: funcionariosFormatados
     });
   } catch (error) {
     console.error('Erro ao listar funcionários:', error);

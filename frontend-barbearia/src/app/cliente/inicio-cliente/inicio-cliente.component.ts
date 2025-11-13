@@ -56,6 +56,6 @@ export class InicioClienteComponent implements OnInit {
   }
 
   getImagemUrl(foto: string | null): string {
-    return foto || 'https://via.placeholder.com/400x300?text=Barbearia';
+    return foto || 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80';
   }
 }

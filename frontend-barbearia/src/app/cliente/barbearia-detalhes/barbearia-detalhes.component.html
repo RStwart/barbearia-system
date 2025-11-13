@@ -48,39 +48,42 @@
     <div class="servicos-section">
       <h2>✂️ Serviços Disponíveis</h2>
       
-      <div class="servicos-grid">
+      <div class="servicos-grid" *ngIf="servicos.length > 0">
         <div class="servico-card" *ngFor="let servico of servicos">
           <div class="servico-imagem">
-            <img [src]="getImagemUrl(servico.foto_url)" [alt]="servico.nome">
-            <div class="servico-categoria" *ngIf="servico.categoria_nome">
-              {{ servico.categoria_nome }}
-            </div>
+            <img [src]="getServicoImagemUrl(servico.foto_url)" [alt]="servico.nome">
           </div>
 
           <div class="servico-info">
             <h3>{{ servico.nome }}</h3>
-            <p class="servico-descricao" *ngIf="servico.descricao">
-              {{ servico.descricao }}
+            
+            <p class="servico-descricao">
+              {{ servico.descricao || 'Serviço profissional de qualidade' }}
             </p>
+
+            <div class="servico-duracao" *ngIf="servico.duracao">
+              <span class="icone">⏱️</span>
+              <span>{{ servico.duracao }} min</span>
+            </div>
 
             <div class="servico-footer">
               <div class="preco-info">
-                <span class="preco-label">Preço</span>
-                <span class="preco">R$ {{ formatarPreco(servico.preco) }}</span>
+                <span class="preco-label">Valor</span>
+                <span class="preco">{{ formatarPrecoReal(servico.preco) }}</span>
               </div>
               
               <button 
                 class="btn btn-agendar" 
                 (click)="agendarServico(servico)"
                 [disabled]="!servico.ativo">
-                {{ servico.ativo ? 'Agendar' : 'Indisponível' }}
+                📅 Agendar
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="sem-resultados" *ngIf="servicos.length === 0">
+      <div class="sem-resultados" *ngIf="servicos.length === 0 && !carregando">
         <span class="icone">✂️</span>
         <h3>Nenhum serviço disponível</h3>
         <p>Esta unidade ainda não cadastrou serviços</p>
@@ -95,7 +98,7 @@
         <div class="profissional-card" *ngFor="let funcionario of funcionarios">
           <div class="profissional-avatar">
             <img 
-              [src]="funcionario.foto_url || 'https://via.placeholder.com/150?text=👤'" 
+              [src]="funcionario.foto_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80'" 
               [alt]="funcionario.nome">
           </div>
           <div class="profissional-info">
