@@ -1,14 +1,14 @@
-<div class="produtos-container">
+﻿<div class="produtos-container">
   <!-- Header com Tabs -->
   <div class="header">
     <div class="header-left">
-      <h1>📦 Gestão da Loja</h1>
+      <h1>💼 Gestão de Serviços</h1>
       <div class="tabs">
         <button 
           class="tab"
-          [class.active]="abaAtiva === 'produtos'"
-          (click)="mudarAba('produtos')">
-          Produtos
+          [class.active]="abaAtiva === 'servicos'"
+          (click)="mudarAba('servicos')">
+          Serviços
         </button>
         <button 
           class="tab"
@@ -20,9 +20,9 @@
     </div>
     <button 
       class="btn btn-primary" 
-      (click)="abaAtiva === 'produtos' ? abrirModalNovoProduto() : abrirModalNovaCategoria()">
+      (click)="abaAtiva === 'servicos' ? abrirModalNovoServico() : abrirModalNovaCategoria()">
       <span class="icon">➕</span>
-      {{ abaAtiva === 'produtos' ? 'Novo Produto' : 'Nova Categoria' }}
+      {{ abaAtiva === 'servicos' ? 'Novo Serviço' : 'Nova Categoria' }}
     </button>
   </div>
 
@@ -31,69 +31,63 @@
     ✅ {{ sucesso }}
   </div>
 
-  <div class="mensagem erro" *ngIf="erro && !mostrarModalProduto && !mostrarModalCategoria">
+  <div class="mensagem erro" *ngIf="erro && !mostrarModalServico && !mostrarModalCategoria">
     ❌ {{ erro }}
   </div>
 
-  <!-- ==================== ABA PRODUTOS ==================== -->
-  <div *ngIf="abaAtiva === 'produtos'">
+  <!-- ==================== ABA SERVIÇOS ==================== -->
+  <div *ngIf="abaAtiva === 'servicos'">
     <!-- Filtros -->
     <div class="filtros-container">
       <div class="busca-box">
         <span class="icone-busca">🔍</span>
         <input 
           type="text" 
-          [(ngModel)]="termoBuscaProduto" 
-          (input)="aplicarFiltrosProdutos(); paginaAtualProdutos = 1"
-          placeholder="Buscar produtos por nome, descrição ou categoria..."
+          [(ngModel)]="termoBuscaServico" 
+          (input)="aplicarFiltrosServicos(); paginaAtualServicos = 1"
+          placeholder="Buscar serviços por nome, descrição ou categoria..."
           class="input-busca">
-        <button class="btn-limpar" (click)="limparFiltrosProdutos()" *ngIf="termoBuscaProduto">✖</button>
+        <button class="btn-limpar" (click)="limparFiltrosServicos()" *ngIf="termoBuscaServico">✖</button>
       </div>
     </div>
 
     <!-- Loading -->
-    <div class="loading" *ngIf="carregando && produtos.length === 0">
+    <div class="loading" *ngIf="carregando && servicos.length === 0">
       <div class="spinner"></div>
-      <p>Carregando produtos...</p>
+      <p>Carregando serviços...</p>
     </div>
 
-    <!-- Grid de Produtos -->
-    <div class="produtos-grid" *ngIf="!carregando || produtos.length > 0">
-      <div class="produto-card" *ngFor="let produto of produtosPaginados">
-        <div class="produto-imagem">
+    <!-- Grid de Serviços -->
+    <div class="servicos-grid" *ngIf="!carregando || servicos.length > 0">
+      <div class="servico-card" *ngFor="let produto of servicosPaginados">
+        <div class="servico-imagem">
           <img [src]="produto.foto_url || 'https://via.placeholder.com/300x200?text=Sem+Imagem'" 
                [alt]="produto.nome"
                (error)="onImageError($event)">
-          <div class="produto-status" [class.inativo]="!produto.ativo">
+          <div class="servico-status" [class.inativo]="!produto.ativo">
             {{ produto.ativo ? 'Ativo' : 'Inativo' }}
           </div>
         </div>
         
-        <div class="produto-info">
-          <span class="produto-categoria" *ngIf="produto.categoria_nome">
+        <div class="servico-info">
+          <span class="servico-categoria" *ngIf="produto.categoria_nome">
             {{ produto.categoria_nome }}
           </span>
-          <h3 class="produto-nome">{{ produto.nome }}</h3>
-          <p class="produto-descricao" *ngIf="produto.descricao">
+          <h3 class="servico-nome">{{ produto.nome }}</h3>
+          <p class="servico-descricao" *ngIf="produto.descricao">
             {{ produto.descricao }}
           </p>
           
-          <div class="produto-detalhes">
+          <div class="servico-detalhes">
             <div class="preco-container">
               <span class="preco-label">Preço</span>
               <span class="preco">R$ {{ formatarPreco(produto.preco) }}</span>
             </div>
-            <div class="estoque-container">
-              <span class="estoque-label">Estoque</span>
-              <span class="estoque" [class.baixo]="produto.estoque < 10">
-                {{ produto.estoque }} un.
-              </span>
-            </div>
           </div>
         </div>
 
-        <div class="produto-acoes">
-          <button class="btn-acao editar" (click)="abrirModalEditarProduto(produto)" title="Editar">
+        <div class="servico-acoes">
+          <button class="btn-acao editar" (click)="abrirModalEditarServico(produto)" title="Editar">
             ✏️
           </button>
           <button 
@@ -103,7 +97,7 @@
             [title]="produto.ativo ? 'Desativar' : 'Ativar'">
             {{ produto.ativo ? '👁️' : '🚫' }}
           </button>
-          <button class="btn-acao excluir" (click)="confirmarExclusaoProduto(produto)" title="Excluir">
+          <button class="btn-acao excluir" (click)="confirmarExclusaoServico(produto)" title="Excluir">
             🗑️
           </button>
         </div>
@@ -111,30 +105,30 @@
     </div>
 
     <!-- Sem resultados -->
-    <div class="sem-resultados" *ngIf="produtosPaginados.length === 0 && !carregando">
+    <div class="sem-resultados" *ngIf="servicosPaginados.length === 0 && !carregando">
       <span class="icone">📭</span>
-      <h3>Nenhum produto encontrado</h3>
-      <p *ngIf="termoBuscaProduto">Tente ajustar os filtros de busca</p>
-      <p *ngIf="!termoBuscaProduto">Clique em "Novo Produto" para cadastrar</p>
+      <h3>Nenhum serviço encontrado</h3>
+      <p *ngIf="termoBuscaServico">Tente ajustar os filtros de busca</p>
+      <p *ngIf="!termoBuscaServico">Clique em "Novo Serviço" para cadastrar</p>
     </div>
 
     <!-- Paginação -->
-    <div class="paginacao" *ngIf="totalPaginasProdutos > 1">
+    <div class="paginacao" *ngIf="totalPaginasServicos > 1">
       <button 
         class="btn-pagina"
-        [disabled]="paginaAtualProdutos === 1"
-        (click)="paginaAtualProdutos = paginaAtualProdutos - 1">
+        [disabled]="paginaAtualServicos === 1"
+        (click)="paginaAtualServicos = paginaAtualServicos - 1">
         ‹
       </button>
 
       <span class="pagina-info">
-        Página {{ paginaAtualProdutos }} de {{ totalPaginasProdutos }}
+        Página {{ paginaAtualServicos }} de {{ totalPaginasServicos }}
       </span>
 
       <button 
         class="btn-pagina"
-        [disabled]="paginaAtualProdutos === totalPaginasProdutos"
-        (click)="paginaAtualProdutos = paginaAtualProdutos + 1">
+        [disabled]="paginaAtualServicos === totalPaginasServicos"
+        (click)="paginaAtualServicos = paginaAtualServicos + 1">
         ›
       </button>
     </div>
@@ -224,11 +218,11 @@
   </div>
 </div>
 
-<!-- ==================== MODAL PRODUTO ==================== -->
-<div class="modal-overlay" *ngIf="mostrarModalProduto" (click)="fecharModais()">
+<!-- ==================== MODAL SERVIÇO ==================== -->
+<div class="modal-overlay" *ngIf="mostrarModalServico" (click)="fecharModais()">
   <div class="modal-conteudo modal-large" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>{{ editandoProduto ? '✏️ Editar Produto' : '➕ Novo Produto' }}</h2>
+      <h2>{{ editandoServico ? '✏️ Editar Serviço' : '➕ Novo Serviço' }}</h2>
       <button class="btn-fechar" (click)="fecharModais()">×</button>
     </div>
 
@@ -239,17 +233,17 @@
 
       <div class="form-linha">
         <div class="form-grupo col-2">
-          <label>Nome do Produto *</label>
+          <label>Nome do Serviço *</label>
           <input 
             type="text" 
-            [(ngModel)]="formularioProduto.nome"
+            [(ngModel)]="formularioServico.nome"
             placeholder="Ex: Corte Degradê"
             required>
         </div>
 
         <div class="form-grupo">
           <label>Categoria</label>
-          <select [(ngModel)]="formularioProduto.categoria_id">
+          <select [(ngModel)]="formularioServico.categoria_id">
             <option [value]="undefined">Sem categoria</option>
             <option *ngFor="let cat of categorias" [value]="cat.id">
               {{ cat.nome }}
@@ -261,9 +255,9 @@
       <div class="form-grupo">
         <label>Descrição</label>
         <textarea 
-          [(ngModel)]="formularioProduto.descricao"
+          [(ngModel)]="formularioServico.descricao"
           rows="3"
-          placeholder="Descrição detalhada do produto..."></textarea>
+          placeholder="Descrição detalhada do serviço..."></textarea>
       </div>
 
       <div class="form-linha">
@@ -271,25 +265,16 @@
           <label>Preço (R$) *</label>
           <input 
             type="number" 
-            [(ngModel)]="formularioProduto.preco"
+            [(ngModel)]="formularioServico.preco"
             min="0"
             step="0.01"
             placeholder="0,00"
             required>
         </div>
 
-        <div class="form-grupo">
-          <label>Estoque</label>
-          <input 
-            type="number" 
-            [(ngModel)]="formularioProduto.estoque"
-            min="0"
-            placeholder="0">
-        </div>
-
-        <div class="form-grupo" *ngIf="editandoProduto">
+        <div class="form-grupo" *ngIf="editandoServico">
           <label>Status</label>
-          <select [(ngModel)]="formularioProduto.ativo">
+          <select [(ngModel)]="formularioServico.ativo">
             <option [value]="true">Ativo</option>
             <option [value]="false">Inativo</option>
           </select>
@@ -300,15 +285,15 @@
         <label>URL da Foto (opcional)</label>
         <input 
           type="text" 
-          [(ngModel)]="formularioProduto.foto_url"
+          [(ngModel)]="formularioServico.foto_url"
           placeholder="https://exemplo.com/imagem.jpg">
-        <small>Cole o link de uma imagem para o produto</small>
+        <small>Cole o link de uma imagem para o serviço</small>
       </div>
 
-      <div class="preview-imagem" *ngIf="formularioProduto.foto_url">
+      <div class="preview-imagem" *ngIf="formularioServico.foto_url">
         <label>Preview:</label>
         <img 
-          [src]="formularioProduto.foto_url" 
+          [src]="formularioServico.foto_url" 
           alt="Preview"
           (error)="onImageError($event)">
       </div>
@@ -318,8 +303,8 @@
       <button class="btn btn-secondary" (click)="fecharModais()" [disabled]="carregando">
         Cancelar
       </button>
-      <button class="btn btn-primary" (click)="salvarProduto()" [disabled]="carregando">
-        {{ carregando ? 'Salvando...' : (editandoProduto ? 'Salvar Alterações' : 'Cadastrar Produto') }}
+      <button class="btn btn-primary" (click)="salvarServico()" [disabled]="carregando">
+        {{ carregando ? 'Salvando...' : (editandoServico ? 'Salvar Alterações' : 'Cadastrar Produto') }}
       </button>
     </div>
   </div>
@@ -375,8 +360,8 @@
   </div>
 </div>
 
-<!-- ==================== MODAL EXCLUIR PRODUTO ==================== -->
-<div class="modal-overlay" *ngIf="mostrarModalExcluirProduto" (click)="fecharModais()">
+<!-- ==================== MODAL Excluir Serviço ==================== -->
+<div class="modal-overlay" *ngIf="mostrarModalExcluirServico" (click)="fecharModais()">
   <div class="modal-conteudo modal-pequeno" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>⚠️ Confirmar Exclusão</h2>
@@ -388,9 +373,9 @@
         ❌ {{ erro }}
       </div>
 
-      <p>Tem certeza que deseja excluir o produto:</p>
-      <p class="nome-destaque">{{ produtoSelecionado?.nome }}</p>
-      <p class="aviso">Esta ação irá desativar o produto no sistema.</p>
+      <p>Tem certeza que deseja excluir o serviço:</p>
+      <p class="nome-destaque">{{ servicoSelecionado?.nome }}</p>
+      <p class="aviso">Esta ação irá desativar o serviço no sistema.</p>
     </div>
 
     <div class="modal-footer">
@@ -432,3 +417,4 @@
     </div>
   </div>
 </div>
+

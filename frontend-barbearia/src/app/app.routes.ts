@@ -63,9 +63,7 @@ export const routes: Routes = [
       { path: '', component: DashboardComponent },
       { path: 'agendamentos', component: AgendamentosComponent },
       { path: 'produtos', component: ProdutosComponent },
-      { path: 'funcionarios', component: FuncionariosComponent },
-      { path: 'financeiro', component: DashboardComponent }, // Temporário
-      { path: 'perfil', component: DashboardComponent } // Temporário
+      { path: 'funcionarios', component: FuncionariosComponent }
     ]
   },
 

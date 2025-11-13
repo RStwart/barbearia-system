@@ -18,8 +18,8 @@
         <span class="label">Agendamentos</span>
       </a>
       <a routerLink="/estabelecimento/produtos" routerLinkActive="active" (click)="closeSidebarOnMobile()">
-        <span class="icon">📦</span>
-        <span class="label">Meus Produtos</span>
+        <span class="icon">�</span>
+        <span class="label">Meus Serviços</span>
       </a>
       <a 
         *ngIf="usuario.tipo === 'GERENTE'"
@@ -28,14 +28,6 @@
         (click)="closeSidebarOnMobile()">
         <span class="icon">👥</span>
         <span class="label">Funcionários</span>
-      </a>
-      <a routerLink="/estabelecimento/financeiro" routerLinkActive="active" (click)="closeSidebarOnMobile()">
-        <span class="icon">💰</span>
-        <span class="label">Financeiro</span>
-      </a>
-      <a routerLink="/estabelecimento/perfil" routerLinkActive="active" (click)="closeSidebarOnMobile()">
-        <span class="icon">🏪</span>
-        <span class="label">Perfil da Loja</span>
       </a>
     </nav>
 

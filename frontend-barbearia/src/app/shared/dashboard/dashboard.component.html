@@ -57,36 +57,10 @@
         <p class="stat-label">{{ estatisticas.vendasAno.total}} vendas</p>
       </div>
     </div>
-
-    <!-- Card NF Pendentes -->
-    <div class="stat-card card-red">
-      <div class="stat-icon">⚠️</div>
-      <div class="stat-info">
-        <h3>NF Pendentes</h3>
-        <p class="stat-value">{{ estatisticas.nfPendentes }}</p>
-        <p class="stat-label">Aguardando ajuste</p>
-      </div>
-    </div>
   </div>
 
-  <!-- PRODUTOS E SERVIÇOS MAIS VENDIDOS -->
+  <!-- SERVIÇOS MAIS VENDIDOS -->
   <div *ngIf="!carregandoEstatisticas && estatisticas" class="ranking-grid">
-    <!-- Top Produtos -->
-    <div class="ranking-card">
-      <h3>🏆 Produtos Mais Vendidos (Mês)</h3>
-      <div class="ranking-list">
-        <div *ngFor="let produto of estatisticas.produtosMaisVendidos; let i = index" class="ranking-item">
-          <span class="ranking-position">{{ i + 1 }}º</span>
-          <span class="ranking-nome">{{ produto.produto_nome }}</span>
-          <span class="ranking-quantidade">{{ produto.total_vendido }} un.</span>
-          <span class="ranking-valor">{{ formatarPreco(produto.valor_total) }}</span>
-        </div>
-        <div *ngIf="estatisticas.produtosMaisVendidos.length === 0" class="ranking-vazio">
-          Nenhum produto vendido este mês
-        </div>
-      </div>
-    </div>
-
     <!-- Top Serviços -->
     <div class="ranking-card">
       <h3>⭐ Serviços Mais Vendidos (Mês)</h3>
@@ -109,16 +83,6 @@
     <h2>💰 Histórico de Vendas</h2>
     
     <div class="filtros-container">
-      <div class="filtro-grupo">
-        <label>Status NF:</label>
-        <select [(ngModel)]="filtroStatusNF" (change)="aplicarFiltros()">
-          <option value="TODOS">Todos</option>
-          <option value="AGUARDANDO_AJUSTE">Aguardando Ajuste</option>
-          <option value="EMITIDA">NF Emitida</option>
-          <option value="NAO_NECESSARIA">Não Necessária</option>
-        </select>
-      </div>
-
       <div class="filtro-grupo">
         <label>Tipo:</label>
         <select [(ngModel)]="filtroTipoVenda" (change)="aplicarFiltros()">
@@ -145,7 +109,7 @@
           type="text" 
           [(ngModel)]="termoBusca" 
           (input)="aplicarFiltros()"
-          placeholder="Cliente, funcionário, NF..."
+          placeholder="Cliente ou funcionário..."
         />
       </div>
 
@@ -173,8 +137,6 @@
           <th>Funcionário</th>
           <th>Valor</th>
           <th>Pagamento</th>
-          <th>Status NF</th>
-          <th>Nota Fiscal</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -192,18 +154,12 @@
           <td class="valor">{{ formatarPreco(venda.valor_total) }}</td>
           <td>{{ venda.forma_pagamento }}</td>
           <td>
-            <span class="badge" [ngClass]="getStatusNFClass(venda.status_nf)">
-              {{ getStatusNFTexto(venda.status_nf) }}
-            </span>
-          </td>
-          <td>{{ venda.nota_fiscal || '-' }}</td>
-          <td>
             <button 
-              class="btn-acao btn-editar" 
-              (click)="abrirModalNF(venda)"
-              title="Editar Nota Fiscal"
+              class="btn-acao btn-visualizar" 
+              (click)="visualizarDetalhes(venda)"
+              title="Ver Detalhes"
             >
-              📝
+              �️
             </button>
           </td>
         </tr>
@@ -238,48 +194,6 @@
     >
       ▶
     </button>
-  </div>
-
-  <!-- MODAL NOTA FISCAL -->
-  <div *ngIf="mostrarModalNF" class="modal-overlay" (click)="fecharModalNF()">
-    <div class="modal-conteudo" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>📝 Editar Nota Fiscal</h2>
-        <button class="btn-fechar" (click)="fecharModalNF()">×</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="info-venda">
-          <p><strong>Venda ID:</strong> #{{ vendaSelecionada?.id }}</p>
-          <p><strong>Valor Total:</strong> {{ formatarPreco(vendaSelecionada?.valor_total!) }}</p>
-          <p><strong>Cliente:</strong> {{ vendaSelecionada?.cliente_nome || 'N/A' }}</p>
-          <p><strong>Data:</strong> {{ formatarDataHora(vendaSelecionada?.criado_em!) }}</p>
-        </div>
-
-        <div class="form-grupo">
-          <label>Número da Nota Fiscal *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="notaFiscal"
-            placeholder="Ex: 12345"
-            required
-          />
-        </div>
-
-        <div class="form-grupo">
-          <label>Status da NF *</label>
-          <select [(ngModel)]="statusNF">
-            <option value="EMITIDA">NF Emitida</option>
-            <option value="NAO_NECESSARIA">Não Necessária</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="fecharModalNF()">Cancelar</button>
-        <button class="btn btn-primary" (click)="salvarNotaFiscal()">Salvar</button>
-      </div>
-    </div>
   </div>
 </div>
 

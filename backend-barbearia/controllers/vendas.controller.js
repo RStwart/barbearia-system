@@ -54,26 +54,6 @@ exports.obterEstatisticas = async (req, res) => {
       [unidade_id]
     );
 
-    // Notas fiscais pendentes
-    const [nfPendentes] = await db.execute(
-      `SELECT COUNT(*) as total
-       FROM vendas 
-       WHERE unidade_id = ? AND status_nf = 'AGUARDANDO_AJUSTE'`,
-      [unidade_id]
-    );
-
-    // Produtos mais vendidos do mês
-    const [produtosMaisVendidos] = await db.execute(
-      `SELECT vp.produto_nome, SUM(vp.quantidade) as total_vendido, COALESCE(SUM(vp.subtotal), 0) as valor_total
-       FROM venda_produtos vp
-       INNER JOIN vendas v ON vp.venda_id = v.id
-       WHERE v.unidade_id = ? AND YEAR(v.criado_em) = YEAR(NOW()) AND MONTH(v.criado_em) = MONTH(NOW())
-       GROUP BY vp.produto_nome
-       ORDER BY total_vendido DESC
-       LIMIT 5`,
-      [unidade_id]
-    );
-
     // Serviços mais vendidos do mês
     const [servicosMaisVendidos] = await db.execute(
       `SELECT vs.servico_nome, SUM(vs.quantidade) as total_vendido, COALESCE(SUM(vs.subtotal), 0) as valor_total
@@ -101,8 +81,6 @@ exports.obterEstatisticas = async (req, res) => {
       vendasMes: vendasMes[0],
       vendasAno: vendasAno[0],
       vendasPorTipo,
-      nfPendentes: nfPendentes[0].total,
-      produtosMaisVendidos,
       servicosMaisVendidos,
       vendasPorPagamento
     });

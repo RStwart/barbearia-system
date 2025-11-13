@@ -67,12 +67,6 @@ export interface Estatisticas {
     quantidade: number;
     total: number;
   }[];
-  nfPendentes: number;
-  produtosMaisVendidos: {
-    produto_nome: string;
-    total_vendido: number;
-    valor_total: number;
-  }[];
   servicosMaisVendidos: {
     servico_nome: string;
     total_vendido: number;

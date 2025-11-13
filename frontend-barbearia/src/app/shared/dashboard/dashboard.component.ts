@@ -21,7 +21,6 @@ export class DashboardComponent implements OnInit {
   carregandoVendas = false;
 
   // Filtros
-  filtroStatusNF: string = 'TODOS';
   filtroTipoVenda: string = 'TODOS';
   filtroPeriodo: string = 'TODOS';
   termoBusca: string = '';
@@ -29,12 +28,6 @@ export class DashboardComponent implements OnInit {
   // Paginação
   paginaAtual = 1;
   itensPorPagina = 10;
-
-  // Modal
-  mostrarModalNF = false;
-  vendaSelecionada: Venda | null = null;
-  notaFiscal = '';
-  statusNF = 'EMITIDA';
 
   // Mensagens
   mensagem = '';
@@ -81,11 +74,6 @@ export class DashboardComponent implements OnInit {
   aplicarFiltros() {
     let resultado = [...this.vendas];
 
-    // Filtro por status de NF
-    if (this.filtroStatusNF !== 'TODOS') {
-      resultado = resultado.filter(v => v.status_nf === this.filtroStatusNF);
-    }
-
     // Filtro por tipo de venda
     if (this.filtroTipoVenda !== 'TODOS') {
       resultado = resultado.filter(v => v.tipo_venda === this.filtroTipoVenda);
@@ -118,7 +106,6 @@ export class DashboardComponent implements OnInit {
       resultado = resultado.filter(v =>
         v.funcionario_nome?.toLowerCase().includes(termo) ||
         v.cliente_nome?.toLowerCase().includes(termo) ||
-        v.nota_fiscal?.toLowerCase().includes(termo) ||
         v.observacoes?.toLowerCase().includes(termo)
       );
     }
@@ -128,7 +115,6 @@ export class DashboardComponent implements OnInit {
   }
 
   limparFiltros() {
-    this.filtroStatusNF = 'TODOS';
     this.filtroTipoVenda = 'TODOS';
     this.filtroPeriodo = 'TODOS';
     this.termoBusca = '';
@@ -151,46 +137,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  abrirModalNF(venda: Venda) {
-    this.vendaSelecionada = venda;
-    this.notaFiscal = venda.nota_fiscal || '';
-    this.statusNF = venda.status_nf === 'AGUARDANDO_AJUSTE' ? 'EMITIDA' : venda.status_nf;
-    this.mostrarModalNF = true;
-  }
-
-  salvarNotaFiscal() {
-    if (!this.vendaSelecionada) return;
-
-    if (!this.notaFiscal.trim()) {
-      this.exibirMensagem('Informe o número da nota fiscal', 'erro');
-      return;
-    }
-
-    this.dashboardService.atualizarNotaFiscal(
-      this.vendaSelecionada.id!,
-      this.notaFiscal,
-      this.statusNF
-    ).subscribe({
-      next: () => {
-        this.exibirMensagem('Nota fiscal atualizada com sucesso!', 'sucesso');
-        this.fecharModalNF();
-        this.carregarVendas();
-        this.carregarEstatisticas();
-      },
-      error: (err) => {
-        console.error('Erro ao atualizar nota fiscal:', err);
-        this.exibirMensagem('Erro ao atualizar nota fiscal', 'erro');
-      }
-    });
-  }
-
-  fecharModalNF() {
-    this.mostrarModalNF = false;
-    this.vendaSelecionada = null;
-    this.notaFiscal = '';
-    this.statusNF = 'EMITIDA';
-  }
-
   formatarPreco(valor: number | string): string {
     const num = typeof valor === 'string' ? parseFloat(valor) : valor;
     if (isNaN(num)) return 'R$ 0,00';
@@ -205,24 +151,6 @@ export class DashboardComponent implements OnInit {
     return new Date(data).toLocaleString('pt-BR');
   }
 
-  getStatusNFClass(status: string): string {
-    switch (status) {
-      case 'AGUARDANDO_AJUSTE': return 'badge-warning';
-      case 'EMITIDA': return 'badge-success';
-      case 'NAO_NECESSARIA': return 'badge-info';
-      default: return 'badge-secondary';
-    }
-  }
-
-  getStatusNFTexto(status: string): string {
-    switch (status) {
-      case 'AGUARDANDO_AJUSTE': return 'Aguardando Ajuste';
-      case 'EMITIDA': return 'NF Emitida';
-      case 'NAO_NECESSARIA': return 'Não Necessária';
-      default: return status;
-    }
-  }
-
   getTipoVendaClass(tipo: string): string {
     switch (tipo) {
       case 'SERVICO': return 'tipo-servico';
@@ -230,6 +158,11 @@ export class DashboardComponent implements OnInit {
       case 'MISTO': return 'tipo-misto';
       default: return '';
     }
+  }
+
+  visualizarDetalhes(venda: any): void {
+    // TODO: Implementar modal/página de detalhes da venda
+    console.log('Visualizar detalhes da venda:', venda);
   }
 
   exibirMensagem(texto: string, tipo: 'sucesso' | 'erro') {

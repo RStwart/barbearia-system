@@ -14,11 +14,11 @@ export class ProdutosComponent implements OnInit {
   Math = Math;
   
   // Controle de tabs
-  abaAtiva: 'produtos' | 'categorias' = 'produtos';
+  abaAtiva: 'servicos' | 'categorias' = 'servicos';
 
-  // Dados
-  produtos: Produto[] = [];
-  produtosFiltrados: Produto[] = [];
+  // Dados - Renomeado de produtos para servicos
+  servicos: Produto[] = [];
+  servicosFiltrados: Produto[] = [];
   categorias: Categoria[] = [];
   categoriasFiltradas: Categoria[] = [];
 
@@ -27,11 +27,11 @@ export class ProdutosComponent implements OnInit {
   erro = '';
   sucesso = '';
 
-  // Modais - Produtos
-  mostrarModalProduto = false;
-  mostrarModalExcluirProduto = false;
-  editandoProduto = false;
-  produtoSelecionado: Produto | null = null;
+  // Modais - Serviços
+  mostrarModalServico = false;
+  mostrarModalExcluirServico = false;
+  editandoServico = false;
+  servicoSelecionado: Produto | null = null;
 
   // Modais - Categorias
   mostrarModalCategoria = false;
@@ -40,7 +40,7 @@ export class ProdutosComponent implements OnInit {
   categoriaSelecionada: Categoria | null = null;
 
   // Formulários
-  formularioProduto: Partial<Produto> = {
+  formularioServico: Partial<Produto> = {
     nome: '',
     descricao: '',
     preco: 0,
@@ -57,11 +57,11 @@ export class ProdutosComponent implements OnInit {
   };
 
   // Busca e filtros
-  termoBuscaProduto = '';
+  termoBuscaServico = '';
   termoBuscaCategoria = '';
 
   // Paginação - Produtos
-  paginaAtualProdutos = 1;
+  paginaAtualServicos = 1;
   itensPorPagina = 12;
 
   // Paginação - Categorias
@@ -74,18 +74,18 @@ export class ProdutosComponent implements OnInit {
   }
 
   carregarDados() {
-    this.carregarProdutos();
+    this.carregarServicos();
     this.carregarCategorias();
   }
 
   // ==================== PRODUTOS ====================
 
-  carregarProdutos() {
+  carregarServicos() {
     this.carregando = true;
     this.produtosService.listarProdutos().subscribe({
       next: (response) => {
-        this.produtos = response.produtos;
-        this.aplicarFiltrosProdutos();
+        this.servicos = response.produtos;
+        this.aplicarFiltrosServicos();
         this.carregando = false;
       },
       error: (error) => {
@@ -96,11 +96,11 @@ export class ProdutosComponent implements OnInit {
     });
   }
 
-  aplicarFiltrosProdutos() {
-    let resultado = [...this.produtos];
+  aplicarFiltrosServicos() {
+    let resultado = [...this.servicos];
 
-    if (this.termoBuscaProduto.trim()) {
-      const termo = this.termoBuscaProduto.toLowerCase();
+    if (this.termoBuscaServico.trim()) {
+      const termo = this.termoBuscaServico.toLowerCase();
       resultado = resultado.filter(p =>
         p.nome.toLowerCase().includes(termo) ||
         (p.descricao && p.descricao.toLowerCase().includes(termo)) ||
@@ -108,22 +108,22 @@ export class ProdutosComponent implements OnInit {
       );
     }
 
-    this.produtosFiltrados = resultado;
+    this.servicosFiltrados = resultado;
   }
 
-  get produtosPaginados(): Produto[] {
-    const inicio = (this.paginaAtualProdutos - 1) * this.itensPorPagina;
+  get servicosPaginados(): Produto[] {
+    const inicio = (this.paginaAtualServicos - 1) * this.itensPorPagina;
     const fim = inicio + this.itensPorPagina;
-    return this.produtosFiltrados.slice(inicio, fim);
+    return this.servicosFiltrados.slice(inicio, fim);
   }
 
-  get totalPaginasProdutos(): number {
-    return Math.ceil(this.produtosFiltrados.length / this.itensPorPagina);
+  get totalPaginasServicos(): number {
+    return Math.ceil(this.servicosFiltrados.length / this.itensPorPagina);
   }
 
-  abrirModalNovoProduto() {
-    this.editandoProduto = false;
-    this.formularioProduto = {
+  abrirModalNovoServico() {
+    this.editandoServico = false;
+    this.formularioServico = {
       nome: '',
       descricao: '',
       preco: 0,
@@ -132,14 +132,14 @@ export class ProdutosComponent implements OnInit {
       foto_url: '',
       ativo: true
     };
-    this.mostrarModalProduto = true;
+    this.mostrarModalServico = true;
     this.erro = '';
   }
 
-  abrirModalEditarProduto(produto: Produto) {
-    this.editandoProduto = true;
-    this.produtoSelecionado = produto;
-    this.formularioProduto = {
+  abrirModalEditarServico(produto: Produto) {
+    this.editandoServico = true;
+    this.servicoSelecionado = produto;
+    this.formularioServico = {
       nome: produto.nome,
       descricao: produto.descricao,
       preco: produto.preco,
@@ -148,12 +148,12 @@ export class ProdutosComponent implements OnInit {
       foto_url: produto.foto_url,
       ativo: produto.ativo
     };
-    this.mostrarModalProduto = true;
+    this.mostrarModalServico = true;
     this.erro = '';
   }
 
-  salvarProduto() {
-    if (!this.formularioProduto.nome || !this.formularioProduto.preco) {
+  salvarServico() {
+    if (!this.formularioServico.nome || !this.formularioServico.preco) {
       this.erro = 'Nome e preço são obrigatórios';
       return;
     }
@@ -161,16 +161,16 @@ export class ProdutosComponent implements OnInit {
     this.carregando = true;
     this.erro = '';
 
-    const operacao = this.editandoProduto
-      ? this.produtosService.atualizarProduto(this.produtoSelecionado!.id!, this.formularioProduto)
-      : this.produtosService.criarProduto(this.formularioProduto);
+    const operacao = this.editandoServico
+      ? this.produtosService.atualizarProduto(this.servicoSelecionado!.id!, this.formularioServico)
+      : this.produtosService.criarProduto(this.formularioServico);
 
     operacao.subscribe({
       next: (response) => {
         this.sucesso = response.message;
         this.carregando = false;
-        this.mostrarModalProduto = false;
-        this.carregarProdutos();
+        this.mostrarModalServico = false;
+        this.carregarServicos();
         setTimeout(() => this.sucesso = '', 3000);
       },
       error: (error) => {
@@ -181,21 +181,21 @@ export class ProdutosComponent implements OnInit {
     });
   }
 
-  confirmarExclusaoProduto(produto: Produto) {
-    this.produtoSelecionado = produto;
-    this.mostrarModalExcluirProduto = true;
+  confirmarExclusaoServico(produto: Produto) {
+    this.servicoSelecionado = produto;
+    this.mostrarModalExcluirServico = true;
   }
 
   excluirProduto() {
-    if (!this.produtoSelecionado) return;
+    if (!this.servicoSelecionado) return;
 
     this.carregando = true;
-    this.produtosService.excluirProduto(this.produtoSelecionado.id!).subscribe({
+    this.produtosService.excluirProduto(this.servicoSelecionado.id!).subscribe({
       next: (response) => {
         this.sucesso = response.message;
         this.carregando = false;
-        this.mostrarModalExcluirProduto = false;
-        this.carregarProdutos();
+        this.mostrarModalExcluirServico = false;
+        this.carregarServicos();
         setTimeout(() => this.sucesso = '', 3000);
       },
       error: (error) => {
@@ -210,7 +210,7 @@ export class ProdutosComponent implements OnInit {
     this.produtosService.alternarStatusProduto(produto.id!).subscribe({
       next: (response) => {
         this.sucesso = response.message;
-        this.carregarProdutos();
+        this.carregarServicos();
         setTimeout(() => this.sucesso = '', 3000);
       },
       error: (error) => {
@@ -338,24 +338,24 @@ export class ProdutosComponent implements OnInit {
 
   // ==================== UTILS ====================
 
-  mudarAba(aba: 'produtos' | 'categorias') {
+  mudarAba(aba: 'servicos' | 'categorias') {
     this.abaAtiva = aba;
     this.erro = '';
     this.sucesso = '';
   }
 
   fecharModais() {
-    this.mostrarModalProduto = false;
-    this.mostrarModalExcluirProduto = false;
+    this.mostrarModalServico = false;
+    this.mostrarModalExcluirServico = false;
     this.mostrarModalCategoria = false;
     this.mostrarModalExcluirCategoria = false;
     this.erro = '';
   }
 
-  limparFiltrosProdutos() {
-    this.termoBuscaProduto = '';
-    this.aplicarFiltrosProdutos();
-    this.paginaAtualProdutos = 1;
+  limparFiltrosServicos() {
+    this.termoBuscaServico = '';
+    this.aplicarFiltrosServicos();
+    this.paginaAtualServicos = 1;
   }
 
   limparFiltrosCategorias() {
@@ -380,3 +380,4 @@ export class ProdutosComponent implements OnInit {
     img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VjZjBmMSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM3ZjhjOGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5TZW0gSW1hZ2VtPC90ZXh0Pjwvc3ZnPg==';
   }
 }
+
