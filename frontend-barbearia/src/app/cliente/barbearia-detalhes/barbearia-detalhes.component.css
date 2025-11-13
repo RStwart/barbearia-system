@@ -1,0 +1,394 @@
+.detalhes-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===== BOTÃO VOLTAR ===== */
+.btn-voltar {
+  padding: 10px 20px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 24px;
+}
+
+.btn-voltar:hover {
+  background: #f8f9fa;
+  border-color: #3498db;
+  color: #3498db;
+  transform: translateX(-4px);
+}
+
+/* ===== LOADING ===== */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.spinner {
+  border: 4px solid #ecf0f1;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== MENSAGENS ===== */
+.mensagem {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mensagem.erro {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* ===== HEADER DA BARBEARIA ===== */
+.barbearia-header {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 32px;
+}
+
+.barbearia-cover {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.barbearia-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.barbearia-info-header {
+  padding: 32px;
+}
+
+.barbearia-info-header h1 {
+  font-size: 32px;
+  color: #2c3e50;
+  margin: 0 0 12px 0;
+  font-weight: 800;
+}
+
+.descricao {
+  font-size: 16px;
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+.info-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.badge .icone {
+  font-size: 18px;
+}
+
+/* ===== SERVIÇOS ===== */
+.servicos-section {
+  margin-bottom: 40px;
+}
+
+.servicos-section h2 {
+  font-size: 28px;
+  color: #2c3e50;
+  margin: 0 0 24px 0;
+  font-weight: 800;
+}
+
+.servicos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.servico-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.servico-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  border-color: #3498db;
+}
+
+.servico-imagem {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.servico-imagem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.servico-categoria {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  background: rgba(52, 152, 219, 0.95);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
+.servico-info {
+  padding: 20px;
+}
+
+.servico-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+}
+
+.servico-descricao {
+  font-size: 14px;
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.servico-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.preco-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preco-label {
+  font-size: 12px;
+  color: #95a5a6;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.preco {
+  font-size: 24px;
+  font-weight: 800;
+  color: #27ae60;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.btn-agendar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-agendar:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-agendar:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ===== PROFISSIONAIS ===== */
+.profissionais-section {
+  margin-bottom: 40px;
+}
+
+.profissionais-section h2 {
+  font-size: 28px;
+  color: #2c3e50;
+  margin: 0 0 24px 0;
+  font-weight: 800;
+}
+
+.profissionais-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.profissional-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.profissional-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.profissional-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #f0f0f0;
+}
+
+.profissional-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profissional-info h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 4px 0;
+}
+
+.profissional-info p {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+/* ===== SEM RESULTADOS ===== */
+.sem-resultados {
+  text-align: center;
+  padding: 60px 20px;
+  color: #95a5a6;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 16px;
+}
+
+.sem-resultados .icone {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.sem-resultados h3 {
+  font-size: 20px;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.sem-resultados p {
+  margin: 0;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .detalhes-container {
+    padding: 16px;
+  }
+
+  .barbearia-cover {
+    height: 200px;
+  }
+
+  .barbearia-info-header {
+    padding: 20px;
+  }
+
+  .barbearia-info-header h1 {
+    font-size: 24px;
+  }
+
+  .servicos-section h2,
+  .profissionais-section h2 {
+    font-size: 22px;
+  }
+
+  .servicos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profissionais-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .servico-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .btn-agendar {
+    width: 100%;
+  }
+}

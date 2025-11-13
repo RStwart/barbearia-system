@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { CadastroClienteComponent } from './cadastro/cadastro-cliente.component';
@@ -15,11 +14,14 @@ import { EstabelecimentoLayoutComponent } from './layouts/estabelecimento-layout
 import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard.component';
 import { AdminEstabelecimentosComponent } from './pages/admin/admin-estabelecimentos/admin-estabelecimentos.component';
 
+// Componentes do Cliente
+import { InicioClienteComponent } from './cliente/inicio-cliente/inicio-cliente.component';
+import { BarbeariaDetalhesComponent } from './cliente/barbearia-detalhes/barbearia-detalhes.component';
+
 // Componentes compartilhados (temporários)
 import { DashboardComponent } from './shared/dashboard/dashboard.component';
 import { ProdutosComponent } from './shared/produtos/produtos.component';
 import { AgendamentosComponent } from './shared/agendamentos/agendamentos.component';
-import { LojaComponent } from './shared/loja/loja.component';
 import { FuncionariosComponent } from './shared/funcionarios/funcionarios.component';
 
 export const routes: Routes = [
@@ -46,12 +48,11 @@ export const routes: Routes = [
     path: 'cliente',
     component: ClienteLayoutComponent,
     children: [
-      { path: '', component: DashboardComponent },
+      { path: '', component: InicioClienteComponent },
+      { path: 'barbearia/:id', component: BarbeariaDetalhesComponent },
       { path: 'agendamentos', component: AgendamentosComponent },
-      { path: 'lojas', component: LojaComponent },
-      { path: 'favoritos', component: DashboardComponent }, // Temporário
-      { path: 'carrinho', component: DashboardComponent }, // Temporário
-      { path: 'historico', component: DashboardComponent } // Temporário
+      { path: 'favoritos', component: DashboardComponent }, // TODO: Criar componente
+      { path: 'historico', component: DashboardComponent } // TODO: Criar componente
     ]
   },
   

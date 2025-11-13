@@ -1,0 +1,94 @@
+<div class="inicio-container">
+  <div class="header-section">
+    <h1>🏠 Barbearias Disponíveis</h1>
+    <p class="subtitle">Escolha sua barbearia preferida e agende seu horário</p>
+  </div>
+
+  <!-- Mensagem de erro -->
+  <div class="mensagem erro" *ngIf="erro">
+    ❌ {{ erro }}
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando">
+    <div class="spinner"></div>
+    <p>Carregando barbearias...</p>
+  </div>
+
+  <!-- Grid de Barbearias -->
+  <div class="barbearias-grid" *ngIf="!carregando">
+    <div class="barbearia-card" *ngFor="let barbearia of barbearias" (click)="selecionarBarbearia(barbearia)">
+      <div class="barbearia-imagem">
+        <img [src]="getImagemUrl(barbearia.foto_url)" [alt]="barbearia.nome">
+        <div class="status-badge" [class.inativo]="!barbearia.ativo">
+          {{ barbearia.ativo ? 'Aberto' : 'Fechado' }}
+        </div>
+      </div>
+
+      <div class="barbearia-info">
+        <h2 class="barbearia-nome">{{ barbearia.nome }}</h2>
+        
+        <p class="barbearia-descricao" *ngIf="barbearia.descricao">
+          {{ barbearia.descricao }}
+        </p>
+
+        <div class="barbearia-detalhes">
+          <div class="detalhe-item">
+            <span class="icone">📍</span>
+            <div class="detalhe-texto">
+              <strong>Endereço:</strong>
+              <span>{{ barbearia.endereco }}, {{ barbearia.cidade }} - {{ barbearia.estado }}</span>
+            </div>
+          </div>
+
+          <div class="detalhe-item">
+            <span class="icone">🕐</span>
+            <div class="detalhe-texto">
+              <strong>Horário:</strong>
+              <span>{{ barbearia.horario_abertura }} - {{ barbearia.horario_fechamento }}</span>
+            </div>
+          </div>
+
+          <div class="detalhe-item" *ngIf="barbearia.telefone">
+            <span class="icone">📞</span>
+            <div class="detalhe-texto">
+              <strong>Telefone:</strong>
+              <span>{{ barbearia.telefone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="barbearia-acoes">
+          <button class="btn btn-primary" (click)="selecionarBarbearia(barbearia)">
+            Ver Serviços
+          </button>
+
+          <div class="botoes-contato">
+            <button 
+              *ngIf="barbearia.whatsapp" 
+              class="btn-contato whatsapp" 
+              (click)="abrirWhatsApp(barbearia.whatsapp, $event)"
+              title="WhatsApp">
+              <span class="icone">💬</span>
+            </button>
+
+            <button 
+              *ngIf="barbearia.instagram" 
+              class="btn-contato instagram" 
+              (click)="abrirInstagram(barbearia.instagram, $event)"
+              title="Instagram">
+              <span class="icone">📸</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sem barbearias -->
+  <div class="sem-resultados" *ngIf="!carregando && barbearias.length === 0">
+    <span class="icone">🏪</span>
+    <h3>Nenhuma barbearia cadastrada</h3>
+    <p>Volte em breve para conferir nossas unidades!</p>
+  </div>
+</div>

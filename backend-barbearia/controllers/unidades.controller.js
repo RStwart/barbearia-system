@@ -5,7 +5,7 @@ const listarUnidades = async (req, res) => {
   try {
     const query = `
       SELECT 
-        id_unidade,
+        id_unidade as id,
         nome,
         responsavel,
         cnpj,
@@ -29,6 +29,7 @@ const listarUnidades = async (req, res) => {
         status_pagamento,
         status_avaliacao
       FROM unidades 
+      WHERE ativo = 1
       ORDER BY data_cadastro DESC
     `;
     
@@ -56,7 +57,7 @@ const buscarUnidadePorId = async (req, res) => {
     
     const query = `
       SELECT 
-        id_unidade,
+        id_unidade as id,
         nome,
         responsavel,
         cnpj,
@@ -577,6 +578,64 @@ const obterEstatisticas = async (req, res) => {
   }
 };
 
+// ================ LISTAR SERVIÇOS POR UNIDADE ================
+const listarServicosPorUnidade = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const query = `
+      SELECT p.id, p.nome, p.descricao, p.preco, p.foto_url, p.ativo,
+             c.nome as categoria_nome
+      FROM produtos p
+      LEFT JOIN categorias c ON p.categoria_id = c.id
+      WHERE p.estabelecimento_id = ? AND p.ativo = 1
+      ORDER BY p.nome ASC
+    `;
+
+    const [servicos] = await db.execute(query, [id]);
+
+    res.json({
+      success: true,
+      servicos
+    });
+  } catch (error) {
+    console.error('Erro ao listar serviços:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao listar serviços',
+      error: error.message
+    });
+  }
+};
+
+// ================ LISTAR FUNCIONÁRIOS POR UNIDADE ================
+const listarFuncionariosPorUnidade = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const query = `
+      SELECT id, nome, email, telefone, foto_url
+      FROM usuarios
+      WHERE estabelecimento_id = ? AND tipo IN ('FUNCIONARIO', 'GERENTE') AND ativo = 1
+      ORDER BY nome ASC
+    `;
+
+    const [funcionarios] = await db.execute(query, [id]);
+
+    res.json({
+      success: true,
+      funcionarios
+    });
+  } catch (error) {
+    console.error('Erro ao listar funcionários:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao listar funcionários',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   listarUnidades,
   buscarUnidadePorId,
@@ -586,5 +645,7 @@ module.exports = {
   alterarStatus,
   alterarStatusPagamento,
   alterarStatusAvaliacao,
-  obterEstatisticas
+  obterEstatisticas,
+  listarServicosPorUnidade,
+  listarFuncionariosPorUnidade
 };

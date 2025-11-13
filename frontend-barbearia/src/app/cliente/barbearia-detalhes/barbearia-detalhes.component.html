@@ -1,0 +1,109 @@
+<div class="detalhes-container">
+  <!-- Botão Voltar -->
+  <button class="btn-voltar" (click)="voltar()">
+    ← Voltar
+  </button>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="carregando">
+    <div class="spinner"></div>
+    <p>Carregando...</p>
+  </div>
+
+  <!-- Erro -->
+  <div class="mensagem erro" *ngIf="erro">
+    ❌ {{ erro }}
+  </div>
+
+  <!-- Conteúdo -->
+  <div *ngIf="!carregando && barbearia">
+    <!-- Header da Barbearia -->
+    <div class="barbearia-header">
+      <div class="barbearia-cover">
+        <img [src]="getImagemUrl(barbearia.foto_url)" [alt]="barbearia.nome">
+      </div>
+      
+      <div class="barbearia-info-header">
+        <h1>{{ barbearia.nome }}</h1>
+        <p class="descricao" *ngIf="barbearia.descricao">{{ barbearia.descricao }}</p>
+        
+        <div class="info-badges">
+          <span class="badge">
+            <span class="icone">📍</span>
+            {{ barbearia.cidade }} - {{ barbearia.estado }}
+          </span>
+          <span class="badge">
+            <span class="icone">🕐</span>
+            {{ barbearia.horario_abertura }} - {{ barbearia.horario_fechamento }}
+          </span>
+          <span class="badge" *ngIf="barbearia.telefone">
+            <span class="icone">📞</span>
+            {{ barbearia.telefone }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Serviços Disponíveis -->
+    <div class="servicos-section">
+      <h2>✂️ Serviços Disponíveis</h2>
+      
+      <div class="servicos-grid">
+        <div class="servico-card" *ngFor="let servico of servicos">
+          <div class="servico-imagem">
+            <img [src]="getImagemUrl(servico.foto_url)" [alt]="servico.nome">
+            <div class="servico-categoria" *ngIf="servico.categoria_nome">
+              {{ servico.categoria_nome }}
+            </div>
+          </div>
+
+          <div class="servico-info">
+            <h3>{{ servico.nome }}</h3>
+            <p class="servico-descricao" *ngIf="servico.descricao">
+              {{ servico.descricao }}
+            </p>
+
+            <div class="servico-footer">
+              <div class="preco-info">
+                <span class="preco-label">Preço</span>
+                <span class="preco">R$ {{ formatarPreco(servico.preco) }}</span>
+              </div>
+              
+              <button 
+                class="btn btn-agendar" 
+                (click)="agendarServico(servico)"
+                [disabled]="!servico.ativo">
+                {{ servico.ativo ? 'Agendar' : 'Indisponível' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sem-resultados" *ngIf="servicos.length === 0">
+        <span class="icone">✂️</span>
+        <h3>Nenhum serviço disponível</h3>
+        <p>Esta unidade ainda não cadastrou serviços</p>
+      </div>
+    </div>
+
+    <!-- Profissionais -->
+    <div class="profissionais-section" *ngIf="funcionarios.length > 0">
+      <h2>👨‍💼 Nossos Profissionais</h2>
+      
+      <div class="profissionais-grid">
+        <div class="profissional-card" *ngFor="let funcionario of funcionarios">
+          <div class="profissional-avatar">
+            <img 
+              [src]="funcionario.foto_url || 'https://via.placeholder.com/150?text=👤'" 
+              [alt]="funcionario.nome">
+          </div>
+          <div class="profissional-info">
+            <h4>{{ funcionario.nome }}</h4>
+            <p *ngIf="funcionario.especialidade">{{ funcionario.especialidade }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

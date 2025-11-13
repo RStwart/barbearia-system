@@ -1,0 +1,317 @@
+.inicio-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===== HEADER ===== */
+.header-section {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.header-section h1 {
+  font-size: 32px;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+  font-weight: 800;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+/* ===== MENSAGENS ===== */
+.mensagem {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mensagem.erro {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* ===== LOADING ===== */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.spinner {
+  border: 4px solid #ecf0f1;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== GRID DE BARBEARIAS ===== */
+.barbearias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 28px;
+  margin-bottom: 32px;
+}
+
+.barbearia-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.barbearia-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+  border-color: #3498db;
+}
+
+.barbearia-imagem {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.barbearia-imagem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.barbearia-card:hover .barbearia-imagem img {
+  transform: scale(1.05);
+}
+
+.status-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(39, 174, 96, 0.95);
+  color: white;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.status-badge.inativo {
+  background: rgba(231, 76, 60, 0.95);
+}
+
+.barbearia-info {
+  padding: 24px;
+}
+
+.barbearia-nome {
+  font-size: 24px;
+  font-weight: 800;
+  color: #2c3e50;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+}
+
+.barbearia-descricao {
+  font-size: 15px;
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.barbearia-detalhes {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detalhe-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.detalhe-item .icone {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.detalhe-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detalhe-texto strong {
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.detalhe-texto span {
+  color: #7f8c8d;
+}
+
+.barbearia-acoes {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  flex: 1;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.botoes-contato {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-contato {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.btn-contato:hover {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.btn-contato.whatsapp {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+}
+
+.btn-contato.instagram {
+  background: linear-gradient(135deg, #E1306C 0%, #C13584 50%, #833AB4 100%);
+}
+
+/* ===== SEM RESULTADOS ===== */
+.sem-resultados {
+  text-align: center;
+  padding: 80px 20px;
+  color: #95a5a6;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 16px;
+  margin: 20px 0;
+}
+
+.sem-resultados .icone {
+  font-size: 80px;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.sem-resultados h3 {
+  font-size: 24px;
+  color: #2c3e50;
+  margin: 0 0 12px 0;
+  font-weight: 700;
+}
+
+.sem-resultados p {
+  margin: 0;
+  font-size: 16px;
+  color: #7f8c8d;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .inicio-container {
+    padding: 16px;
+  }
+
+  .header-section h1 {
+    font-size: 24px;
+  }
+
+  .barbearias-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .barbearia-imagem {
+    height: 200px;
+  }
+
+  .barbearia-nome {
+    font-size: 20px;
+  }
+
+  .barbearia-acoes {
+    flex-direction: column;
+  }
+
+  .btn-primary {
+    width: 100%;
+  }
+
+  .botoes-contato {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .barbearias-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
