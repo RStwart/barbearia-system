@@ -56,7 +56,27 @@ const listarUnidadesAtivas = async (req, res) => {
       SELECT 
         id_unidade,
         nome,
-        ativo
+        responsavel,
+        cnpj,
+        cpf,
+        telefone,
+        email,
+        cep,
+        endereco,
+        numero,
+        bairro,
+        cidade,
+        estado,
+        complemento,
+        horario_funcionamento,
+        horario_abertura,
+        horario_fechamento,
+        latitude,
+        longitude,
+        data_cadastro,
+        ativo,
+        status_pagamento,
+        status_avaliacao
       FROM unidades 
       WHERE ativo = 1
       ORDER BY nome ASC
@@ -613,11 +633,18 @@ const listarServicosPorUnidade = async (req, res) => {
     const { id } = req.params;
 
     const query = `
-      SELECT id, nome, descricao, preco, duracao, ativo,
-             created_at, updated_at
-      FROM servicos
-      WHERE unidade_id = ? AND ativo = 1
-      ORDER BY nome ASC
+      SELECT 
+        s.id, 
+        s.nome, 
+        s.descricao, 
+        s.preco, 
+        s.duracao,
+        s.ativo,
+        s.created_at,
+        s.updated_at
+      FROM servicos s
+      WHERE s.unidade_id = ? AND s.ativo = 1
+      ORDER BY s.nome ASC
     `;
 
     const [servicos] = await db.execute(query, [id]);

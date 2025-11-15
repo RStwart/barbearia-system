@@ -163,7 +163,7 @@ exports.excluirCategoria = async (req, res) => {
 
     // Verificar se há produtos vinculados
     const [produtos] = await db.execute(
-      'SELECT COUNT(*) as total FROM produtos WHERE categoria_id = ?',
+      'SELECT COUNT(*) as total FROM servicos WHERE categoria_id = ?',
       [id]
     );
 
@@ -304,9 +304,9 @@ exports.criarProduto = async (req, res) => {
     }
 
     const sql = `
-      INSERT INTO produtos (
-        unidade_id, categoria_id, nome, descricao, preco, estoque, foto_url, ativo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, TRUE)
+      INSERT INTO servicos (
+        unidade_id, categoria_id, nome, descricao, preco, duracao, ativo
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [result] = await db.execute(sql, [
@@ -315,12 +315,12 @@ exports.criarProduto = async (req, res) => {
       nome,
       descricao || null,
       preco,
-      estoque || 0,
-      foto_url || null
+      estoque || 30,
+      1
     ]);
 
     res.status(201).json({
-      message: "Produto criado com sucesso",
+      message: "Serviço criado com sucesso",
       produto: {
         id: result.insertId,
         unidade_id,
@@ -328,8 +328,7 @@ exports.criarProduto = async (req, res) => {
         nome,
         descricao,
         preco,
-        estoque,
-        foto_url,
+        duracao: estoque || 30,
         ativo: true
       }
     });
@@ -353,14 +352,14 @@ exports.atualizarProduto = async (req, res) => {
     }
 
     // Verificar se o produto pertence à unidade
-    const [produto] = await db.execute(
-      'SELECT id FROM produtos WHERE id = ? AND unidade_id = ?',
+    const [produtos] = await db.execute(
+      'SELECT id FROM servicos WHERE id = ? AND unidade_id = ?',
       [id, unidade_id]
     );
 
-    if (produto.length === 0) {
+    if (produtos.length === 0) {
       return res.status(404).json({ 
-        error: "Produto não encontrado ou não pertence a esta unidade." 
+        error: "Serviço não encontrado ou não pertence a esta unidade." 
       });
     }
 
@@ -402,13 +401,8 @@ exports.atualizarProduto = async (req, res) => {
     }
 
     if (estoque !== undefined) {
-      campos.push('estoque = ?');
+      campos.push('duracao = ?');
       valores.push(estoque);
-    }
-
-    if (foto_url !== undefined) {
-      campos.push('foto_url = ?');
-      valores.push(foto_url || null);
     }
 
     if (ativo !== undefined) {
@@ -422,7 +416,7 @@ exports.atualizarProduto = async (req, res) => {
 
     valores.push(id);
 
-    const sql = `UPDATE produtos SET ${campos.join(', ')} WHERE id = ?`;
+    const sql = `UPDATE servicos SET ${campos.join(', ')} WHERE id = ?`;
     await db.execute(sql, valores);
 
     res.json({ message: "Produto atualizado com sucesso" });
@@ -457,7 +451,7 @@ exports.excluirProduto = async (req, res) => {
     }
 
     // Deletar produto permanentemente
-    await db.execute('DELETE FROM produtos WHERE id = ?', [id]);
+    await db.execute('DELETE FROM servicos WHERE id = ?', [id]);
 
     res.json({ message: "Produto excluído com sucesso" });
   } catch (error) {
@@ -478,8 +472,8 @@ exports.alternarStatusProduto = async (req, res) => {
       });
     }
 
-    const [produto] = await db.execute(
-      'SELECT ativo FROM produtos WHERE id = ? AND unidade_id = ?',
+    const [produtos] = await db.execute(
+      'SELECT ativo FROM servicos WHERE id = ? AND unidade_id = ?',
       [id, unidade_id]
     );
 
@@ -493,7 +487,7 @@ exports.alternarStatusProduto = async (req, res) => {
     const statusAtual = Boolean(produto[0].ativo);
     const novoStatus = !statusAtual;
 
-    await db.execute('UPDATE produtos SET ativo = ? WHERE id = ?', [novoStatus ? 1 : 0, id]);
+    await db.execute('UPDATE servicos SET ativo = ? WHERE id = ?', [novoStatus ? 1 : 0, id]);
 
     res.json({ 
       message: `Produto ${novoStatus ? 'ativado' : 'desativado'} com sucesso`,

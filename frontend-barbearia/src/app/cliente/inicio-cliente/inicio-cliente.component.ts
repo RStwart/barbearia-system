@@ -28,7 +28,12 @@ export class InicioClienteComponent implements OnInit {
     this.carregando = true;
     this.barbeariasService.listarBarbearias().subscribe({
       next: (response: { unidades: Barbearia[] }) => {
-        this.barbearias = response.unidades || [];
+        // Mapear id_unidade para id para compatibilidade
+        this.barbearias = (response.unidades || []).map(unidade => ({
+          ...unidade,
+          id: unidade.id_unidade || unidade.id
+        }));
+        console.log('Barbearias carregadas:', this.barbearias);
         this.carregando = false;
       },
       error: (error: any) => {
@@ -55,7 +60,7 @@ export class InicioClienteComponent implements OnInit {
     window.open(`https://instagram.com/${username}`, '_blank');
   }
 
-  getImagemUrl(foto: string | null): string {
+  getImagemUrl(foto: string | null | undefined): string {
     return foto || 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80';
   }
 }

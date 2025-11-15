@@ -262,13 +262,7 @@ exports.criarVenda = async (req, res) => {
            produto.produto_preco, produto.quantidade, produto.subtotal]
         );
 
-        // Atualizar estoque se produto_id existir
-        if (produto.produto_id) {
-          await db.execute(
-            `UPDATE produtos SET estoque = estoque - ? WHERE id = ?`,
-            [produto.quantidade, produto.produto_id]
-          );
-        }
+        // Serviços não têm estoque para atualizar
       }
     }
 
@@ -398,12 +392,7 @@ exports.excluirVenda = async (req, res) => {
     );
 
     // Devolver produtos ao estoque
-    for (let produto of produtos) {
-      await db.execute(
-        `UPDATE produtos SET estoque = estoque + ? WHERE id = ?`,
-        [produto.quantidade, produto.produto_id]
-      );
-    }
+    // Serviços não têm estoque para restaurar
 
     // Excluir venda (cascade vai deletar os itens)
     await db.execute(`DELETE FROM vendas WHERE id = ?`, [id]);

@@ -60,7 +60,11 @@ export class BarbeariaDetalhesComponent implements OnInit {
     this.carregando = true;
     this.barbeariasService.buscarBarbeariaPorId(this.barbeariaId).subscribe({
       next: (response: any) => {
-        this.barbearia = response.unidade;
+        this.barbearia = {
+          ...response.unidade,
+          id: response.unidade.id_unidade || response.unidade.id
+        };
+        console.log('Barbearia carregada:', this.barbearia);
         this.carregando = false;
       },
       error: (error: any) => {
