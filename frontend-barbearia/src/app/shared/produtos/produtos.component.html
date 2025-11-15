@@ -275,8 +275,8 @@
         <div class="form-grupo" *ngIf="editandoServico">
           <label>Status</label>
           <select [(ngModel)]="formularioServico.ativo">
-            <option [value]="true">Ativo</option>
-            <option [value]="false">Inativo</option>
+            <option [ngValue]="true">Ativo</option>
+            <option [ngValue]="false">Inativo</option>
           </select>
         </div>
       </div>
@@ -343,8 +343,8 @@
       <div class="form-grupo" *ngIf="editandoCategoria">
         <label>Status</label>
         <select [(ngModel)]="formularoCategoria.ativo">
-          <option [value]="true">Ativo</option>
-          <option [value]="false">Inativo</option>
+          <option [ngValue]="true">Ativo</option>
+          <option [ngValue]="false">Inativo</option>
         </select>
       </div>
     </div>

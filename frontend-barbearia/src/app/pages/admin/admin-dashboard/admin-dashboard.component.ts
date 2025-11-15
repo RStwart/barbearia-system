@@ -30,6 +30,12 @@ interface UsuarioForm {
   primeiro_acesso: boolean;
 }
 
+interface Unidade {
+  id_unidade: number;
+  nome: string;
+  ativo: boolean;
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -78,11 +84,15 @@ export class AdminDashboardComponent implements OnInit {
     primeiro_acesso: true
   };
 
+  // Lista de unidades para o select
+  unidades: Unidade[] = [];
+
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.carregarUsuarios();
     this.carregarEstatisticas();
+    this.carregarUnidades();
   }
 
   private getHeaders(): HttpHeaders {
@@ -129,6 +139,20 @@ export class AdminDashboardComponent implements OnInit {
             usuariosAtivos: this.usuarios.filter(u => u.ativo).length,
             estabelecimentos: 0 // Será carregado da API de unidades
           };
+        }
+      });
+  }
+
+  carregarUnidades() {
+    this.http.get<any>(`${environment.apiUrl}/unidades`, { headers: this.getHeaders() })
+      .subscribe({
+        next: (response) => {
+          // Filtrar apenas unidades ativas
+          this.unidades = (response.unidades || []).filter((u: Unidade) => u.ativo);
+        },
+        error: (error) => {
+          console.error('Erro ao carregar unidades:', error);
+          this.unidades = [];
         }
       });
   }
@@ -187,6 +211,10 @@ export class AdminDashboardComponent implements OnInit {
       primeiro_acesso: true
     };
     this.mostrarModal = true;
+    // Recarregar unidades para garantir que está atualizado
+    if (this.unidades.length === 0) {
+      this.carregarUnidades();
+    }
   }
 
   editarUsuario(usuario: Usuario) {

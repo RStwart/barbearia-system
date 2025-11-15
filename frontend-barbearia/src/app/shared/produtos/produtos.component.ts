@@ -161,9 +161,15 @@ export class ProdutosComponent implements OnInit {
     this.carregando = true;
     this.erro = '';
 
+    // Garantir que ativo seja booleano
+    const dadosServico = {
+      ...this.formularioServico,
+      ativo: Boolean(this.formularioServico.ativo)
+    };
+
     const operacao = this.editandoServico
-      ? this.produtosService.atualizarProduto(this.servicoSelecionado!.id!, this.formularioServico)
-      : this.produtosService.criarProduto(this.formularioServico);
+      ? this.produtosService.atualizarProduto(this.servicoSelecionado!.id!, dadosServico)
+      : this.produtosService.criarProduto(dadosServico);
 
     operacao.subscribe({
       next: (response) => {
@@ -291,9 +297,15 @@ export class ProdutosComponent implements OnInit {
     this.carregando = true;
     this.erro = '';
 
+    // Garantir que ativo seja booleano
+    const dadosCategoria = {
+      ...this.formularoCategoria,
+      ativo: Boolean(this.formularoCategoria.ativo)
+    };
+
     const operacao = this.editandoCategoria
-      ? this.produtosService.atualizarCategoria(this.categoriaSelecionada!.id!, this.formularoCategoria)
-      : this.produtosService.criarCategoria(this.formularoCategoria);
+      ? this.produtosService.atualizarCategoria(this.categoriaSelecionada!.id!, dadosCategoria)
+      : this.produtosService.criarCategoria(dadosCategoria);
 
     operacao.subscribe({
       next: (response) => {

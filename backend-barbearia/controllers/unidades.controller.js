@@ -5,7 +5,7 @@ const listarUnidades = async (req, res) => {
   try {
     const query = `
       SELECT 
-        id_unidade as id,
+        id_unidade,
         nome,
         responsavel,
         cnpj,
@@ -29,7 +29,6 @@ const listarUnidades = async (req, res) => {
         status_pagamento,
         status_avaliacao
       FROM unidades 
-      WHERE ativo = 1
       ORDER BY data_cadastro DESC
     `;
     
@@ -42,6 +41,36 @@ const listarUnidades = async (req, res) => {
     });
   } catch (error) {
     console.error("Erro ao listar unidades:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erro interno do servidor",
+      error: error.message
+    });
+  }
+};
+
+// ================ LISTAR UNIDADES ATIVAS (SIMPLIFICADO) ================
+const listarUnidadesAtivas = async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        id_unidade,
+        nome,
+        ativo
+      FROM unidades 
+      WHERE ativo = 1
+      ORDER BY nome ASC
+    `;
+    
+    const [unidades] = await db.execute(query);
+    
+    res.json({
+      success: true,
+      unidades,
+      total: unidades.length
+    });
+  } catch (error) {
+    console.error("Erro ao listar unidades ativas:", error);
     res.status(500).json({
       success: false,
       message: "Erro interno do servidor",
@@ -643,6 +672,7 @@ const listarFuncionariosPorUnidade = async (req, res) => {
 
 module.exports = {
   listarUnidades,
+  listarUnidadesAtivas,
   buscarUnidadePorId,
   criarUnidade,
   atualizarUnidade,

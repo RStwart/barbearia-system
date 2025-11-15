@@ -118,7 +118,7 @@ exports.atualizarCategoria = async (req, res) => {
 
     if (ativo !== undefined) {
       campos.push('ativo = ?');
-      valores.push(ativo);
+      valores.push(ativo ? 1 : 0);
     }
 
     if (campos.length === 0) {
@@ -413,7 +413,7 @@ exports.atualizarProduto = async (req, res) => {
 
     if (ativo !== undefined) {
       campos.push('ativo = ?');
-      valores.push(ativo);
+      valores.push(ativo ? 1 : 0);
     }
 
     if (campos.length === 0) {
@@ -489,9 +489,11 @@ exports.alternarStatusProduto = async (req, res) => {
       });
     }
 
-    const novoStatus = !produto[0].ativo;
+    // Converter para booleano e inverter
+    const statusAtual = Boolean(produto[0].ativo);
+    const novoStatus = !statusAtual;
 
-    await db.execute('UPDATE produtos SET ativo = ? WHERE id = ?', [novoStatus, id]);
+    await db.execute('UPDATE produtos SET ativo = ? WHERE id = ?', [novoStatus ? 1 : 0, id]);
 
     res.json({ 
       message: `Produto ${novoStatus ? 'ativado' : 'desativado'} com sucesso`,

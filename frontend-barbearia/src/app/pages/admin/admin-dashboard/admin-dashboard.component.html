@@ -264,14 +264,16 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Unidade ID</label>
-          <input 
-            type="number" 
+          <label>Unidade</label>
+          <select 
             [(ngModel)]="usuarioForm.unidade_id" 
             name="unidade_id"
-            placeholder="ID da unidade"
-            min="1"
-            class="form-input">
+            class="form-select">
+            <option [value]="undefined">Nenhuma unidade</option>
+            <option *ngFor="let unidade of unidades" [value]="unidade.id_unidade">
+              {{ unidade.nome }}
+            </option>
+          </select>
         </div>
       </div>
 

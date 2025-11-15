@@ -43,8 +43,6 @@ export interface ProdutosResponse {
   providedIn: 'root'
 })
 export class ProdutosService {
-  private apiUrl = `${environment.apiUrl}/agendamentos`;
-
   constructor(private http: HttpClient) {}
 
   // ==================== CATEGORIAS ====================
@@ -68,40 +66,31 @@ export class ProdutosService {
   // ==================== PRODUTOS (SERVIÇOS) ====================
   
   listarProdutos(): Observable<ProdutosResponse> {
-    return this.http.get<any>(`${this.apiUrl}/servicos/listar`).pipe(
+    return this.http.get<any>(`${environment.apiUrl}/produtos/listar`).pipe(
       map((response: any) => ({
-        produtos: response.servicos || [],
-        total: response.servicos?.length || 0
+        produtos: response.produtos || [],
+        total: response.produtos?.length || 0
       }))
     );
   }
 
   buscarProdutoPorId(id: number): Observable<{produto: Produto}> {
-    // TODO: Implementar endpoint no backend
-    return this.http.get<{produto: Produto}>(`${environment.apiUrl}/servicos/${id}`);
+    return this.http.get<{produto: Produto}>(`${environment.apiUrl}/produtos/${id}`);
   }
 
   criarProduto(produto: Partial<Produto>): Observable<any> {
-    // TODO: Implementar endpoint no backend
-    console.warn('Endpoint de criar serviço não implementado no backend');
-    return new Observable(observer => observer.error('Not implemented'));
+    return this.http.post<any>(`${environment.apiUrl}/produtos/criar`, produto);
   }
 
   atualizarProduto(id: number, produto: Partial<Produto>): Observable<any> {
-    // TODO: Implementar endpoint no backend
-    console.warn('Endpoint de atualizar serviço não implementado no backend');
-    return new Observable(observer => observer.error('Not implemented'));
+    return this.http.put<any>(`${environment.apiUrl}/produtos/${id}`, produto);
   }
 
   excluirProduto(id: number): Observable<any> {
-    // TODO: Implementar endpoint no backend
-    console.warn('Endpoint de excluir serviço não implementado no backend');
-    return new Observable(observer => observer.error('Not implemented'));
+    return this.http.delete<any>(`${environment.apiUrl}/produtos/${id}`);
   }
 
   alternarStatusProduto(id: number): Observable<any> {
-    // TODO: Implementar endpoint no backend
-    console.warn('Endpoint de alternar status não implementado no backend');
-    return new Observable(observer => observer.error('Not implemented'));
+    return this.http.patch<any>(`${environment.apiUrl}/produtos/${id}/status`, {});
   }
 }
