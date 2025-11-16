@@ -328,4 +328,23 @@ export class AdminDashboardComponent implements OnInit {
     };
     this.aplicarFiltros();
   }
+
+  aplicarMascaraTelefone(event: any) {
+    let valor = event.target.value.replace(/\D/g, '');
+    
+    if (valor.length > 11) {
+      valor = valor.substring(0, 11);
+    }
+    
+    if (valor.length <= 10) {
+      // (11) 9999-9999
+      valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    } else {
+      // (11) 99999-9999
+      valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    }
+    
+    this.usuarioForm.telefone = valor;
+    event.target.value = valor;
+  }
 }

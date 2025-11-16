@@ -244,6 +244,8 @@
             [(ngModel)]="usuarioForm.telefone" 
             name="telefone"
             placeholder="(11) 99999-9999"
+            (input)="aplicarMascaraTelefone($event)"
+            maxlength="15"
             class="form-input">
         </div>
       </div>
