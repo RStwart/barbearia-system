@@ -186,6 +186,11 @@ exports.atualizarFuncionario = async (req, res) => {
     const { nome, email, telefone, foto_perfil, ativo } = req.body;
     const { unidade_id, tipo } = req.user;
 
+    console.log('=== ATUALIZAR FUNCIONÁRIO ===');
+    console.log('ID:', id);
+    console.log('Dados recebidos:', { nome, email, telefone, foto_perfil, ativo });
+    console.log('Unidade ID do gerente:', unidade_id);
+
     if (tipo !== 'GERENTE') {
       return res.status(403).json({ 
         error: "Acesso negado. Apenas gerentes podem atualizar funcionários." 
@@ -194,9 +199,11 @@ exports.atualizarFuncionario = async (req, res) => {
 
     // Verificar se o funcionário pertence à unidade do gerente
     const [funcionario] = await db.execute(
-      'SELECT id FROM usuarios WHERE id = ? AND tipo = "FUNCIONARIO" AND unidade_id = ?',
+      'SELECT id FROM usuarios WHERE id = ? AND tipo = \'FUNCIONARIO\' AND unidade_id = ?',
       [id, unidade_id]
     );
+
+    console.log('Funcionário encontrado:', funcionario);
 
     if (funcionario.length === 0) {
       return res.status(404).json({ 
@@ -221,12 +228,12 @@ exports.atualizarFuncionario = async (req, res) => {
     const campos = [];
     const valores = [];
 
-    if (nome) {
+    if (nome !== undefined && nome !== null) {
       campos.push('nome = ?');
       valores.push(nome);
     }
 
-    if (email) {
+    if (email !== undefined && email !== null) {
       campos.push('email = ?');
       valores.push(email);
     }
@@ -243,7 +250,7 @@ exports.atualizarFuncionario = async (req, res) => {
 
     if (ativo !== undefined) {
       campos.push('ativo = ?');
-      valores.push(ativo);
+      valores.push(ativo ? 1 : 0);
     }
 
     if (campos.length === 0) {
@@ -256,7 +263,12 @@ exports.atualizarFuncionario = async (req, res) => {
 
     const sql = `UPDATE usuarios SET ${campos.join(', ')} WHERE id = ?`;
 
-    await db.execute(sql, valores);
+    console.log('SQL:', sql);
+    console.log('Valores:', valores);
+
+    const [result] = await db.execute(sql, valores);
+
+    console.log('Resultado da atualização:', result);
 
     res.json({ message: "Funcionário atualizado com sucesso" });
   } catch (error) {
@@ -271,6 +283,10 @@ exports.excluirFuncionario = async (req, res) => {
     const { id } = req.params;
     const { unidade_id, tipo } = req.user;
 
+    console.log('=== EXCLUIR FUNCIONÁRIO ===');
+    console.log('ID:', id);
+    console.log('Unidade ID do gerente:', unidade_id);
+
     if (tipo !== 'GERENTE') {
       return res.status(403).json({ 
         error: "Acesso negado. Apenas gerentes podem excluir funcionários." 
@@ -279,9 +295,11 @@ exports.excluirFuncionario = async (req, res) => {
 
     // Verificar se o funcionário pertence à unidade do gerente
     const [funcionario] = await db.execute(
-      'SELECT id FROM usuarios WHERE id = ? AND tipo = "FUNCIONARIO" AND unidade_id = ?',
+      'SELECT id FROM usuarios WHERE id = ? AND tipo = \'FUNCIONARIO\' AND unidade_id = ?',
       [id, unidade_id]
     );
+
+    console.log('Funcionário encontrado:', funcionario);
 
     if (funcionario.length === 0) {
       return res.status(404).json({ 
@@ -290,10 +308,12 @@ exports.excluirFuncionario = async (req, res) => {
     }
 
     // Desativar ao invés de deletar
-    await db.execute(
-      'UPDATE usuarios SET ativo = FALSE WHERE id = ?',
+    const [result] = await db.execute(
+      'UPDATE usuarios SET ativo = 0 WHERE id = ?',
       [id]
     );
+
+    console.log('Resultado da exclusão:', result);
 
     res.json({ message: "Funcionário desativado com sucesso" });
   } catch (error) {
@@ -316,7 +336,7 @@ exports.alternarStatus = async (req, res) => {
 
     // Verificar se o funcionário pertence à unidade do gerente
     const [funcionario] = await db.execute(
-      'SELECT ativo FROM usuarios WHERE id = ? AND tipo = "FUNCIONARIO" AND unidade_id = ?',
+      'SELECT ativo FROM usuarios WHERE id = ? AND tipo = \'FUNCIONARIO\' AND unidade_id = ?',
       [id, unidade_id]
     );
 
