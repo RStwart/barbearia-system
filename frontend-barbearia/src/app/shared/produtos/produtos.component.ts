@@ -44,9 +44,7 @@ export class ProdutosComponent implements OnInit {
     nome: '',
     descricao: '',
     preco: 0,
-    estoque: 0,
-    categoria_id: undefined,
-    foto_url: '',
+    estoque: 30,
     ativo: true
   };
 
@@ -103,8 +101,7 @@ export class ProdutosComponent implements OnInit {
       const termo = this.termoBuscaServico.toLowerCase();
       resultado = resultado.filter(p =>
         p.nome.toLowerCase().includes(termo) ||
-        (p.descricao && p.descricao.toLowerCase().includes(termo)) ||
-        (p.categoria_nome && p.categoria_nome.toLowerCase().includes(termo))
+        (p.descricao && p.descricao.toLowerCase().includes(termo))
       );
     }
 
@@ -127,9 +124,7 @@ export class ProdutosComponent implements OnInit {
       nome: '',
       descricao: '',
       preco: 0,
-      estoque: 0,
-      categoria_id: undefined,
-      foto_url: '',
+      estoque: 30,
       ativo: true
     };
     this.mostrarModalServico = true;
@@ -143,9 +138,7 @@ export class ProdutosComponent implements OnInit {
       nome: produto.nome,
       descricao: produto.descricao,
       preco: produto.preco,
-      estoque: produto.estoque,
-      categoria_id: produto.categoria_id,
-      foto_url: produto.foto_url,
+      estoque: produto.estoque || produto.duracao,
       ativo: produto.ativo
     };
     this.mostrarModalServico = true;

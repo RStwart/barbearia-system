@@ -191,28 +191,24 @@ exports.listarProdutos = async (req, res) => {
 
     if (tipo !== 'GERENTE') {
       return res.status(403).json({ 
-        error: "Acesso negado. Apenas gerentes podem gerenciar produtos." 
+        error: "Acesso negado. Apenas gerentes podem gerenciar serviços." 
       });
     }
 
     const sql = `
       SELECT 
-        p.id,
-        p.unidade_id,
-        p.categoria_id,
-        c.nome as categoria_nome,
-        p.nome,
-        p.descricao,
-        p.preco,
-        p.estoque,
-        p.foto_url,
-        p.ativo,
-        p.criado_em,
-        p.atualizado_em
-      FROM produtos p
-      LEFT JOIN categorias c ON p.categoria_id = c.id
-      WHERE p.unidade_id = ?
-      ORDER BY c.nome, p.nome ASC
+        s.id,
+        s.unidade_id,
+        s.nome,
+        s.descricao,
+        s.preco,
+        s.duracao,
+        s.ativo,
+        s.created_at as criado_em,
+        s.updated_at as atualizado_em
+      FROM servicos s
+      WHERE s.unidade_id = ?
+      ORDER BY s.nome ASC
     `;
 
     const [produtos] = await db.execute(sql, [unidade_id]);
@@ -222,8 +218,8 @@ exports.listarProdutos = async (req, res) => {
       total: produtos.length 
     });
   } catch (error) {
-    console.error("Erro ao listar produtos:", error);
-    res.status(500).json({ error: "Erro ao listar produtos" });
+    console.error("Erro ao listar serviços:", error);
+    res.status(500).json({ error: "Erro ao listar serviços" });
   }
 };
 
@@ -235,41 +231,37 @@ exports.buscarProdutoPorId = async (req, res) => {
 
     if (tipo !== 'GERENTE') {
       return res.status(403).json({ 
-        error: "Acesso negado. Apenas gerentes podem visualizar produtos." 
+        error: "Acesso negado. Apenas gerentes podem visualizar serviços." 
       });
     }
 
     const sql = `
       SELECT 
-        p.id,
-        p.unidade_id,
-        p.categoria_id,
-        c.nome as categoria_nome,
-        p.nome,
-        p.descricao,
-        p.preco,
-        p.estoque,
-        p.foto_url,
-        p.ativo,
-        p.criado_em,
-        p.atualizado_em
-      FROM produtos p
-      LEFT JOIN categorias c ON p.categoria_id = c.id
-      WHERE p.id = ? AND p.unidade_id = ?
+        s.id,
+        s.unidade_id,
+        s.nome,
+        s.descricao,
+        s.preco,
+        s.duracao,
+        s.ativo,
+        s.created_at as criado_em,
+        s.updated_at as atualizado_em
+      FROM servicos s
+      WHERE s.id = ? AND s.unidade_id = ?
     `;
 
     const [produtos] = await db.execute(sql, [id, unidade_id]);
 
     if (produtos.length === 0) {
       return res.status(404).json({ 
-        error: "Produto não encontrado ou não pertence a esta unidade." 
+        error: "Serviço não encontrado ou não pertence a esta unidade." 
       });
     }
 
     res.json({ produto: produtos[0] });
   } catch (error) {
-    console.error("Erro ao buscar produto:", error);
-    res.status(500).json({ error: "Erro ao buscar produto" });
+    console.error("Erro ao buscar serviço:", error);
+    res.status(500).json({ error: "Erro ao buscar serviço" });
   }
 };
 
@@ -281,7 +273,7 @@ exports.criarProduto = async (req, res) => {
 
     if (tipo !== 'GERENTE') {
       return res.status(403).json({ 
-        error: "Acesso negado. Apenas gerentes podem criar produtos." 
+        error: "Acesso negado. Apenas gerentes podem criar serviços." 
       });
     }
 
@@ -289,29 +281,14 @@ exports.criarProduto = async (req, res) => {
       return res.status(400).json({ error: "Nome e preço são obrigatórios." });
     }
 
-    // Verificar se a categoria pertence à unidade (se fornecida)
-    if (categoria_id) {
-      const [categoria] = await db.execute(
-        'SELECT id FROM categorias WHERE id = ? AND unidade_id = ?',
-        [categoria_id, unidade_id]
-      );
-
-      if (categoria.length === 0) {
-        return res.status(400).json({ 
-          error: "Categoria não encontrada ou não pertence a esta unidade." 
-        });
-      }
-    }
-
     const sql = `
       INSERT INTO servicos (
-        unidade_id, categoria_id, nome, descricao, preco, duracao, ativo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        unidade_id, nome, descricao, preco, duracao, ativo
+      ) VALUES (?, ?, ?, ?, ?, ?)
     `;
 
     const [result] = await db.execute(sql, [
       unidade_id,
-      categoria_id || null,
       nome,
       descricao || null,
       preco,
@@ -324,7 +301,6 @@ exports.criarProduto = async (req, res) => {
       produto: {
         id: result.insertId,
         unidade_id,
-        categoria_id,
         nome,
         descricao,
         preco,
@@ -333,8 +309,8 @@ exports.criarProduto = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("Erro ao criar produto:", error);
-    res.status(500).json({ error: "Erro ao criar produto" });
+    console.error("Erro ao criar serviço:", error);
+    res.status(500).json({ error: "Erro ao criar serviço" });
   }
 };
 
@@ -347,7 +323,7 @@ exports.atualizarProduto = async (req, res) => {
 
     if (tipo !== 'GERENTE') {
       return res.status(403).json({ 
-        error: "Acesso negado. Apenas gerentes podem atualizar produtos." 
+        error: "Acesso negado. Apenas gerentes podem atualizar serviços." 
       });
     }
 
@@ -363,27 +339,8 @@ exports.atualizarProduto = async (req, res) => {
       });
     }
 
-    // Verificar se a categoria pertence à unidade (se fornecida)
-    if (categoria_id) {
-      const [categoria] = await db.execute(
-        'SELECT id FROM categorias WHERE id = ? AND unidade_id = ?',
-        [categoria_id, unidade_id]
-      );
-
-      if (categoria.length === 0) {
-        return res.status(400).json({ 
-          error: "Categoria não encontrada ou não pertence a esta unidade." 
-        });
-      }
-    }
-
     const campos = [];
     const valores = [];
-
-    if (categoria_id !== undefined) {
-      campos.push('categoria_id = ?');
-      valores.push(categoria_id || null);
-    }
 
     if (nome) {
       campos.push('nome = ?');
@@ -419,10 +376,10 @@ exports.atualizarProduto = async (req, res) => {
     const sql = `UPDATE servicos SET ${campos.join(', ')} WHERE id = ?`;
     await db.execute(sql, valores);
 
-    res.json({ message: "Produto atualizado com sucesso" });
+    res.json({ message: "Serviço atualizado com sucesso" });
   } catch (error) {
-    console.error("Erro ao atualizar produto:", error);
-    res.status(500).json({ error: "Erro ao atualizar produto" });
+    console.error("Erro ao atualizar serviço:", error);
+    res.status(500).json({ error: "Erro ao atualizar serviço" });
   }
 };
 
@@ -434,29 +391,32 @@ exports.excluirProduto = async (req, res) => {
 
     if (tipo !== 'GERENTE') {
       return res.status(403).json({ 
-        error: "Acesso negado. Apenas gerentes podem excluir produtos." 
+        error: "Acesso negado. Apenas gerentes podem excluir serviços." 
       });
     }
 
-    // Verificar se o produto pertence à unidade
-    const [produto] = await db.execute(
-      'SELECT id FROM produtos WHERE id = ? AND unidade_id = ?',
+    // Verificar se o serviço pertence à unidade
+    const [servicos] = await db.execute(
+      'SELECT id FROM servicos WHERE id = ? AND unidade_id = ?',
       [id, unidade_id]
     );
 
-    if (produto.length === 0) {
+    if (servicos.length === 0) {
       return res.status(404).json({ 
-        error: "Produto não encontrado ou não pertence a esta unidade." 
+        error: "Serviço não encontrado ou não pertence a esta unidade." 
       });
     }
 
-    // Deletar produto permanentemente
+    // Deletar serviço permanentemente
     await db.execute('DELETE FROM servicos WHERE id = ?', [id]);
 
-    res.json({ message: "Produto excluído com sucesso" });
+    res.json({ message: "Serviço excluído com sucesso" });
   } catch (error) {
-    console.error("Erro ao excluir produto:", error);
-    res.status(500).json({ error: "Erro ao excluir produto" });
+    console.error("Erro ao excluir serviço:", error);
+    res.status(500).json({ 
+      error: "Erro ao excluir serviço",
+      details: error.message 
+    });
   }
 };
 
@@ -468,7 +428,7 @@ exports.alternarStatusProduto = async (req, res) => {
 
     if (tipo !== 'GERENTE') {
       return res.status(403).json({ 
-        error: "Acesso negado. Apenas gerentes podem alterar status de produtos." 
+        error: "Acesso negado. Apenas gerentes podem alterar status de serviços." 
       });
     }
 
@@ -477,24 +437,24 @@ exports.alternarStatusProduto = async (req, res) => {
       [id, unidade_id]
     );
 
-    if (produto.length === 0) {
+    if (produtos.length === 0) {
       return res.status(404).json({ 
-        error: "Produto não encontrado ou não pertence a esta unidade." 
+        error: "Serviço não encontrado ou não pertence a esta unidade." 
       });
     }
 
     // Converter para booleano e inverter
-    const statusAtual = Boolean(produto[0].ativo);
+    const statusAtual = Boolean(produtos[0].ativo);
     const novoStatus = !statusAtual;
 
     await db.execute('UPDATE servicos SET ativo = ? WHERE id = ?', [novoStatus ? 1 : 0, id]);
 
     res.json({ 
-      message: `Produto ${novoStatus ? 'ativado' : 'desativado'} com sucesso`,
+      message: `Serviço ${novoStatus ? 'ativado' : 'desativado'} com sucesso`,
       ativo: novoStatus
     });
   } catch (error) {
     console.error("Erro ao alternar status:", error);
-    res.status(500).json({ error: "Erro ao alternar status do produto" });
+    res.status(500).json({ error: "Erro ao alternar status do serviço" });
   }
 };

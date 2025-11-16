@@ -17,14 +17,14 @@ export interface Categoria {
 export interface Produto {
   id?: number;
   unidade_id?: number;
-  categoria_id?: number;
-  categoria_nome?: string;
   nome: string;
   descricao?: string;
   preco: number;
-  estoque: number;
-  foto_url?: string;
+  duracao?: number;
+  estoque?: number;
   ativo: boolean;
+  created_at?: string;
+  updated_at?: string;
   criado_em?: string;
   atualizado_em?: string;
 }

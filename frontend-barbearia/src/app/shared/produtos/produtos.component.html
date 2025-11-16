@@ -60,19 +60,13 @@
     <!-- Grid de Serviços -->
     <div class="servicos-grid" *ngIf="!carregando || servicos.length > 0">
       <div class="servico-card" *ngFor="let produto of servicosPaginados">
-        <div class="servico-imagem">
-          <img [src]="produto.foto_url || 'https://via.placeholder.com/300x200?text=Sem+Imagem'" 
-               [alt]="produto.nome"
-               (error)="onImageError($event)">
+        <div class="servico-header">
           <div class="servico-status" [class.inativo]="!produto.ativo">
-            {{ produto.ativo ? 'Ativo' : 'Inativo' }}
+            {{ produto.ativo ? 'ATIVO' : 'INATIVO' }}
           </div>
         </div>
         
         <div class="servico-info">
-          <span class="servico-categoria" *ngIf="produto.categoria_nome">
-            {{ produto.categoria_nome }}
-          </span>
           <h3 class="servico-nome">{{ produto.nome }}</h3>
           <p class="servico-descricao" *ngIf="produto.descricao">
             {{ produto.descricao }}
@@ -82,6 +76,9 @@
             <div class="preco-container">
               <span class="preco-label">Preço</span>
               <span class="preco">R$ {{ formatarPreco(produto.preco) }}</span>
+            </div>
+            <div class="duracao-container" *ngIf="produto.duracao || produto.estoque">
+              <span class="duracao-label">⏱️ {{ produto.duracao || produto.estoque }} min</span>
             </div>
           </div>
         </div>
@@ -231,25 +228,13 @@
         ❌ {{ erro }}
       </div>
 
-      <div class="form-linha">
-        <div class="form-grupo col-2">
-          <label>Nome do Serviço *</label>
-          <input 
-            type="text" 
-            [(ngModel)]="formularioServico.nome"
-            placeholder="Ex: Corte Degradê"
-            required>
-        </div>
-
-        <div class="form-grupo">
-          <label>Categoria</label>
-          <select [(ngModel)]="formularioServico.categoria_id">
-            <option [value]="undefined">Sem categoria</option>
-            <option *ngFor="let cat of categorias" [value]="cat.id">
-              {{ cat.nome }}
-            </option>
-          </select>
-        </div>
+      <div class="form-grupo">
+        <label>Nome do Serviço *</label>
+        <input 
+          type="text" 
+          [(ngModel)]="formularioServico.nome"
+          placeholder="Ex: Corte Degradê"
+          required>
       </div>
 
       <div class="form-grupo">
@@ -272,6 +257,17 @@
             required>
         </div>
 
+        <div class="form-grupo">
+          <label>Duração (minutos) *</label>
+          <input 
+            type="number" 
+            [(ngModel)]="formularioServico.estoque"
+            min="1"
+            step="1"
+            placeholder="30"
+            required>
+        </div>
+
         <div class="form-grupo" *ngIf="editandoServico">
           <label>Status</label>
           <select [(ngModel)]="formularioServico.ativo">
@@ -279,23 +275,6 @@
             <option [ngValue]="false">Inativo</option>
           </select>
         </div>
-      </div>
-
-      <div class="form-grupo">
-        <label>URL da Foto (opcional)</label>
-        <input 
-          type="text" 
-          [(ngModel)]="formularioServico.foto_url"
-          placeholder="https://exemplo.com/imagem.jpg">
-        <small>Cole o link de uma imagem para o serviço</small>
-      </div>
-
-      <div class="preview-imagem" *ngIf="formularioServico.foto_url">
-        <label>Preview:</label>
-        <img 
-          [src]="formularioServico.foto_url" 
-          alt="Preview"
-          (error)="onImageError($event)">
       </div>
     </div>
 
