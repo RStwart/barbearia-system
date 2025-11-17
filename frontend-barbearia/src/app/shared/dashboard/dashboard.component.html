@@ -160,7 +160,7 @@
               (click)="visualizarDetalhes(venda)"
               title="Ver Detalhes"
             >
-              �️
+              👁️
             </button>
           </td>
         </tr>
@@ -198,3 +198,149 @@
   </div>
 </div>
 
+<!-- MODAL DE DETALHES DA VENDA -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="fecharModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header do Modal -->
+    <div class="modal-header">
+      <h2>📋 Detalhes da Venda #{{ vendaSelecionada?.id }}</h2>
+      <button class="btn-fechar" (click)="fecharModal()">✖</button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="carregandoDetalhes" class="modal-loading">
+      <div class="spinner"></div>
+      <p>Carregando detalhes...</p>
+    </div>
+
+    <!-- Conteúdo do Modal -->
+    <div *ngIf="!carregandoDetalhes && vendaSelecionada" class="modal-body">
+      <!-- Informações Principais -->
+      <div class="info-section">
+        <h3>📊 Informações Gerais</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Data/Hora:</span>
+            <span class="info-value">{{ formatarDataHora(vendaSelecionada.criado_em!) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tipo:</span>
+            <span class="badge-tipo" [ngClass]="getTipoVendaClass(vendaSelecionada.tipo_venda)">
+              {{ vendaSelecionada.tipo_venda }}
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Valor Total:</span>
+            <span class="info-value destaque">{{ formatarPreco(vendaSelecionada.valor_total) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pessoas Envolvidas -->
+      <div class="info-section">
+        <h3>👥 Pessoas</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Funcionário:</span>
+            <span class="info-value">{{ vendaSelecionada.funcionario_nome }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Cliente:</span>
+            <span class="info-value">{{ vendaSelecionada.cliente_nome || 'N/A' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagamento -->
+      <div class="info-section">
+        <h3>💳 Pagamento</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Forma de Pagamento:</span>
+            <span class="info-value">{{ vendaSelecionada.forma_pagamento }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Status do Pagamento:</span>
+            <span class="badge-status" [ngClass]="getStatusPagamentoClass(vendaSelecionada.status_pagamento)">
+              {{ vendaSelecionada.status_pagamento }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nota Fiscal -->
+      <div class="info-section">
+        <h3>📄 Nota Fiscal</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Número da NF:</span>
+            <span class="info-value">{{ vendaSelecionada.nota_fiscal || 'Não emitida' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Status da NF:</span>
+            <span class="badge-status" [ngClass]="getStatusNFClass(vendaSelecionada.status_nf)">
+              {{ vendaSelecionada.status_nf }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Serviços -->
+      <div class="info-section" *ngIf="vendaSelecionada.servicos && vendaSelecionada.servicos.length > 0">
+        <h3>✂️ Serviços</h3>
+        <table class="detalhes-table">
+          <thead>
+            <tr>
+              <th>Serviço</th>
+              <th>Qtd</th>
+              <th>Preço Unit.</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let servico of vendaSelecionada.servicos">
+              <td>{{ servico.servico_nome }}</td>
+              <td>{{ servico.quantidade }}</td>
+              <td>{{ formatarPreco(servico.servico_preco) }}</td>
+              <td>{{ formatarPreco(servico.subtotal) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Produtos -->
+      <div class="info-section" *ngIf="vendaSelecionada.produtos && vendaSelecionada.produtos.length > 0">
+        <h3>📦 Produtos</h3>
+        <table class="detalhes-table">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Qtd</th>
+              <th>Preço Unit.</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let produto of vendaSelecionada.produtos">
+              <td>{{ produto.produto_nome }}</td>
+              <td>{{ produto.quantidade }}</td>
+              <td>{{ formatarPreco(produto.produto_preco) }}</td>
+              <td>{{ formatarPreco(produto.subtotal) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Observações -->
+      <div class="info-section" *ngIf="vendaSelecionada.observacoes">
+        <h3>📝 Observações</h3>
+        <p class="observacoes-text">{{ vendaSelecionada.observacoes }}</p>
+      </div>
+    </div>
+
+    <!-- Footer do Modal -->
+    <div class="modal-footer">
+      <button class="btn-secundario" (click)="fecharModal()">Fechar</button>
+    </div>
+  </div>
+</div>

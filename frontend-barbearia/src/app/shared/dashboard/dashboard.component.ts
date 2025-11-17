@@ -37,6 +37,11 @@ export class DashboardComponent implements OnInit {
   mensagem = '';
   tipoMensagem: 'sucesso' | 'erro' = 'sucesso';
 
+  // Modal de detalhes
+  mostrarModal = false;
+  vendaSelecionada: Venda | null = null;
+  carregandoDetalhes = false;
+
   constructor(
     private dashboardService: DashboardService,
     private authService: AuthService
@@ -175,9 +180,46 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  visualizarDetalhes(venda: any): void {
-    // TODO: Implementar modal/página de detalhes da venda
-    console.log('Visualizar detalhes da venda:', venda);
+  visualizarDetalhes(venda: Venda): void {
+    this.carregandoDetalhes = true;
+    this.mostrarModal = true;
+    
+    // Buscar detalhes completos da venda
+    this.dashboardService.buscarVendaPorId(venda.id!).subscribe({
+      next: (vendaCompleta) => {
+        this.vendaSelecionada = vendaCompleta;
+        this.carregandoDetalhes = false;
+      },
+      error: (err) => {
+        console.error('Erro ao buscar detalhes da venda:', err);
+        this.exibirMensagem('Erro ao carregar detalhes da venda', 'erro');
+        this.carregandoDetalhes = false;
+        this.fecharModal();
+      }
+    });
+  }
+
+  fecharModal(): void {
+    this.mostrarModal = false;
+    this.vendaSelecionada = null;
+  }
+
+  getStatusPagamentoClass(status: string): string {
+    switch (status) {
+      case 'PAGO': return 'status-pago';
+      case 'AGUARDANDO': return 'status-aguardando';
+      case 'CANCELADO': return 'status-cancelado';
+      default: return '';
+    }
+  }
+
+  getStatusNFClass(status: string): string {
+    switch (status) {
+      case 'EMITIDA': return 'status-emitida';
+      case 'AGUARDANDO_AJUSTE': return 'status-aguardando-ajuste';
+      case 'NAO_NECESSARIA': return 'status-nao-necessaria';
+      default: return '';
+    }
   }
 
   exibirMensagem(texto: string, tipo: 'sucesso' | 'erro') {
