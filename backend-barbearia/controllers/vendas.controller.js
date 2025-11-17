@@ -5,53 +5,57 @@ const db = require("../config/db");
 // Obter estatísticas do dashboard
 exports.obterEstatisticas = async (req, res) => {
   try {
-    const { unidade_id, tipo } = req.user;
+    const { unidade_id, tipo, id } = req.user;
 
-    if (tipo !== 'GERENTE' && tipo !== 'ADM') {
+    if (tipo !== 'GERENTE' && tipo !== 'ADM' && tipo !== 'FUNCIONARIO') {
       return res.status(403).json({ 
-        error: "Acesso negado. Apenas gerentes podem visualizar estatísticas." 
+        error: "Acesso negado." 
       });
     }
+
+    // Filtro adicional para funcionários (apenas suas vendas)
+    const filtroFuncionario = tipo === 'FUNCIONARIO' ? ' AND funcionario_id = ?' : '';
+    const paramsFuncionario = tipo === 'FUNCIONARIO' ? [unidade_id, id] : [unidade_id];
 
     // Vendas do dia
     const [vendasDia] = await db.execute(
       `SELECT COUNT(*) as total, COALESCE(SUM(valor_total), 0) as valor
        FROM vendas 
-       WHERE unidade_id = ? AND DATE(criado_em) = CURDATE()`,
-      [unidade_id]
+       WHERE unidade_id = ? AND DATE(criado_em) = CURDATE()${filtroFuncionario}`,
+      paramsFuncionario
     );
 
     // Vendas da semana
     const [vendasSemana] = await db.execute(
       `SELECT COUNT(*) as total, COALESCE(SUM(valor_total), 0) as valor
        FROM vendas 
-       WHERE unidade_id = ? AND YEARWEEK(criado_em) = YEARWEEK(NOW())`,
-      [unidade_id]
+       WHERE unidade_id = ? AND YEARWEEK(criado_em) = YEARWEEK(NOW())${filtroFuncionario}`,
+      paramsFuncionario
     );
 
     // Vendas do mês
     const [vendasMes] = await db.execute(
       `SELECT COUNT(*) as total, COALESCE(SUM(valor_total), 0) as valor
        FROM vendas 
-       WHERE unidade_id = ? AND YEAR(criado_em) = YEAR(NOW()) AND MONTH(criado_em) = MONTH(NOW())`,
-      [unidade_id]
+       WHERE unidade_id = ? AND YEAR(criado_em) = YEAR(NOW()) AND MONTH(criado_em) = MONTH(NOW())${filtroFuncionario}`,
+      paramsFuncionario
     );
 
     // Vendas do ano
     const [vendasAno] = await db.execute(
       `SELECT COUNT(*) as total, COALESCE(SUM(valor_total), 0) as valor
        FROM vendas 
-       WHERE unidade_id = ? AND YEAR(criado_em) = YEAR(NOW())`,
-      [unidade_id]
+       WHERE unidade_id = ? AND YEAR(criado_em) = YEAR(NOW())${filtroFuncionario}`,
+      paramsFuncionario
     );
 
     // Vendas por tipo
     const [vendasPorTipo] = await db.execute(
       `SELECT tipo_venda, COUNT(*) as quantidade, COALESCE(SUM(valor_total), 0) as total
        FROM vendas 
-       WHERE unidade_id = ? AND YEAR(criado_em) = YEAR(NOW()) AND MONTH(criado_em) = MONTH(NOW())
+       WHERE unidade_id = ? AND YEAR(criado_em) = YEAR(NOW()) AND MONTH(criado_em) = MONTH(NOW())${filtroFuncionario}
        GROUP BY tipo_venda`,
-      [unidade_id]
+      paramsFuncionario
     );
 
     // Serviços mais vendidos do mês
@@ -59,20 +63,20 @@ exports.obterEstatisticas = async (req, res) => {
       `SELECT vs.servico_nome, SUM(vs.quantidade) as total_vendido, COALESCE(SUM(vs.subtotal), 0) as valor_total
        FROM venda_servicos vs
        INNER JOIN vendas v ON vs.venda_id = v.id
-       WHERE v.unidade_id = ? AND YEAR(v.criado_em) = YEAR(NOW()) AND MONTH(v.criado_em) = MONTH(NOW())
+       WHERE v.unidade_id = ? AND YEAR(v.criado_em) = YEAR(NOW()) AND MONTH(v.criado_em) = MONTH(NOW())${filtroFuncionario}
        GROUP BY vs.servico_nome
        ORDER BY total_vendido DESC
        LIMIT 5`,
-      [unidade_id]
+      paramsFuncionario
     );
 
     // Vendas por forma de pagamento (mês)
     const [vendasPorPagamento] = await db.execute(
       `SELECT forma_pagamento, COUNT(*) as quantidade, COALESCE(SUM(valor_total), 0) as total
        FROM vendas 
-       WHERE unidade_id = ? AND YEAR(criado_em) = YEAR(NOW()) AND MONTH(criado_em) = MONTH(NOW())
+       WHERE unidade_id = ? AND YEAR(criado_em) = YEAR(NOW()) AND MONTH(criado_em) = MONTH(NOW())${filtroFuncionario}
        GROUP BY forma_pagamento`,
-      [unidade_id]
+      paramsFuncionario
     );
 
     res.json({
@@ -95,13 +99,22 @@ exports.obterEstatisticas = async (req, res) => {
 // Listar vendas
 exports.listarVendas = async (req, res) => {
   try {
-    const { unidade_id, tipo } = req.user;
+    const { unidade_id, tipo, id } = req.user;
 
-    if (tipo !== 'GERENTE' && tipo !== 'ADM') {
+    console.log('📊 Listar Vendas - Tipo:', tipo, 'ID:', id, 'Unidade:', unidade_id);
+
+    if (tipo !== 'GERENTE' && tipo !== 'ADM' && tipo !== 'FUNCIONARIO') {
       return res.status(403).json({ 
-        error: "Acesso negado. Apenas gerentes podem visualizar vendas." 
+        error: "Acesso negado." 
       });
     }
+
+    // Funcionários veem apenas suas vendas, Gerentes veem todas da unidade
+    const filtroFuncionario = tipo === 'FUNCIONARIO' ? 'AND v.funcionario_id = ?' : '';
+    const params = tipo === 'FUNCIONARIO' ? [unidade_id, id] : [unidade_id];
+
+    console.log('🔍 Filtro Funcionário:', filtroFuncionario);
+    console.log('📋 Params:', params);
 
     const sql = `
       SELECT 
@@ -123,11 +136,15 @@ exports.listarVendas = async (req, res) => {
       FROM vendas v
       LEFT JOIN usuarios uf ON v.funcionario_id = uf.id
       LEFT JOIN usuarios uc ON v.cliente_id = uc.id
-      WHERE v.unidade_id = ?
+      WHERE v.unidade_id = ? ${filtroFuncionario}
       ORDER BY v.criado_em DESC
     `;
 
-    const [vendas] = await db.execute(sql, [unidade_id]);
+    console.log('🔎 SQL:', sql);
+
+    const [vendas] = await db.execute(sql, params);
+
+    console.log('✅ Vendas encontradas:', vendas.length);
 
     // Buscar itens de cada venda
     for (let venda of vendas) {
@@ -137,13 +154,9 @@ exports.listarVendas = async (req, res) => {
         [venda.id]
       );
       venda.servicos = servicos;
-
-      // Buscar produtos
-      const [produtos] = await db.execute(
-        `SELECT * FROM venda_produtos WHERE venda_id = ?`,
-        [venda.id]
-      );
-      venda.produtos = produtos;
+      
+      // Produtos virão em futuras implementações
+      venda.produtos = [];
     }
 
     res.json({ vendas });
@@ -186,13 +199,7 @@ exports.buscarVendaPorId = async (req, res) => {
       [id]
     );
     venda.servicos = servicos;
-
-    // Buscar produtos
-    const [produtos] = await db.execute(
-      `SELECT * FROM venda_produtos WHERE venda_id = ?`,
-      [id]
-    );
-    venda.produtos = produtos;
+    venda.produtos = [];
 
     res.json(venda);
   } catch (error) {
@@ -252,19 +259,8 @@ exports.criarVenda = async (req, res) => {
       }
     }
 
-    // Inserir produtos e atualizar estoque
-    if (produtos && produtos.length > 0) {
-      for (let produto of produtos) {
-        await db.execute(
-          `INSERT INTO venda_produtos (venda_id, produto_id, produto_nome, produto_preco, quantidade, subtotal)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [venda_id, produto.produto_id || null, produto.produto_nome, 
-           produto.produto_preco, produto.quantidade, produto.subtotal]
-        );
-
-        // Serviços não têm estoque para atualizar
-      }
-    }
+    // Produtos virão em futuras implementações
+    // A tabela venda_produtos ainda não foi criada
 
     res.status(201).json({ 
       message: "Venda criada com sucesso",
@@ -385,13 +381,7 @@ exports.excluirVenda = async (req, res) => {
       return res.status(404).json({ error: "Venda não encontrada" });
     }
 
-    // Buscar produtos vendidos para devolver ao estoque
-    const [produtos] = await db.execute(
-      `SELECT produto_id, quantidade FROM venda_produtos WHERE venda_id = ? AND produto_id IS NOT NULL`,
-      [id]
-    );
-
-    // Devolver produtos ao estoque
+    // Produtos virão em futuras implementações
     // Serviços não têm estoque para restaurar
 
     // Excluir venda (cascade vai deletar os itens)

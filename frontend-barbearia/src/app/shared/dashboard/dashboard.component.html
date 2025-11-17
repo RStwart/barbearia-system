@@ -2,7 +2,8 @@
   <!-- HEADER -->
   <div class="header">
     <h1>📊 Dashboard</h1>
-    <p class="subtitle">Visão geral do seu negócio</p>
+    <p class="subtitle" *ngIf="!isFuncionario">Visão geral do seu negócio</p>
+    <p class="subtitle" *ngIf="isFuncionario">Histórico dos seus atendimentos</p>
   </div>
 
   <!-- MENSAGEM -->
@@ -11,13 +12,13 @@
   </div>
 
   <!-- LOADING ESTATÍSTICAS -->
-  <div *ngIf="carregandoEstatisticas" class="loading">
+  <div *ngIf="carregandoEstatisticas && !isFuncionario" class="loading">
     <div class="spinner"></div>
     <p>Carregando estatísticas...</p>
   </div>
 
-  <!-- CARDS DE ESTATÍSTICAS -->
-  <div *ngIf="!carregandoEstatisticas && estatisticas" class="stats-grid">
+  <!-- CARDS DE ESTATÍSTICAS (APENAS GERENTE) -->
+  <div *ngIf="!carregandoEstatisticas && estatisticas && !isFuncionario" class="stats-grid">
     <!-- Card Dia -->
     <div class="stat-card card-blue">
       <div class="stat-icon">📅</div>
@@ -59,8 +60,8 @@
     </div>
   </div>
 
-  <!-- SERVIÇOS MAIS VENDIDOS -->
-  <div *ngIf="!carregandoEstatisticas && estatisticas" class="ranking-grid">
+  <!-- SERVIÇOS MAIS VENDIDOS (APENAS GERENTE) -->
+  <div *ngIf="!carregandoEstatisticas && estatisticas && !isFuncionario" class="ranking-grid">
     <!-- Top Serviços -->
     <div class="ranking-card">
       <h3>⭐ Serviços Mais Vendidos (Mês)</h3>

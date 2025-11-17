@@ -280,9 +280,14 @@ exports.atualizarAgendamento = async (req, res) => {
       const agendamentoAtual = agendamentoExiste[0];
       const statusAnterior = agendamentoAtual.status;
 
+      console.log('🔄 Status alterado para concluído - Agendamento #' + id);
+      console.log('📊 Status anterior:', statusAnterior);
+
       // Só criar venda se o status anterior NÃO era concluído (evita duplicação)
       if (statusAnterior !== 'concluido') {
         try {
+          console.log('💰 Iniciando criação de venda automática...');
+          
           // Buscar dados completos do agendamento
           const [dadosAgendamento] = await db.execute(
             `SELECT a.*, s.nome as servico_nome, s.preco as servico_preco
@@ -296,42 +301,62 @@ exports.atualizarAgendamento = async (req, res) => {
             const agendamento = dadosAgendamento[0];
             const valorVenda = valor_total || agendamento.valor_total;
 
-            // Inserir venda
+            console.log('📋 Dados para venda:', {
+              unidade_id: agendamento.unidade_id,
+              funcionario_id: agendamento.funcionario_id,
+              cliente_id: agendamento.cliente_id,
+              servico_id: agendamento.servico_id,
+              servico_nome: agendamento.servico_nome,
+              valor: valorVenda
+            });
+
+            // Inserir venda com valores corretos do ENUM
             const [resultVenda] = await db.execute(
               `INSERT INTO vendas (unidade_id, funcionario_id, cliente_id, tipo_venda, valor_total, 
                 forma_pagamento, status_pagamento, observacoes, status_nf) 
-               VALUES (?, ?, ?, 'SERVICO', ?, 'DINHEIRO', 'PAGO', ?, 'AGUARDANDO_AJUSTE')`,
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
               [
                 agendamento.unidade_id,
                 agendamento.funcionario_id,
                 agendamento.cliente_id,
+                'SERVICO',
                 valorVenda,
-                `Venda automática - Agendamento #${id}`
+                'DINHEIRO',
+                'PAGO',
+                `Venda automática - Agendamento #${id}`,
+                'AGUARDANDO_AJUSTE'
               ]
             );
 
             const venda_id = resultVenda.insertId;
+            console.log('✅ Venda criada - ID:', venda_id);
 
             // Inserir serviço na venda
             await db.execute(
               `INSERT INTO venda_servicos (venda_id, agendamento_id, servico_id, servico_nome, servico_preco, quantidade, subtotal)
-               VALUES (?, ?, ?, ?, ?, 1, ?)`,
+               VALUES (?, ?, ?, ?, ?, ?, ?)`,
               [
                 venda_id,
                 id,
                 agendamento.servico_id,
                 agendamento.servico_nome,
-                valorVenda,
+                agendamento.servico_preco,
+                1,
                 valorVenda
               ]
             );
 
-            console.log(`✅ Venda #${venda_id} criada automaticamente para agendamento #${id}`);
+            console.log(`✅ Venda #${venda_id} e venda_servicos criados para agendamento #${id}`);
+          } else {
+            console.log('⚠️ Nenhum dado de agendamento encontrado');
           }
         } catch (vendaError) {
-          console.error('⚠️ Erro ao criar venda automática:', vendaError);
+          console.error('❌ Erro ao criar venda automática:', vendaError);
+          console.error('Stack:', vendaError.stack);
           // Não falhar a atualização do agendamento se houver erro na venda
         }
+      } else {
+        console.log('ℹ️ Agendamento já estava concluído - venda não criada');
       }
     }
 

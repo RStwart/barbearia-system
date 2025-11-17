@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DashboardService, Estatisticas, Venda } from '../../services/dashboard.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,6 +12,9 @@ import { DashboardService, Estatisticas, Venda } from '../../services/dashboard.
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  // Tipo de usuário
+  isFuncionario = false;
+  
   // Estatísticas
   estatisticas: Estatisticas | null = null;
   carregandoEstatisticas = false;
@@ -33,10 +37,21 @@ export class DashboardComponent implements OnInit {
   mensagem = '';
   tipoMensagem: 'sucesso' | 'erro' = 'sucesso';
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    this.carregarEstatisticas();
+    // Verificar se é funcionário
+    const user = this.authService.getUserFromToken();
+    this.isFuncionario = user?.tipo === 'FUNCIONARIO';
+    
+    // Funcionários não carregam estatísticas
+    if (!this.isFuncionario) {
+      this.carregarEstatisticas();
+    }
+    
     this.carregarVendas();
   }
 
