@@ -195,7 +195,7 @@ exports.criarAgendamento = async (req, res) => {
         horarioInicio + ':00',
         horarioFim,
         valorTotal,
-        'confirmado',
+        'pendente',
         observacoes || null
       ]
     );
