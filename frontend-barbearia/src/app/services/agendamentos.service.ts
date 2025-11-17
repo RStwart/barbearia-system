@@ -104,4 +104,11 @@ export class AgendamentosService {
 
     return this.http.get<any>(`${this.apiUrl}/funcionarios/listar`, { params });
   }
+
+  buscarClientes(termo: string): Observable<any> {
+    let params = new HttpParams();
+    params = params.set('termo', termo);
+    
+    return this.http.get<any>(`${this.apiUrl}/clientes/buscar`, { params });
+  }
 }

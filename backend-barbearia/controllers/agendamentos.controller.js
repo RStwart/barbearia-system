@@ -4,6 +4,7 @@ const db = require("../config/db.js");
 exports.listarAgendamentos = async (req, res) => {
   try {
     const { unidade_id, data_inicio, data_fim } = req.query;
+    const usuarioLogado = req.user; // Dados do token JWT
 
     let sql = `
       SELECT 
@@ -25,7 +26,17 @@ exports.listarAgendamentos = async (req, res) => {
 
     const params = [];
 
-    if (unidade_id) {
+    // Filtro por tipo de usuário
+    if (usuarioLogado.tipo === 'GERENTE') {
+      // Gerente vê todos agendamentos da sua unidade
+      sql += ` AND a.unidade_id = ?`;
+      params.push(usuarioLogado.unidade_id);
+    } else if (usuarioLogado.tipo === 'FUNCIONARIO') {
+      // Funcionário vê apenas seus próprios agendamentos
+      sql += ` AND a.funcionario_id = ?`;
+      params.push(usuarioLogado.id);
+    } else if (unidade_id) {
+      // Outros usuários (ADM) podem filtrar por unidade
       sql += ` AND a.unidade_id = ?`;
       params.push(unidade_id);
     }
@@ -41,7 +52,7 @@ exports.listarAgendamentos = async (req, res) => {
       params.push(data_fim);
     }
 
-    sql += ` ORDER BY a.data_agendamento ASC, a.hora_inicio ASC`;
+    sql += ` ORDER BY a.data_agendamento DESC, a.hora_inicio DESC`;
 
     const [agendamentos] = await db.execute(sql, params);
     res.json({ agendamentos });
@@ -228,7 +239,11 @@ exports.atualizarAgendamento = async (req, res) => {
     }
     if (data_agendamento !== undefined) {
       updates.push('data_agendamento = ?');
-      params.push(data_agendamento);
+      // Converter data ISO para formato MySQL (YYYY-MM-DD)
+      const dataFormatada = data_agendamento.includes('T') 
+        ? data_agendamento.split('T')[0] 
+        : data_agendamento;
+      params.push(dataFormatada);
     }
     if (hora_inicio !== undefined) {
       updates.push('hora_inicio = ?');
@@ -259,6 +274,66 @@ exports.atualizarAgendamento = async (req, res) => {
     params.push(id);
 
     await db.execute(sql, params);
+
+    // Se o status mudou para 'concluido', registrar venda automaticamente
+    if (status === 'concluido') {
+      const agendamentoAtual = agendamentoExiste[0];
+      const statusAnterior = agendamentoAtual.status;
+
+      // Só criar venda se o status anterior NÃO era concluído (evita duplicação)
+      if (statusAnterior !== 'concluido') {
+        try {
+          // Buscar dados completos do agendamento
+          const [dadosAgendamento] = await db.execute(
+            `SELECT a.*, s.nome as servico_nome, s.preco as servico_preco
+             FROM agendamentos a
+             INNER JOIN servicos s ON a.servico_id = s.id
+             WHERE a.id = ?`,
+            [id]
+          );
+
+          if (dadosAgendamento.length > 0) {
+            const agendamento = dadosAgendamento[0];
+            const valorVenda = valor_total || agendamento.valor_total;
+
+            // Inserir venda
+            const [resultVenda] = await db.execute(
+              `INSERT INTO vendas (unidade_id, funcionario_id, cliente_id, tipo_venda, valor_total, 
+                forma_pagamento, status_pagamento, observacoes, status_nf) 
+               VALUES (?, ?, ?, 'SERVICO', ?, 'DINHEIRO', 'PAGO', ?, 'AGUARDANDO_AJUSTE')`,
+              [
+                agendamento.unidade_id,
+                agendamento.funcionario_id,
+                agendamento.cliente_id,
+                valorVenda,
+                `Venda automática - Agendamento #${id}`
+              ]
+            );
+
+            const venda_id = resultVenda.insertId;
+
+            // Inserir serviço na venda
+            await db.execute(
+              `INSERT INTO venda_servicos (venda_id, agendamento_id, servico_id, servico_nome, servico_preco, quantidade, subtotal)
+               VALUES (?, ?, ?, ?, ?, 1, ?)`,
+              [
+                venda_id,
+                id,
+                agendamento.servico_id,
+                agendamento.servico_nome,
+                valorVenda,
+                valorVenda
+              ]
+            );
+
+            console.log(`✅ Venda #${venda_id} criada automaticamente para agendamento #${id}`);
+          }
+        } catch (vendaError) {
+          console.error('⚠️ Erro ao criar venda automática:', vendaError);
+          // Não falhar a atualização do agendamento se houver erro na venda
+        }
+      }
+    }
 
     res.json({ message: "Agendamento atualizado com sucesso!" });
   } catch (error) {
@@ -357,5 +432,33 @@ exports.listarFuncionarios = async (req, res) => {
   } catch (error) {
     console.error("Erro ao listar funcionários:", error);
     res.status(500).json({ error: "Erro ao listar funcionários" });
+  }
+};
+
+// Buscar clientes por nome
+exports.buscarClientes = async (req, res) => {
+  try {
+    const { termo } = req.query;
+
+    if (!termo || termo.length < 2) {
+      return res.json({ clientes: [] });
+    }
+
+    const sql = `
+      SELECT id, nome, email, telefone 
+      FROM usuarios 
+      WHERE tipo = 'CLIENTE' 
+        AND ativo = TRUE
+        AND (nome LIKE ? OR email LIKE ? OR telefone LIKE ?)
+      ORDER BY nome ASC
+      LIMIT 20
+    `;
+
+    const termoBusca = `%${termo}%`;
+    const [clientes] = await db.execute(sql, [termoBusca, termoBusca, termoBusca]);
+    res.json({ clientes });
+  } catch (error) {
+    console.error("Erro ao buscar clientes:", error);
+    res.status(500).json({ error: "Erro ao buscar clientes" });
   }
 };

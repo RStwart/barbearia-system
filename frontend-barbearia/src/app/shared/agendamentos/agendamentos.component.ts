@@ -26,6 +26,12 @@ export class AgendamentosComponent implements OnInit {
   funcionarios: Funcionario[] = [];
   unidade_id: number | null = null;
 
+  // Busca de clientes
+  clientes: any[] = [];
+  buscaCliente: string = '';
+  clienteSelecionado: any = null;
+  mostrarListaClientes = false;
+
   // Modais
   mostrarModalDetalhes = false;
   mostrarModalEditar = false;
@@ -174,7 +180,7 @@ export class AgendamentosComponent implements OnInit {
         const match = dataAgendamento === dataFormatada;
         return match;
       })
-      .sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio));
+      .sort((a, b) => b.hora_inicio.localeCompare(a.hora_inicio));
     
     console.log('✅ Agendamentos do dia filtrados:', this.agendamentosDia.length);
   }
@@ -185,6 +191,10 @@ export class AgendamentosComponent implements OnInit {
       data_agendamento: this.diaSelecionado ? this.formatarData(this.diaSelecionado) : this.formatarData(new Date()),
       status: 'pendente'
     };
+    this.buscaCliente = '';
+    this.clienteSelecionado = null;
+    this.clientes = [];
+    this.mostrarListaClientes = false;
     this.mostrarModalNovo = true;
   }
 
@@ -196,6 +206,13 @@ export class AgendamentosComponent implements OnInit {
   abrirModalEditar(agendamento: Agendamento) {
     this.agendamentoSelecionado = agendamento;
     this.formulario = { ...agendamento };
+    
+    // Garantir que a data está no formato correto para o input date (YYYY-MM-DD)
+    if (this.formulario.data_agendamento) {
+      const data = new Date(this.formulario.data_agendamento);
+      this.formulario.data_agendamento = data.toISOString().split('T')[0];
+    }
+    
     this.mostrarModalEditar = true;
     this.mostrarModalDetalhes = false;
   }
@@ -206,6 +223,7 @@ export class AgendamentosComponent implements OnInit {
     this.mostrarModalNovo = false;
     this.agendamentoSelecionado = null;
     this.erro = '';
+    this.limparCliente();
   }
 
   salvarAgendamento() {
@@ -214,9 +232,16 @@ export class AgendamentosComponent implements OnInit {
     this.carregando = true;
     this.erro = '';
 
+    // Garantir que a data está no formato correto (YYYY-MM-DD)
+    const dadosParaEnviar = { ...this.formulario };
+    if (dadosParaEnviar.data_agendamento) {
+      const data = new Date(dadosParaEnviar.data_agendamento);
+      dadosParaEnviar.data_agendamento = data.toISOString().split('T')[0];
+    }
+
     if (this.mostrarModalEditar && this.agendamentoSelecionado) {
       // Atualizar
-      this.agendamentosService.atualizarAgendamento(this.agendamentoSelecionado.id!, this.formulario)
+      this.agendamentosService.atualizarAgendamento(this.agendamentoSelecionado.id!, dadosParaEnviar)
         .subscribe({
           next: () => {
             this.carregando = false;
@@ -230,7 +255,7 @@ export class AgendamentosComponent implements OnInit {
         });
     } else {
       // Criar novo
-      this.agendamentosService.criarAgendamento(this.formulario as Agendamento)
+      this.agendamentosService.criarAgendamento(dadosParaEnviar as Agendamento)
         .subscribe({
           next: () => {
             this.carregando = false;
@@ -272,6 +297,40 @@ export class AgendamentosComponent implements OnInit {
         this.formulario.valor_total = servico.preco;
       }
     }
+  }
+
+  buscarClientes() {
+    if (this.buscaCliente.length < 2) {
+      this.clientes = [];
+      this.mostrarListaClientes = false;
+      return;
+    }
+
+    this.agendamentosService.buscarClientes(this.buscaCliente).subscribe({
+      next: (response: any) => {
+        this.clientes = response.clientes || [];
+        this.mostrarListaClientes = this.clientes.length > 0;
+      },
+      error: (error) => {
+        console.error('Erro ao buscar clientes:', error);
+        this.clientes = [];
+      }
+    });
+  }
+
+  selecionarCliente(cliente: any) {
+    this.clienteSelecionado = cliente;
+    this.buscaCliente = cliente.nome;
+    this.formulario.cliente_id = cliente.id;
+    this.mostrarListaClientes = false;
+  }
+
+  limparCliente() {
+    this.clienteSelecionado = null;
+    this.buscaCliente = '';
+    this.formulario.cliente_id = undefined;
+    this.clientes = [];
+    this.mostrarListaClientes = false;
   }
 
   validarFormulario(): boolean {

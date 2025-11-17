@@ -174,13 +174,40 @@
 
       <div class="form-grupo">
         <label>Cliente *</label>
-        <input 
-          type="number" 
-          [(ngModel)]="formulario.cliente_id" 
-          placeholder="ID do Cliente"
-          required
-        />
-        <small>Digite o ID do cliente ou implemente busca</small>
+        <div class="busca-cliente-container">
+          <input 
+            type="text" 
+            [(ngModel)]="buscaCliente" 
+            (input)="buscarClientes()"
+            (focus)="buscarClientes()"
+            placeholder="Digite o nome, email ou telefone do cliente"
+            required
+          />
+          <button 
+            type="button" 
+            class="btn-limpar-cliente" 
+            *ngIf="clienteSelecionado"
+            (click)="limparCliente()">
+            ✕
+          </button>
+          
+          <div class="lista-clientes" *ngIf="mostrarListaClientes && clientes.length > 0">
+            <div 
+              class="cliente-item" 
+              *ngFor="let cliente of clientes"
+              (click)="selecionarCliente(cliente)">
+              <div class="cliente-nome">{{ cliente.nome }}</div>
+              <div class="cliente-info">{{ cliente.email }} | {{ cliente.telefone }}</div>
+            </div>
+          </div>
+          
+          <div class="sem-clientes" *ngIf="buscaCliente.length >= 2 && clientes.length === 0 && !mostrarListaClientes">
+            Nenhum cliente encontrado
+          </div>
+        </div>
+        <small *ngIf="clienteSelecionado" class="cliente-selecionado">
+          ✓ Cliente selecionado: {{ clienteSelecionado.nome }} (ID: {{ clienteSelecionado.id }})
+        </small>
       </div>
 
       <div class="form-grupo">

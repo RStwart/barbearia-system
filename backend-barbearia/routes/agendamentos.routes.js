@@ -6,6 +6,7 @@ const { verifyToken } = require("../controllers/auth.controller");
 // Rotas auxiliares (DEVEM VIR ANTES das rotas com parâmetros dinâmicos)
 router.get("/servicos/listar", verifyToken, agendamentosController.listarServicos);
 router.get("/funcionarios/listar", verifyToken, agendamentosController.listarFuncionarios);
+router.get("/clientes/buscar", verifyToken, agendamentosController.buscarClientes);
 
 // Rotas de agendamentos (protegidas)
 router.get("/", verifyToken, agendamentosController.listarAgendamentos);
