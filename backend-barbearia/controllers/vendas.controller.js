@@ -314,9 +314,9 @@ exports.atualizarVenda = async (req, res) => {
   try {
     const { id } = req.params;
     const { unidade_id, tipo } = req.user;
-    const { observacoes, status_pagamento } = req.body;
+    const { observacoes, status_pagamento, forma_pagamento } = req.body;
 
-    if (tipo !== 'GERENTE') {
+    if (tipo !== 'GERENTE' && tipo !== 'ADM') {
       return res.status(403).json({ 
         error: "Acesso negado. Apenas gerentes podem editar vendas." 
       });
@@ -344,6 +344,11 @@ exports.atualizarVenda = async (req, res) => {
       valores.push(status_pagamento);
     }
 
+    if (forma_pagamento !== undefined) {
+      campos.push('forma_pagamento = ?');
+      valores.push(forma_pagamento);
+    }
+
     if (campos.length === 0) {
       return res.status(400).json({ error: "Nenhum campo para atualizar" });
     }
@@ -368,7 +373,7 @@ exports.excluirVenda = async (req, res) => {
     const { id } = req.params;
     const { unidade_id, tipo } = req.user;
 
-    if (tipo !== 'GERENTE') {
+    if (tipo !== 'GERENTE' && tipo !== 'ADM') {
       return res.status(403).json({ 
         error: "Acesso negado. Apenas gerentes podem excluir vendas." 
       });

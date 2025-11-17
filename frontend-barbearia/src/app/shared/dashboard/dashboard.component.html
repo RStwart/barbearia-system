@@ -155,13 +155,31 @@
           <td class="valor">{{ formatarPreco(venda.valor_total) }}</td>
           <td>{{ venda.forma_pagamento }}</td>
           <td>
-            <button 
-              class="btn-acao btn-visualizar" 
-              (click)="visualizarDetalhes(venda)"
-              title="Ver Detalhes"
-            >
-              👁️
-            </button>
+            <div class="acoes-grupo">
+              <button 
+                class="btn-acao btn-visualizar" 
+                (click)="visualizarDetalhes(venda)"
+                title="Ver Detalhes"
+              >
+                👁️
+              </button>
+              <button 
+                *ngIf="!isFuncionario"
+                class="btn-acao btn-editar" 
+                (click)="editarVenda(venda)"
+                title="Editar Venda"
+              >
+                ✏️
+              </button>
+              <button 
+                *ngIf="!isFuncionario"
+                class="btn-acao btn-excluir" 
+                (click)="confirmarExclusao(venda)"
+                title="Excluir Venda"
+              >
+                🗑️
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -324,6 +342,87 @@
     <!-- Footer do Modal -->
     <div class="modal-footer">
       <button class="btn-secundario" (click)="fecharModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE EDIÇÃO -->
+<div class="modal-overlay" *ngIf="mostrarModalEdicao" (click)="fecharModalEdicao()">
+  <div class="modal-content modal-pequeno" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>✏️ Editar Venda #{{ vendaEdicao?.id }}</h2>
+      <button class="btn-fechar" (click)="fecharModalEdicao()">✖</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grupo">
+        <label>Forma de Pagamento:</label>
+        <select [(ngModel)]="vendaEdicao.forma_pagamento">
+          <option value="DINHEIRO">Dinheiro</option>
+          <option value="CARTAO_DEBITO">Cartão Débito</option>
+          <option value="CARTAO_CREDITO">Cartão Crédito</option>
+          <option value="PIX">PIX</option>
+          <option value="OUTROS">Outros</option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <label>Status do Pagamento:</label>
+        <select [(ngModel)]="vendaEdicao.status_pagamento">
+          <option value="AGUARDANDO">Aguardando</option>
+          <option value="PAGO">Pago</option>
+          <option value="CANCELADO">Cancelado</option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <label>Observações:</label>
+        <textarea 
+          [(ngModel)]="vendaEdicao.observacoes"
+          rows="4"
+          placeholder="Observações sobre a venda..."
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secundario" (click)="fecharModalEdicao()" [disabled]="salvandoEdicao">
+        Cancelar
+      </button>
+      <button class="btn-primario" (click)="salvarEdicao()" [disabled]="salvandoEdicao">
+        {{ salvandoEdicao ? 'Salvando...' : 'Salvar' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO -->
+<div class="modal-overlay" *ngIf="mostrarModalExclusao" (click)="fecharModalExclusao()">
+  <div class="modal-content modal-pequeno" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⚠️ Confirmar Exclusão</h2>
+      <button class="btn-fechar" (click)="fecharModalExclusao()">✖</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="aviso-exclusao">
+        <p>Tem certeza que deseja excluir a venda #{{ vendaExclusao?.id }}?</p>
+        <p class="aviso-destaque">⚠️ Esta ação não pode ser desfeita!</p>
+        <div class="info-venda-exclusao">
+          <p><strong>Cliente:</strong> {{ vendaExclusao?.cliente_nome || 'N/A' }}</p>
+          <p><strong>Funcionário:</strong> {{ vendaExclusao?.funcionario_nome }}</p>
+          <p><strong>Valor:</strong> {{ formatarPreco(vendaExclusao?.valor_total || 0) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secundario" (click)="fecharModalExclusao()" [disabled]="excluindo">
+        Cancelar
+      </button>
+      <button class="btn-perigo" (click)="excluirVenda()" [disabled]="excluindo">
+        {{ excluindo ? 'Excluindo...' : 'Excluir' }}
+      </button>
     </div>
   </div>
 </div>

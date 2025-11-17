@@ -42,6 +42,16 @@ export class DashboardComponent implements OnInit {
   vendaSelecionada: Venda | null = null;
   carregandoDetalhes = false;
 
+  // Modal de edição
+  mostrarModalEdicao = false;
+  vendaEdicao: any = {};
+  salvandoEdicao = false;
+
+  // Modal de confirmação de exclusão
+  mostrarModalExclusao = false;
+  vendaExclusao: Venda | null = null;
+  excluindo = false;
+
   constructor(
     private dashboardService: DashboardService,
     private authService: AuthService
@@ -220,6 +230,73 @@ export class DashboardComponent implements OnInit {
       case 'NAO_NECESSARIA': return 'status-nao-necessaria';
       default: return '';
     }
+  }
+
+  editarVenda(venda: Venda): void {
+    this.vendaEdicao = {
+      id: venda.id,
+      forma_pagamento: venda.forma_pagamento,
+      status_pagamento: venda.status_pagamento,
+      observacoes: venda.observacoes || ''
+    };
+    this.mostrarModalEdicao = true;
+  }
+
+  salvarEdicao(): void {
+    if (!this.vendaEdicao.id) return;
+
+    this.salvandoEdicao = true;
+    this.dashboardService.atualizarVenda(this.vendaEdicao.id, {
+      forma_pagamento: this.vendaEdicao.forma_pagamento,
+      status_pagamento: this.vendaEdicao.status_pagamento,
+      observacoes: this.vendaEdicao.observacoes
+    }).subscribe({
+      next: () => {
+        this.exibirMensagem('Venda atualizada com sucesso!', 'sucesso');
+        this.fecharModalEdicao();
+        this.carregarVendas();
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar venda:', err);
+        this.exibirMensagem('Erro ao atualizar venda', 'erro');
+        this.salvandoEdicao = false;
+      }
+    });
+  }
+
+  fecharModalEdicao(): void {
+    this.mostrarModalEdicao = false;
+    this.vendaEdicao = {};
+    this.salvandoEdicao = false;
+  }
+
+  confirmarExclusao(venda: Venda): void {
+    this.vendaExclusao = venda;
+    this.mostrarModalExclusao = true;
+  }
+
+  excluirVenda(): void {
+    if (!this.vendaExclusao?.id) return;
+
+    this.excluindo = true;
+    this.dashboardService.excluirVenda(this.vendaExclusao.id).subscribe({
+      next: () => {
+        this.exibirMensagem('Venda excluída com sucesso!', 'sucesso');
+        this.fecharModalExclusao();
+        this.carregarVendas();
+      },
+      error: (err) => {
+        console.error('Erro ao excluir venda:', err);
+        this.exibirMensagem('Erro ao excluir venda', 'erro');
+        this.excluindo = false;
+      }
+    });
+  }
+
+  fecharModalExclusao(): void {
+    this.mostrarModalExclusao = false;
+    this.vendaExclusao = null;
+    this.excluindo = false;
   }
 
   exibirMensagem(texto: string, tipo: 'sucesso' | 'erro') {

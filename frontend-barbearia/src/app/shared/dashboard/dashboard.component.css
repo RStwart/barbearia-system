@@ -406,8 +406,28 @@
 
 .btn-acao:hover {
   transform: scale(1.1);
+}
+
+.btn-visualizar:hover {
   border-color: #3498db;
   background: #ecf8ff;
+}
+
+.btn-editar:hover {
+  border-color: #f39c12;
+  background: #fff9e6;
+}
+
+.btn-excluir:hover {
+  border-color: #e74c3c;
+  background: #ffe6e6;
+}
+
+.acoes-grupo {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ===== SEM RESULTADOS ===== */
@@ -727,6 +747,119 @@
 .btn-secundario:hover {
   background: #7f8c8d;
   transform: translateY(-2px);
+}
+
+.btn-primario {
+  padding: 10px 24px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primario:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.btn-primario:disabled,
+.btn-secundario:disabled,
+.btn-perigo:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-perigo {
+  padding: 10px 24px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-perigo:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+
+.modal-pequeno {
+  max-width: 500px;
+}
+
+.form-grupo {
+  margin-bottom: 20px;
+}
+
+.form-grupo label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.form-grupo input,
+.form-grupo select,
+.form-grupo textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #ecf0f1;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.form-grupo input:focus,
+.form-grupo select:focus,
+.form-grupo textarea:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.form-grupo textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.aviso-exclusao {
+  text-align: center;
+  padding: 20px;
+}
+
+.aviso-exclusao p {
+  font-size: 16px;
+  color: #2c3e50;
+  margin: 0 0 12px 0;
+}
+
+.aviso-destaque {
+  color: #e74c3c !important;
+  font-weight: 700;
+  font-size: 18px !important;
+  margin: 20px 0 !important;
+}
+
+.info-venda-exclusao {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.info-venda-exclusao p {
+  margin: 8px 0;
+  font-size: 14px;
 }
 
 .modal-conteudo {
