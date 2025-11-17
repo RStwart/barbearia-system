@@ -122,14 +122,6 @@
               </button>
               
               <button 
-                *ngIf="podeRemarcar(agendamento)"
-                class="btn-acao btn-remarcar"
-                (click)="remarcarAgendamento(agendamento)"
-                title="Remarcar">
-                🔄 Remarcar
-              </button>
-              
-              <button 
                 *ngIf="podeCancelar(agendamento)"
                 class="btn-acao btn-cancelar"
                 (click)="abrirModalCancelar(agendamento)"

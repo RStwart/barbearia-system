@@ -141,11 +141,6 @@ export class MeusAgendamentosComponent implements OnInit {
     return status === 'pendente' || status === 'confirmado';
   }
 
-  podeRemarcar(agendamento: Agendamento): boolean {
-    const status = agendamento.status.toLowerCase();
-    return status === 'pendente' || status === 'confirmado';
-  }
-
   abrirModalAvaliacao(agendamento: Agendamento) {
     this.agendamentoParaAvaliar = agendamento;
     this.notaAvaliacao = 0;
@@ -214,17 +209,6 @@ export class MeusAgendamentosComponent implements OnInit {
           alert('Erro ao cancelar agendamento. Tente novamente.');
         }
       });
-  }
-
-  remarcarAgendamento(agendamento: Agendamento) {
-    // Redirecionar para detalhes da barbearia com o serviço pré-selecionado
-    this.router.navigate(['/cliente/barbearia', agendamento.unidade_id], {
-      queryParams: {
-        servicoId: agendamento.servico_id,
-        funcionarioId: agendamento.funcionario_id,
-        remarcar: true
-      }
-    });
   }
 
   novoAgendamento() {
