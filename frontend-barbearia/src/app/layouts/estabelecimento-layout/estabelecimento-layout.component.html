@@ -17,7 +17,11 @@
         <span class="icon">📅</span>
         <span class="label">Agendamentos</span>
       </a>
-      <a routerLink="/estabelecimento/produtos" routerLinkActive="active" (click)="closeSidebarOnMobile()">
+      <a 
+        *ngIf="usuario.tipo === 'GERENTE'"
+        routerLink="/estabelecimento/produtos" 
+        routerLinkActive="active" 
+        (click)="closeSidebarOnMobile()">
         <span class="icon">✂️</span>
         <span class="label">Meus Serviços</span>
       </a>

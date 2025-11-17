@@ -170,22 +170,24 @@ exports.listarVendas = async (req, res) => {
 exports.buscarVendaPorId = async (req, res) => {
   try {
     const { id } = req.params;
-    const { unidade_id, tipo } = req.user;
+    const { unidade_id, tipo, id: usuario_id } = req.user;
 
-    if (tipo !== 'GERENTE' && tipo !== 'ADM') {
-      return res.status(403).json({ 
-        error: "Acesso negado." 
-      });
-    }
-
-    const [vendas] = await db.execute(
-      `SELECT v.*, uf.nome as funcionario_nome, uc.nome as cliente_nome
+    // Montar query com filtro por tipo de usuário
+    let query = `SELECT v.*, uf.nome as funcionario_nome, uc.nome as cliente_nome
        FROM vendas v
        LEFT JOIN usuarios uf ON v.funcionario_id = uf.id
        LEFT JOIN usuarios uc ON v.cliente_id = uc.id
-       WHERE v.id = ? AND v.unidade_id = ?`,
-      [id, unidade_id]
-    );
+       WHERE v.id = ? AND v.unidade_id = ?`;
+    
+    let params = [id, unidade_id];
+
+    // FUNCIONARIO só pode ver suas próprias vendas
+    if (tipo === 'FUNCIONARIO') {
+      query += ' AND v.funcionario_id = ?';
+      params.push(usuario_id);
+    }
+
+    const [vendas] = await db.execute(query, params);
 
     if (vendas.length === 0) {
       return res.status(404).json({ error: "Venda não encontrada" });

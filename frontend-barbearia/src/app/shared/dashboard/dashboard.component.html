@@ -268,23 +268,6 @@
         </div>
       </div>
 
-      <!-- Nota Fiscal -->
-      <div class="info-section">
-        <h3>📄 Nota Fiscal</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="info-label">Número da NF:</span>
-            <span class="info-value">{{ vendaSelecionada.nota_fiscal || 'Não emitida' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Status da NF:</span>
-            <span class="badge-status" [ngClass]="getStatusNFClass(vendaSelecionada.status_nf)">
-              {{ vendaSelecionada.status_nf }}
-            </span>
-          </div>
-        </div>
-      </div>
-
       <!-- Serviços -->
       <div class="info-section" *ngIf="vendaSelecionada.servicos && vendaSelecionada.servicos.length > 0">
         <h3>✂️ Serviços</h3>
