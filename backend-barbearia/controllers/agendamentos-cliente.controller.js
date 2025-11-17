@@ -174,9 +174,11 @@ exports.criarAgendamento = async (req, res) => {
       });
     }
 
-    // ID do cliente (em produção viria do token de autenticação)
-    // Por enquanto vamos usar um cliente padrão
-    const clienteId = 2; // TODO: Pegar do req.user após implementar autenticação
+    // ID do cliente vem do token de autenticação
+    const clienteId = req.user.id;
+    
+    console.log('🔑 Cliente ID do token:', clienteId);
+    console.log('👤 Dados do usuário:', req.user);
 
     // Criar agendamento
     const [result] = await db.execute(
@@ -240,8 +242,8 @@ exports.criarAgendamento = async (req, res) => {
 // ================ LISTAR AGENDAMENTOS DO CLIENTE ================
 exports.listarAgendamentosCliente = async (req, res) => {
   try {
-    // TODO: Pegar cliente_id do token de autenticação
-    const clienteId = 2; // Temporário
+    // ID do cliente vem do token de autenticação
+    const clienteId = req.user.id;
 
     const [agendamentos] = await db.execute(
       `SELECT 
@@ -284,7 +286,7 @@ exports.listarAgendamentosCliente = async (req, res) => {
 exports.cancelarAgendamento = async (req, res) => {
   try {
     const { id } = req.params;
-    const clienteId = 2; // TODO: Pegar do token
+    const clienteId = req.user.id;
 
     // Verificar se o agendamento existe e pertence ao cliente
     const [agendamentos] = await db.execute(
@@ -325,7 +327,7 @@ exports.avaliarAgendamento = async (req, res) => {
   try {
     const { id } = req.params;
     const { nota, comentario } = req.body;
-    const clienteId = 2; // TODO: Pegar do token
+    const clienteId = req.user.id;
 
     // Validar nota
     if (!nota || nota < 1 || nota > 5) {
