@@ -1,315 +1,182 @@
 <div class="admin-dashboard">
-  <!-- Cards de Estatísticas -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon">👥</div>
-      <div class="stat-content">
-        <h3>{{ stats.totalUsuarios }}</h3>
-        <p>Total de Usuários</p>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">✅</div>
-      <div class="stat-content">
-        <h3>{{ stats.usuariosAtivos }}</h3>
-        <p>Usuários Ativos</p>
-      </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon">🏪</div>
-      <div class="stat-content">
-        <h3>{{ stats.estabelecimentos }}</h3>
-        <p>Estabelecimentos</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Seção de Usuários -->
-  <div class="usuarios-section">
-    <div class="section-header">
-      <h2>Gerenciar Usuários</h2>
-      <button class="btn btn-primary" (click)="novoUsuario()">
-        <span class="btn-icon">➕</span>
-        Novo Usuário
-      </button>
-    </div>
-
-    <!-- Filtros -->
-    <div class="filtros-container">
-      <div class="filtro-group">
-        <label>Filtrar por Nome:</label>
-        <input 
-          type="text" 
-          [(ngModel)]="filtros.nome" 
-          (input)="aplicarFiltros()"
-          placeholder="Digite o nome..."
-          class="form-input">
-      </div>
-      <div class="filtro-group">
-        <label>Filtrar por ID:</label>
-        <input 
-          type="text" 
-          [(ngModel)]="filtros.id" 
-          (input)="aplicarFiltros()"
-          placeholder="Digite o ID..."
-          class="form-input">
-      </div>
-      <div class="filtro-group">
-        <label>Filtrar por Unidade ID:</label>
-        <input 
-          type="text" 
-          [(ngModel)]="filtros.unidade_id" 
-          (input)="aplicarFiltros()"
-          placeholder="Digite o ID da unidade..."
-          class="form-input">
-      </div>
-      <div class="filtro-group">
-        <button class="btn btn-secondary" (click)="limparFiltros()">
-          🗑️ Limpar Filtros
-        </button>
-      </div>
-    </div>
-
-    <!-- Tabela de Usuários -->
-    <div class="scroll-hint" *ngIf="!carregando && usuariosPaginados.length > 0">
-      👉 Deslize horizontalmente para ver mais colunas
-    </div>
-    <div class="table-container">
-      <div class="table-loading" *ngIf="carregando">
-        <div class="loading-spinner"></div>
-        <p>Carregando usuários...</p>
-      </div>
-
-      <table class="usuarios-table" *ngIf="!carregando">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Telefone</th>
-            <th>Tipo</th>
-            <th>Unidade ID</th>
-            <th>Status</th>
-            <th>1º Acesso</th>
-            <th>Criado em</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let usuario of usuariosPaginados">
-            <td>{{ usuario.id }}</td>
-            <td>
-              <div class="user-info-cell">
-                <div class="user-avatar">
-                  {{ usuario.nome.charAt(0).toUpperCase() }}
-                </div>
-                <span>{{ usuario.nome }}</span>
-              </div>
-            </td>
-            <td>{{ usuario.email }}</td>
-            <td>{{ usuario.telefone || '-' }}</td>
-            <td>
-              <span class="badge" [class]="getTipoBadgeClass(usuario.tipo)">
-                {{ usuario.tipo }}
-              </span>
-            </td>
-            <td>{{ usuario.unidade_id || '-' }}</td>
-            <td>
-              <button 
-                class="status-toggle"
-                [class.active]="usuario.ativo"
-                [class.inactive]="!usuario.ativo"
-                (click)="alternarStatus(usuario)">
-                {{ usuario.ativo ? 'Ativo' : 'Inativo' }}
-              </button>
-            </td>
-            <td>
-              <span class="badge" [class.badge-sim]="usuario.primeiro_acesso" [class.badge-nao]="!usuario.primeiro_acesso">
-                {{ usuario.primeiro_acesso ? 'Sim' : 'Não' }}
-              </span>
-            </td>
-            <td>{{ usuario.criado_em | date:'dd/MM/yyyy HH:mm' }}</td>
-            <td>
-              <div class="action-buttons">
-                <button 
-                  class="btn-action btn-edit" 
-                  (click)="editarUsuario(usuario)"
-                  title="Editar">
-                  ✏️
-                </button>
-                <button 
-                  class="btn-action btn-delete" 
-                  (click)="excluirUsuario(usuario)"
-                  title="Excluir">
-                  🗑️
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Mensagem quando não há usuários -->
-      <div class="empty-state" *ngIf="!carregando && usuariosPaginados.length === 0">
-        <div class="empty-icon">👥</div>
-        <h3>Nenhum usuário encontrado</h3>
-        <p>Não há usuários que correspondam aos filtros aplicados.</p>
-        <button class="btn btn-primary" (click)="limparFiltros()">
-          Limpar Filtros
-        </button>
-      </div>
-    </div>
-
-    <!-- Paginação -->
-    <div class="pagination-container" *ngIf="!carregando && totalPaginas > 1">
-      <div class="pagination-info">
-        Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} - 
-        {{ Math.min(paginaAtual * itensPorPagina, usuariosFiltrados.length) }} 
-        de {{ usuariosFiltrados.length }} usuários
-      </div>
-      <div class="pagination">
-        <button 
-          class="btn-page" 
-          [disabled]="paginaAtual === 1"
-          (click)="irParaPagina(paginaAtual - 1)">
-          ← Anterior
-        </button>
-        
-        <button 
-          *ngFor="let pagina of paginasArray" 
-          class="btn-page"
-          [class.active]="pagina === paginaAtual"
-          (click)="irParaPagina(pagina)">
-          {{ pagina }}
-        </button>
-        
-        <button 
-          class="btn-page" 
-          [disabled]="paginaAtual === totalPaginas"
-          (click)="irParaPagina(paginaAtual + 1)">
-          Próxima →
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal de Usuário -->
-<div class="modal-overlay" *ngIf="mostrarModal" (click)="fecharModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>{{ editando ? 'Editar Usuário' : 'Novo Usuário' }}</h3>
-      <button class="modal-close" (click)="fecharModal()">✕</button>
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h1>🎯 Dashboard Administrativo</h1>
+      <p class="subtitle">Visão geral completa do sistema</p>
     </div>
     
-    <form class="modal-form" (ngSubmit)="salvarUsuario()">
-      <div class="form-row">
-        <div class="form-group required">
-          <label>Nome</label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioForm.nome" 
-            name="nome"
-            required
-            placeholder="Digite o nome completo"
-            class="form-input">
-        </div>
-        <div class="form-group required">
-          <label>Email</label>
-          <input 
-            type="email" 
-            [(ngModel)]="usuarioForm.email" 
-            name="email"
-            required
-            placeholder="exemplo@email.com"
-            class="form-input">
-        </div>
+    <!-- Seletor de Unidade -->
+    <div class="unidade-selector">
+      <label>Unidade:</label>
+      <select 
+        [(ngModel)]="unidadeSelecionada" 
+        (change)="selecionarUnidade()"
+        [disabled]="carregandoUnidades">
+        <option *ngFor="let unidade of unidades" [value]="unidade.id_unidade">
+          🏪 {{ unidade.nome }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="carregando" class="loading-state">
+    <div class="spinner"></div>
+    <p>Carregando estatísticas...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!carregando && estatisticas" class="dashboard-content">
+    
+    <!-- Vendas -->
+    <div class="vendas-section">
+      <div class="section-title">
+        <h2>💰 Vendas</h2>
       </div>
       
-      <div class="form-row">
-        <div class="form-group" [class.required]="!editando">
-          <label>{{ editando ? 'Nova Senha (deixe vazio para manter)' : 'Senha' }}</label>
-          <input 
-            type="password" 
-            [(ngModel)]="usuarioForm.senha" 
-            name="senha"
-            [required]="!editando"
-            placeholder="Digite a senha"
-            class="form-input">
+      <div class="vendas-grid">
+        <div class="venda-card hoje">
+          <div class="venda-header">
+            <span class="venda-icon">📆</span>
+            <h3>Hoje</h3>
+          </div>
+          <div class="venda-value">{{ formatarPreco(estatisticas.vendasHoje.valor_total) }}</div>
+          <div class="venda-detail">{{ estatisticas.vendasHoje.total_vendas }} vendas realizadas</div>
         </div>
-        <div class="form-group">
-          <label>Telefone</label>
-          <input 
-            type="text" 
-            [(ngModel)]="usuarioForm.telefone" 
-            name="telefone"
-            placeholder="(11) 99999-9999"
-            (input)="aplicarMascaraTelefone($event)"
-            maxlength="15"
-            class="form-input">
+
+        <div class="venda-card mes">
+          <div class="venda-header">
+            <span class="venda-icon">📊</span>
+            <h3>Este Mês</h3>
+          </div>
+          <div class="venda-value">{{ formatarPreco(estatisticas.vendasMes.valor_total) }}</div>
+          <div class="venda-detail">{{ estatisticas.vendasMes.total_vendas }} vendas no total</div>
         </div>
       </div>
-      
-      <div class="form-row">
-        <div class="form-group required">
-          <label>Tipo</label>
-          <select 
-            [(ngModel)]="usuarioForm.tipo" 
-            name="tipo"
-            required
-            class="form-select">
-            <option value="">Selecione um tipo</option>
-            <option value="CLIENTE">Cliente</option>
-            <option value="FUNCIONARIO">Funcionário</option>
-            <option value="GERENTE">Gerente</option>
-            <option value="ADM">Administrador</option>
-          </select>
+    </div>
+
+    <!-- Duas Colunas: Usuários por Tipo e Agendamentos por Status -->
+    <div class="two-columns">
+      <!-- Usuários por Tipo -->
+      <div class="info-card">
+        <div class="card-title">
+          <h3>👤 Usuários por Tipo</h3>
         </div>
-        <div class="form-group">
-          <label>Unidade</label>
-          <select 
-            [(ngModel)]="usuarioForm.unidade_id" 
-            name="unidade_id"
-            class="form-select">
-            <option [value]="undefined">Nenhuma unidade</option>
-            <option *ngFor="let unidade of unidades" [value]="unidade.id_unidade">
-              {{ unidade.nome }}
-            </option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row checkboxes-row">
-        <div class="form-group checkbox-group">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="usuarioForm.ativo" 
-            name="ativo"
-            id="usuario-ativo">
-          <label for="usuario-ativo">Usuário Ativo</label>
-        </div>
-        <div class="form-group checkbox-group">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="usuarioForm.primeiro_acesso" 
-            name="primeiro_acesso"
-            id="primeiro-acesso">
-          <label for="primeiro-acesso">Primeiro Acesso</label>
+        <div class="list-items">
+          <div *ngFor="let item of estatisticas.usuariosPorTipo" class="list-item">
+            <div class="item-left">
+              <span class="item-icon">{{ getTipoIcon(item.tipo) }}</span>
+              <span class="item-name">{{ getTipoLabel(item.tipo) }}</span>
+            </div>
+            <span class="item-value">{{ item.quantidade }}</span>
+          </div>
+          <div *ngIf="estatisticas.usuariosPorTipo.length === 0" class="empty-message">
+            Nenhum dado disponível
+          </div>
         </div>
       </div>
 
-      <div class="info-note">
-        <strong>ℹ️ Primeiro Acesso:</strong> Quando marcado, o usuário será obrigado a trocar a senha no primeiro login.
+      <!-- Agendamentos por Status -->
+      <div class="info-card">
+        <div class="card-title">
+          <h3>📋 Agendamentos por Status</h3>
+        </div>
+        <div class="list-items">
+          <div *ngFor="let item of estatisticas.agendamentosPorStatus" class="list-item">
+            <div class="item-left">
+              <span class="item-icon">{{ getStatusIcon(item.status) }}</span>
+              <span class="item-name">{{ getStatusLabel(item.status) }}</span>
+            </div>
+            <span class="item-value">{{ item.quantidade }}</span>
+          </div>
+          <div *ngIf="estatisticas.agendamentosPorStatus.length === 0" class="empty-message">
+            Nenhum agendamento registrado
+          </div>
+        </div>
       </div>
-      
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" (click)="fecharModal()">
-          Cancelar
-        </button>
-        <button type="submit" class="btn btn-primary">
-          {{ editando ? 'Atualizar' : 'Criar' }} Usuário
-        </button>
+    </div>
+
+    <!-- Top 5 Unidades Mais Ativas -->
+    <div class="info-card full-width">
+      <div class="card-title">
+        <h3>🏆 Top 5 Unidades Mais Ativas (Este Mês)</h3>
       </div>
-    </form>
+      <div class="table-responsive">
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th>Posição</th>
+              <th>Nome da Unidade</th>
+              <th>Agendamentos</th>
+              <th>Receita</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let unidade of estatisticas.unidadesAtivas; let i = index">
+              <td>
+                <span class="posicao" [class.top1]="i === 0" [class.top2]="i === 1" [class.top3]="i === 2">
+                  {{ i + 1 }}º
+                </span>
+              </td>
+              <td class="unidade-nome">{{ unidade.nome }}</td>
+              <td>{{ unidade.total_agendamentos }}</td>
+              <td class="receita">{{ formatarPreco(unidade.receita_mes) }}</td>
+            </tr>
+            <tr *ngIf="estatisticas.unidadesAtivas.length === 0">
+              <td colspan="4" class="empty-cell">Nenhuma unidade com agendamentos este mês</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Serviços Mais Vendidos -->
+    <div class="info-card full-width">
+      <div class="card-title">
+        <h3>✂️ Serviços Mais Vendidos (Este Mês)</h3>
+      </div>
+      <div class="servicos-grid">
+        <div *ngFor="let servico of estatisticas.servicosMaisVendidos; let i = index" class="servico-item">
+          <div class="servico-rank">{{ i + 1 }}</div>
+          <div class="servico-info">
+            <div class="servico-nome">{{ servico.servico_nome }}</div>
+            <div class="servico-vendas">{{ servico.total_vendido }} vendas</div>
+          </div>
+        </div>
+        <div *ngIf="estatisticas.servicosMaisVendidos.length === 0" class="empty-message">
+          Nenhum serviço vendido este mês
+        </div>
+      </div>
+    </div>
+
+    <!-- Crescimento Mensal -->
+    <div class="info-card full-width">
+      <div class="card-title">
+        <h3>📈 Crescimento Mensal (Últimos 6 Meses)</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="crescimento-table">
+          <thead>
+            <tr>
+              <th>Mês</th>
+              <th>Total de Vendas</th>
+              <th>Receita</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let mes of estatisticas.crescimentoMensal">
+              <td>{{ formatarMes(mes.mes) }}</td>
+              <td>{{ mes.total_vendas }}</td>
+              <td class="receita">{{ formatarPreco(mes.receita) }}</td>
+            </tr>
+            <tr *ngIf="estatisticas.crescimentoMensal.length === 0">
+              <td colspan="3" class="empty-cell">Nenhum dado disponível</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>

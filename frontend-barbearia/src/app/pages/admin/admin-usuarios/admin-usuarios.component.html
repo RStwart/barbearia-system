@@ -1,0 +1,293 @@
+<div class="usuarios-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>👥 Gerenciar Usuários</h1>
+      <p class="subtitle">Controle total sobre os usuários do sistema</p>
+    </div>
+    <button class="btn btn-primary" (click)="novoUsuario()">
+      <span class="btn-icon">➕</span>
+      Novo Usuário
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-container">
+    <div class="filtro-group">
+      <label>Filtrar por Nome:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="filtros.nome" 
+        (input)="aplicarFiltros()"
+        placeholder="Digite o nome..."
+        class="form-input">
+    </div>
+    <div class="filtro-group">
+      <label>Filtrar por ID:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="filtros.id" 
+        (input)="aplicarFiltros()"
+        placeholder="Digite o ID..."
+        class="form-input">
+    </div>
+    <div class="filtro-group">
+      <label>Filtrar por Unidade ID:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="filtros.unidade_id" 
+        (input)="aplicarFiltros()"
+        placeholder="Digite o ID da unidade..."
+        class="form-input">
+    </div>
+    <div class="filtro-group">
+      <button class="btn btn-secondary" (click)="limparFiltros()">
+        🗑️ Limpar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="table-loading" *ngIf="carregando">
+    <div class="loading-spinner"></div>
+    <p>Carregando usuários...</p>
+  </div>
+
+  <!-- Tabela de Usuários -->
+  <div class="table-container" *ngIf="!carregando">
+    <div class="scroll-hint" *ngIf="usuariosPaginados.length > 0">
+      👉 Deslize horizontalmente para ver mais colunas
+    </div>
+    
+    <table class="usuarios-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Tipo</th>
+          <th>Unidade ID</th>
+          <th>Status</th>
+          <th>1º Acesso</th>
+          <th>Criado em</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuariosPaginados">
+          <td>{{ usuario.id }}</td>
+          <td>
+            <div class="user-info-cell">
+              <div class="user-avatar">
+                {{ usuario.nome.charAt(0).toUpperCase() }}
+              </div>
+              <span>{{ usuario.nome }}</span>
+            </div>
+          </td>
+          <td>{{ usuario.email }}</td>
+          <td>{{ usuario.telefone || '-' }}</td>
+          <td>
+            <span class="badge" [class]="getTipoBadgeClass(usuario.tipo)">
+              {{ usuario.tipo }}
+            </span>
+          </td>
+          <td>{{ usuario.unidade_id || '-' }}</td>
+          <td>
+            <button 
+              class="status-toggle"
+              [class.active]="usuario.ativo"
+              [class.inactive]="!usuario.ativo"
+              (click)="alternarStatus(usuario)">
+              {{ usuario.ativo ? 'Ativo' : 'Inativo' }}
+            </button>
+          </td>
+          <td>
+            <span class="badge" [class.badge-sim]="usuario.primeiro_acesso" [class.badge-nao]="!usuario.primeiro_acesso">
+              {{ usuario.primeiro_acesso ? 'Sim' : 'Não' }}
+            </span>
+          </td>
+          <td>{{ usuario.criado_em | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <div class="action-buttons">
+              <button 
+                class="btn-action btn-edit" 
+                (click)="editarUsuario(usuario)"
+                title="Editar">
+                ✏️
+              </button>
+              <button 
+                class="btn-action btn-delete" 
+                (click)="excluirUsuario(usuario)"
+                title="Excluir">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Mensagem quando não há usuários -->
+    <div class="empty-state" *ngIf="usuariosPaginados.length === 0">
+      <div class="empty-icon">👥</div>
+      <h3>Nenhum usuário encontrado</h3>
+      <p>Não há usuários que correspondam aos filtros aplicados.</p>
+      <button class="btn btn-primary" (click)="limparFiltros()">
+        Limpar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Paginação -->
+  <div class="pagination-container" *ngIf="!carregando && totalPaginas > 1">
+    <div class="pagination-info">
+      Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} - 
+      {{ Math.min(paginaAtual * itensPorPagina, usuariosFiltrados.length) }} 
+      de {{ usuariosFiltrados.length }} usuários
+    </div>
+    <div class="pagination">
+      <button 
+        class="btn-page" 
+        [disabled]="paginaAtual === 1"
+        (click)="irParaPagina(paginaAtual - 1)">
+        ← Anterior
+      </button>
+      
+      <button 
+        *ngFor="let pagina of paginasArray" 
+        class="btn-page"
+        [class.active]="pagina === paginaAtual"
+        (click)="irParaPagina(pagina)">
+        {{ pagina }}
+      </button>
+      
+      <button 
+        class="btn-page" 
+        [disabled]="paginaAtual === totalPaginas"
+        (click)="irParaPagina(paginaAtual + 1)">
+        Próxima →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Usuário -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="fecharModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ editando ? 'Editar Usuário' : 'Novo Usuário' }}</h3>
+      <button class="modal-close" (click)="fecharModal()">✕</button>
+    </div>
+    
+    <form class="modal-form" (ngSubmit)="salvarUsuario()">
+      <div class="form-row">
+        <div class="form-group required">
+          <label>Nome</label>
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioForm.nome" 
+            name="nome"
+            required
+            placeholder="Digite o nome completo"
+            class="form-input">
+        </div>
+        <div class="form-group required">
+          <label>Email</label>
+          <input 
+            type="email" 
+            [(ngModel)]="usuarioForm.email" 
+            name="email"
+            required
+            placeholder="exemplo@email.com"
+            class="form-input">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group" [class.required]="!editando">
+          <label>{{ editando ? 'Nova Senha (deixe vazio para manter)' : 'Senha' }}</label>
+          <input 
+            type="password" 
+            [(ngModel)]="usuarioForm.senha" 
+            name="senha"
+            [required]="!editando"
+            placeholder="Digite a senha"
+            class="form-input">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input 
+            type="text" 
+            [(ngModel)]="usuarioForm.telefone" 
+            name="telefone"
+            placeholder="(11) 99999-9999"
+            (input)="aplicarMascaraTelefone($event)"
+            maxlength="15"
+            class="form-input">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group required">
+          <label>Tipo</label>
+          <select 
+            [(ngModel)]="usuarioForm.tipo" 
+            name="tipo"
+            required
+            class="form-select">
+            <option value="">Selecione um tipo</option>
+            <option value="CLIENTE">Cliente</option>
+            <option value="FUNCIONARIO">Funcionário</option>
+            <option value="GERENTE">Gerente</option>
+            <option value="ADM">Administrador</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Unidade</label>
+          <select 
+            [(ngModel)]="usuarioForm.unidade_id" 
+            name="unidade_id"
+            class="form-select">
+            <option [value]="undefined">Nenhuma unidade</option>
+            <option *ngFor="let unidade of unidades" [value]="unidade.id_unidade">
+              {{ unidade.nome }}
+            </option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row checkboxes-row">
+        <div class="form-group checkbox-group">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="usuarioForm.ativo" 
+            name="ativo"
+            id="usuario-ativo">
+          <label for="usuario-ativo">Usuário Ativo</label>
+        </div>
+        <div class="form-group checkbox-group">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="usuarioForm.primeiro_acesso" 
+            name="primeiro_acesso"
+            id="primeiro-acesso">
+          <label for="primeiro-acesso">Primeiro Acesso</label>
+        </div>
+      </div>
+
+      <div class="info-note">
+        <strong>ℹ️ Primeiro Acesso:</strong> Quando marcado, o usuário será obrigado a trocar a senha no primeiro login.
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="fecharModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+          {{ editando ? 'Atualizar' : 'Criar' }} Usuário
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -4,35 +4,26 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../../environments/environments';
 
-interface Usuario {
-  id: number;
-  nome: string;
-  email: string;
-  telefone?: string;
-  foto_perfil?: string;
-  tipo: 'CLIENTE' | 'FUNCIONARIO' | 'GERENTE' | 'ADM';
-  unidade_id?: number;
-  ativo: boolean;
-  criado_em: string;
-  primeiro_acesso: boolean;
-}
-
-interface UsuarioForm {
-  id?: number;
-  nome: string;
-  email: string;
-  senha?: string;
-  telefone?: string;
-  foto_perfil?: string;
-  tipo: 'CLIENTE' | 'FUNCIONARIO' | 'GERENTE' | 'ADM';
-  unidade_id?: number;
-  ativo: boolean;
-  primeiro_acesso: boolean;
+interface EstatisticasAdmin {
+  totalUsuarios: number;
+  usuariosAtivos: number;
+  estabelecimentos: number;
+  novosCadastros: number;
+  usuariosPorTipo: { tipo: string; quantidade: number; }[];
+  agendamentosHoje: number;
+  agendamentosPorStatus: { status: string; quantidade: number; }[];
+  vendasMes: { total_vendas: number; valor_total: number; };
+  vendasHoje: { total_vendas: number; valor_total: number; };
+  unidadesAtivas: { nome: string; total_agendamentos: number; receita_mes: number; }[];
+  servicosMaisVendidos: { servico_nome: string; total_vendido: number; }[];
+  crescimentoMensal: { mes: string; total_vendas: number; receita: number; }[];
 }
 
 interface Unidade {
   id_unidade: number;
   nome: string;
+  endereco?: string;
+  telefone?: string;
   ativo: boolean;
 }
 
@@ -44,55 +35,19 @@ interface Unidade {
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  // Fazer Math disponível no template
-  Math = Math;
-  
-  // Dados dos cards
-  stats = {
-    totalUsuarios: 0,
-    usuariosAtivos: 0,
-    estabelecimentos: 0
-  };
-
-  // Controle da tabela
-  usuarios: Usuario[] = [];
-  usuariosFiltrados: Usuario[] = [];
-  paginaAtual = 1;
-  itensPorPagina = 10;
-  totalPaginas = 0;
+  estatisticas: EstatisticasAdmin | null = null;
   carregando = false;
-
-  // Filtros
-  filtros = {
-    nome: '',
-    id: '',
-    unidade_id: ''
-  };
-
-  // Modal/Formulário
-  mostrarModal = false;
-  editando = false;
-  usuarioForm: UsuarioForm = {
-    nome: '',
-    email: '',
-    senha: '',
-    telefone: '',
-    foto_perfil: '',
-    tipo: 'CLIENTE',
-    unidade_id: undefined,
-    ativo: true,
-    primeiro_acesso: true
-  };
-
-  // Lista de unidades para o select
+  
+  // Unidades
   unidades: Unidade[] = [];
+  unidadeSelecionada: number | null = null;
+  carregandoUnidades = false;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.carregarUsuarios();
-    this.carregarEstatisticas();
     this.carregarUnidades();
+    this.carregarEstatisticas();
   }
 
   private getHeaders(): HttpHeaders {
@@ -103,248 +58,111 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  carregarUsuarios() {
-    this.carregando = true;
-    this.http.get<any>(`${environment.apiUrl}/admin/usuarios`, { headers: this.getHeaders() })
-      .subscribe({
-        next: (response) => {
-          this.usuarios = response.usuarios || [];
-          this.aplicarFiltros();
-          this.carregando = false;
-        },
-        error: (error) => {
-          console.error('Erro ao carregar usuários:', error);
-          this.carregando = false;
-        }
-      });
-  }
-
-  carregarEstatisticas() {
-    this.http.get<any>(`${environment.apiUrl}/admin/estatisticas`, { headers: this.getHeaders() })
-      .subscribe({
-        next: (response) => {
-          if (response.success && response.estatisticas) {
-            this.stats = {
-              totalUsuarios: response.estatisticas.totalUsuarios,
-              usuariosAtivos: response.estatisticas.usuariosAtivos,
-              estabelecimentos: response.estatisticas.estabelecimentos
-            };
-          }
-        },
-        error: (error) => {
-          console.error('Erro ao carregar estatísticas:', error);
-          // Manter valores padrão em caso de erro
-          this.stats = {
-            totalUsuarios: this.usuarios.length,
-            usuariosAtivos: this.usuarios.filter(u => u.ativo).length,
-            estabelecimentos: 0 // Será carregado da API de unidades
-          };
-        }
-      });
-  }
-
   carregarUnidades() {
+    this.carregandoUnidades = true;
     this.http.get<any>(`${environment.apiUrl}/unidades`, { headers: this.getHeaders() })
       .subscribe({
         next: (response) => {
-          // Filtrar apenas unidades ativas
           this.unidades = (response.unidades || []).filter((u: Unidade) => u.ativo);
+          // Selecionar automaticamente a primeira unidade
+          if (this.unidades.length > 0 && !this.unidadeSelecionada) {
+            this.unidadeSelecionada = this.unidades[0].id_unidade;
+          }
+          this.carregandoUnidades = false;
         },
         error: (error) => {
-          console.error('Erro ao carregar unidades:', error);
-          this.unidades = [];
+          console.error('❌ Erro ao carregar unidades:', error);
+          this.carregandoUnidades = false;
         }
       });
   }
 
-  aplicarFiltros() {
-    this.usuariosFiltrados = this.usuarios.filter(usuario => {
-      const nomeMatch = !this.filtros.nome || 
-        usuario.nome.toLowerCase().includes(this.filtros.nome.toLowerCase());
-      
-      const idMatch = !this.filtros.id || 
-        usuario.id.toString().includes(this.filtros.id);
-      
-      const unidadeMatch = !this.filtros.unidade_id || 
-        (usuario.unidade_id && usuario.unidade_id.toString().includes(this.filtros.unidade_id));
-      
-      return nomeMatch && idMatch && unidadeMatch;
-    });
-
-    this.calcularPaginacao();
+  selecionarUnidade() {
+    console.log('🏪 Unidade selecionada:', this.unidadeSelecionada);
+    this.carregarEstatisticas();
   }
 
-  calcularPaginacao() {
-    this.totalPaginas = Math.ceil(this.usuariosFiltrados.length / this.itensPorPagina);
-    if (this.paginaAtual > this.totalPaginas) {
-      this.paginaAtual = 1;
-    }
-  }
-
-  get usuariosPaginados(): Usuario[] {
-    const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
-    const fim = inicio + this.itensPorPagina;
-    return this.usuariosFiltrados.slice(inicio, fim);
-  }
-
-  get paginasArray(): number[] {
-    return Array.from({ length: this.totalPaginas }, (_, i) => i + 1);
-  }
-
-  irParaPagina(pagina: number) {
-    if (pagina >= 1 && pagina <= this.totalPaginas) {
-      this.paginaAtual = pagina;
-    }
-  }
-
-  novoUsuario() {
-    this.editando = false;
-    this.usuarioForm = {
-      nome: '',
-      email: '',
-      senha: '',
-      telefone: '',
-      foto_perfil: '',
-      tipo: 'CLIENTE',
-      unidade_id: undefined,
-      ativo: true,
-      primeiro_acesso: true
-    };
-    this.mostrarModal = true;
-    // Recarregar unidades para garantir que está atualizado
-    if (this.unidades.length === 0) {
-      this.carregarUnidades();
-    }
-  }
-
-  editarUsuario(usuario: Usuario) {
-    this.editando = true;
-    this.usuarioForm = {
-      id: usuario.id,
-      nome: usuario.nome,
-      email: usuario.email,
-      telefone: usuario.telefone,
-      foto_perfil: usuario.foto_perfil,
-      tipo: usuario.tipo,
-      unidade_id: usuario.unidade_id,
-      ativo: usuario.ativo,
-      primeiro_acesso: usuario.primeiro_acesso
-    };
-    this.mostrarModal = true;
-  }
-
-  salvarUsuario() {
-    const url = this.editando 
-      ? `${environment.apiUrl}/admin/usuarios/${this.usuarioForm.id}`
-      : `${environment.apiUrl}/admin/usuarios`;
+  carregarEstatisticas() {
+    this.carregando = true;
+    console.log('🔄 Carregando estatísticas do dashboard ADM...');
     
-    const method = this.editando ? 'PUT' : 'POST';
+    // Adicionar parâmetro de unidade se houver uma selecionada
+    const params = this.unidadeSelecionada 
+      ? `?unidade_id=${this.unidadeSelecionada}` 
+      : '';
     
-    const dados = { ...this.usuarioForm };
-    if (this.editando && !dados.senha) {
-      delete dados.senha; // Não enviar senha vazia em edição
-    }
-
-    const request = this.editando 
-      ? this.http.put(url, dados, { headers: this.getHeaders() })
-      : this.http.post(url, dados, { headers: this.getHeaders() });
-
-    request.subscribe({
-      next: (response) => {
-        console.log('Usuário salvo com sucesso!');
-        this.fecharModal();
-        this.carregarUsuarios();
-      },
-      error: (error) => {
-        console.error('Erro ao salvar usuário:', error);
-        alert('Erro ao salvar usuário. Verifique os dados e tente novamente.');
-      }
-    });
-  }
-
-  excluirUsuario(usuario: Usuario) {
-    if (confirm(`Tem certeza que deseja excluir o usuário ${usuario.nome}?`)) {
-      this.http.delete(`${environment.apiUrl}/admin/usuarios/${usuario.id}`, { headers: this.getHeaders() })
-        .subscribe({
-          next: () => {
-            console.log('Usuário excluído com sucesso!');
-            this.carregarUsuarios();
-          },
-          error: (error) => {
-            console.error('Erro ao excluir usuário:', error);
-            alert('Erro ao excluir usuário.');
+    this.http.get<any>(`${environment.apiUrl}/admin/estatisticas${params}`, { headers: this.getHeaders() })
+      .subscribe({
+        next: (response) => {
+          console.log('✅ Resposta recebida:', response);
+          if (response.success && response.estatisticas) {
+            this.estatisticas = response.estatisticas;
+            console.log('📊 Estatísticas carregadas:', this.estatisticas);
+          } else {
+            console.warn('⚠️ Resposta sem estatísticas:', response);
           }
-        });
-    }
+          this.carregando = false;
+        },
+        error: (error) => {
+          console.error('❌ Erro ao carregar estatísticas:', error);
+          console.error('Status:', error.status);
+          console.error('Mensagem:', error.message);
+          console.error('Erro completo:', error);
+          this.carregando = false;
+        }
+      });
   }
 
-  alternarStatus(usuario: Usuario) {
-    const novoStatus = !usuario.ativo;
-    this.http.patch(`${environment.apiUrl}/admin/usuarios/${usuario.id}/status`, 
-      { ativo: novoStatus }, 
-      { headers: this.getHeaders() }
-    ).subscribe({
-      next: () => {
-        usuario.ativo = novoStatus;
-        console.log(`Status do usuário ${usuario.nome} alterado para ${novoStatus ? 'ativo' : 'inativo'}`);
-      },
-      error: (error) => {
-        console.error('Erro ao alterar status:', error);
-        alert('Erro ao alterar status do usuário.');
-      }
-    });
+  formatarPreco(valor: number): string {
+    return new Intl.NumberFormat('pt-BR', { 
+      style: 'currency', 
+      currency: 'BRL' 
+    }).format(valor);
   }
 
-  fecharModal() {
-    this.mostrarModal = false;
-    this.usuarioForm = {
-      nome: '',
-      email: '',
-      senha: '',
-      telefone: '',
-      foto_perfil: '',
-      tipo: 'CLIENTE',
-      unidade_id: undefined,
-      ativo: true,
-      primeiro_acesso: true
+  formatarMes(mesAno: string): string {
+    const [ano, mes] = mesAno.split('-');
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    return `${meses[parseInt(mes) - 1]}/${ano}`;
+  }
+
+  getTipoLabel(tipo: string): string {
+    const labels: { [key: string]: string } = {
+      'CLIENTE': 'Clientes',
+      'FUNCIONARIO': 'Funcionários',
+      'GERENTE': 'Gerentes',
+      'ADM': 'Administradores'
     };
+    return labels[tipo] || tipo;
   }
 
-  getTipoBadgeClass(tipo: string): string {
-    switch(tipo) {
-      case 'ADM': return 'badge-admin';
-      case 'GERENTE': return 'badge-gerente';
-      case 'FUNCIONARIO': return 'badge-funcionario';
-      case 'CLIENTE': return 'badge-cliente';
-      default: return 'badge-default';
-    }
-  }
-
-  limparFiltros() {
-    this.filtros = {
-      nome: '',
-      id: '',
-      unidade_id: ''
+  getTipoIcon(tipo: string): string {
+    const icons: { [key: string]: string } = {
+      'CLIENTE': '👤',
+      'FUNCIONARIO': '👨‍💼',
+      'GERENTE': '👔',
+      'ADM': '👑'
     };
-    this.aplicarFiltros();
+    return icons[tipo] || '👤';
   }
 
-  aplicarMascaraTelefone(event: any) {
-    let valor = event.target.value.replace(/\D/g, '');
-    
-    if (valor.length > 11) {
-      valor = valor.substring(0, 11);
-    }
-    
-    if (valor.length <= 10) {
-      // (11) 9999-9999
-      valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-    } else {
-      // (11) 99999-9999
-      valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
-    }
-    
-    this.usuarioForm.telefone = valor;
-    event.target.value = valor;
+  getStatusLabel(status: string): string {
+    const labels: { [key: string]: string } = {
+      'pendente': 'Pendentes',
+      'confirmado': 'Confirmados',
+      'concluido': 'Concluídos',
+      'cancelado': 'Cancelados'
+    };
+    return labels[status] || status;
+  }
+
+  getStatusIcon(status: string): string {
+    const icons: { [key: string]: string } = {
+      'pendente': '⏳',
+      'confirmado': '✅',
+      'concluido': '🎉',
+      'cancelado': '❌'
+    };
+    return icons[status] || '📋';
   }
 }

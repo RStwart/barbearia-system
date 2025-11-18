@@ -12,6 +12,7 @@ import { EstabelecimentoLayoutComponent } from './layouts/estabelecimento-layout
 
 // Componentes específicos do Admin
 import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-dashboard.component';
+import { AdminUsuariosComponent } from './pages/admin/admin-usuarios/admin-usuarios.component';
 import { AdminEstabelecimentosComponent } from './pages/admin/admin-estabelecimentos/admin-estabelecimentos.component';
 
 // Componentes do Cliente
@@ -39,7 +40,7 @@ export const routes: Routes = [
     component: AdminLayoutComponent,
     children: [
       { path: '', component: AdminDashboardComponent },
-      { path: 'usuarios', component: AdminDashboardComponent }, // Dashboard com gerenciamento de usuários
+      { path: 'usuarios', component: AdminUsuariosComponent }, // Gerenciamento de usuários
       { path: 'estabelecimentos', component: AdminEstabelecimentosComponent }, // Gerenciamento de unidades
       { path: 'logs', component: DashboardComponent } // Temporário
     ]

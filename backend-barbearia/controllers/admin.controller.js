@@ -334,6 +334,14 @@ const alterarStatus = async (req, res) => {
 // ================ ESTATÍSTICAS ================
 const obterEstatisticas = async (req, res) => {
   try {
+    const { unidade_id } = req.query;
+    
+    console.log('📊 Carregando estatísticas - Unidade ID:', unidade_id || 'TODAS');
+
+    // Filtro de unidade
+    const filtroUnidade = unidade_id ? 'WHERE unidade_id = ?' : '';
+    const filtroUnidadeParams = unidade_id ? [unidade_id] : [];
+
     // Total de usuários
     const [totalResult] = await db.execute("SELECT COUNT(*) as total FROM usuarios");
     const totalUsuarios = totalResult[0].total;
@@ -351,6 +359,118 @@ const obterEstatisticas = async (req, res) => {
       "SELECT COUNT(*) as novos FROM usuarios WHERE criado_em >= DATE_SUB(NOW(), INTERVAL 30 DAY)"
     );
     const novosCadastros = novosResult[0].novos;
+
+    // Usuários por tipo (com filtro de unidade opcional)
+    let queryUsuariosPorTipo = `
+      SELECT tipo, COUNT(*) as quantidade 
+      FROM usuarios 
+      ${unidade_id ? 'WHERE unidade_id = ?' : ''}
+      GROUP BY tipo 
+      ORDER BY quantidade DESC
+    `;
+    const [usuariosPorTipo] = await db.execute(queryUsuariosPorTipo, filtroUnidadeParams);
+
+    // Agendamentos hoje (com filtro de unidade)
+    let queryAgendamentosHoje = `
+      SELECT COUNT(*) as total 
+      FROM agendamentos 
+      WHERE DATE(data_agendamento) = CURDATE()
+      ${unidade_id ? 'AND unidade_id = ?' : ''}
+    `;
+    const [agendamentosHoje] = await db.execute(queryAgendamentosHoje, filtroUnidadeParams);
+
+    // Agendamentos por status (com filtro de unidade)
+    let queryAgendamentosPorStatus = `
+      SELECT status, COUNT(*) as quantidade 
+      FROM agendamentos
+      ${unidade_id ? 'WHERE unidade_id = ?' : ''}
+      GROUP BY status
+    `;
+    const [agendamentosPorStatus] = await db.execute(queryAgendamentosPorStatus, filtroUnidadeParams);
+
+    // Vendas do mês (com filtro de unidade)
+    let queryVendasMes = `
+      SELECT 
+        COUNT(*) as total_vendas,
+        COALESCE(SUM(valor_total), 0) as valor_total
+      FROM vendas 
+      WHERE MONTH(criado_em) = MONTH(CURDATE()) 
+      AND YEAR(criado_em) = YEAR(CURDATE())
+      ${unidade_id ? 'AND unidade_id = ?' : ''}
+    `;
+    const [vendasMes] = await db.execute(queryVendasMes, filtroUnidadeParams);
+
+    // Vendas hoje (com filtro de unidade)
+    let queryVendasHoje = `
+      SELECT 
+        COUNT(*) as total_vendas,
+        COALESCE(SUM(valor_total), 0) as valor_total
+      FROM vendas 
+      WHERE DATE(criado_em) = CURDATE()
+      ${unidade_id ? 'AND unidade_id = ?' : ''}
+    `;
+    const [vendasHoje] = await db.execute(queryVendasHoje, filtroUnidadeParams);
+
+    // Unidades mais ativas (com filtro de unidade)
+    let queryUnidadesAtivas = `
+      SELECT 
+        u.nome,
+        COUNT(a.id) as total_agendamentos,
+        COALESCE(SUM(v.valor_total), 0) as receita_mes
+      FROM unidades u
+      LEFT JOIN agendamentos a ON u.id_unidade = a.unidade_id 
+        AND MONTH(a.data_agendamento) = MONTH(CURDATE())
+        AND YEAR(a.data_agendamento) = YEAR(CURDATE())
+      LEFT JOIN vendas v ON u.id_unidade = v.unidade_id
+        AND MONTH(v.criado_em) = MONTH(CURDATE())
+        AND YEAR(v.criado_em) = YEAR(CURDATE())
+      WHERE u.ativo = 1
+      ${unidade_id ? 'AND u.id_unidade = ?' : ''}
+      GROUP BY u.id_unidade, u.nome
+      ORDER BY total_agendamentos DESC
+      LIMIT 5
+    `;
+    const [unidadesAtivas] = await db.execute(queryUnidadesAtivas, filtroUnidadeParams);
+
+    // Serviços mais procurados (com filtro de unidade)
+    let queryServicosMaisVendidos = `
+      SELECT 
+        vs.servico_nome,
+        COUNT(*) as total_vendido
+      FROM venda_servicos vs
+      INNER JOIN vendas v ON vs.venda_id = v.id
+      WHERE MONTH(v.criado_em) = MONTH(CURDATE())
+      AND YEAR(v.criado_em) = YEAR(CURDATE())
+      ${unidade_id ? 'AND v.unidade_id = ?' : ''}
+      GROUP BY vs.servico_nome
+      ORDER BY total_vendido DESC
+      LIMIT 5
+    `;
+    const [servicosMaisVendidos] = await db.execute(queryServicosMaisVendidos, filtroUnidadeParams);
+
+    // Crescimento mensal (últimos 6 meses) (com filtro de unidade)
+    let queryCrescimentoMensal = `
+      SELECT 
+        DATE_FORMAT(criado_em, '%Y-%m') as mes,
+        COUNT(*) as total_vendas,
+        COALESCE(SUM(valor_total), 0) as receita
+      FROM vendas
+      WHERE criado_em >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+      ${unidade_id ? 'AND unidade_id = ?' : ''}
+      GROUP BY DATE_FORMAT(criado_em, '%Y-%m')
+      ORDER BY mes ASC
+    `;
+    const [crescimentoMensal] = await db.execute(queryCrescimentoMensal, filtroUnidadeParams);
+
+    console.log('📊 Estatísticas Carregadas:');
+    console.log('Total Usuários:', totalUsuarios);
+    console.log('Estabelecimentos:', estabelecimentos);
+    console.log('Agendamentos Hoje:', agendamentosHoje[0].total);
+    console.log('Vendas Mês:', vendasMes[0]);
+    console.log('Vendas Hoje:', vendasHoje[0]);
+    console.log('Unidades Ativas:', unidadesAtivas.length);
+    console.log('Serviços Vendidos:', servicosMaisVendidos.length);
+    console.log('Crescimento:', crescimentoMensal.length);
     
     res.json({
       success: true,
@@ -358,7 +478,15 @@ const obterEstatisticas = async (req, res) => {
         totalUsuarios,
         usuariosAtivos,
         estabelecimentos,
-        novosCadastros
+        novosCadastros,
+        usuariosPorTipo,
+        agendamentosHoje: agendamentosHoje[0].total,
+        agendamentosPorStatus,
+        vendasMes: vendasMes[0],
+        vendasHoje: vendasHoje[0],
+        unidadesAtivas,
+        servicosMaisVendidos,
+        crescimentoMensal
       }
     });
   } catch (error) {
