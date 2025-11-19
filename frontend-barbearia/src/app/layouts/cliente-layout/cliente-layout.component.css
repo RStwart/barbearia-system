@@ -1,8 +1,8 @@
 :root{
   --sidebar-width: 280px;
   --sidebar-collapsed: 0px;
-  --cliente-primary: #27ae60;
-  --cliente-dark: #219a52;
+  --cliente-primary: #5b6fd8;
+  --cliente-dark: #4f5acf;
 }
 
 *{box-sizing:border-box}
@@ -54,9 +54,9 @@
   font-weight:700;
   font-size:17px;
   margin-bottom:24px;
-  color: #27ae60;
+  color: #5b6fd8;
   padding-bottom: 16px;
-  border-bottom: 2px solid rgba(39, 174, 96, 0.3);
+  border-bottom: 2px solid rgba(91, 111, 216, 0.3);
 }
 
 .collapse-btn{
@@ -131,7 +131,7 @@
 .logout{
   width:100%;
   padding:14px 16px;
-  background:#27ae60;
+  background:#e74c3c;
   color:white;
   border:none;
   border-radius:8px;
@@ -139,7 +139,7 @@
   transition: all 0.3s ease;
   font-weight: 600;
   font-size: 15px;
-  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,9 +147,9 @@
 }
 
 .logout:hover{
-  background:#219a52;
+  background:#c0392b;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(39, 174, 96, 0.4);
+  box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
 }
 
 .logout-icon {

@@ -46,8 +46,8 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #6C63FF;
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+  border-color: #5b6fd8;
+  box-shadow: 0 0 0 3px rgba(91, 111, 216, 0.1);
 }
 
 /* Validadores de Senha */
@@ -120,14 +120,14 @@
 }
 
 .btn-cadastrar {
-  background: #6C63FF;
+  background: #5b6fd8;
   color: white;
 }
 
 .btn-cadastrar:hover:not(:disabled) {
-  background: #5a54f0;
+  background: #4f5acf;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(91, 111, 216, 0.3);
 }
 
 .btn-cadastrar:disabled {

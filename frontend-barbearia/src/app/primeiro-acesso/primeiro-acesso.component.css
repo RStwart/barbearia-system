@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5b6fd8 0%, #4f5acf 100%);
   padding: 20px;
 }
 
@@ -31,7 +31,7 @@
 
 /* ===== HEADER ===== */
 .header-acesso {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5b6fd8 0%, #4f5acf 100%);
   color: white;
   padding: 40px 30px 30px;
   text-align: center;
@@ -75,14 +75,14 @@
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #5b6fd8, #4f5acf);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 32px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(91, 111, 216, 0.3);
   flex-shrink: 0;
 }
 
@@ -101,7 +101,7 @@
 .badge-tipo {
   display: inline-block;
   padding: 4px 12px;
-  background: #667eea;
+  background: #5b6fd8;
   color: white;
   border-radius: 12px;
   font-size: 12px;
@@ -148,8 +148,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #5b6fd8;
+  box-shadow: 0 0 0 3px rgba(91, 111, 216, 0.1);
 }
 
 .btn-toggle-senha {
@@ -170,7 +170,7 @@
 /* ===== REQUISITOS DA SENHA ===== */
 .requisitos-senha {
   background: #f8f9fa;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #5b6fd8;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 24px;
@@ -266,14 +266,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5b6fd8 0%, #4f5acf 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(91, 111, 216, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 16px rgba(91, 111, 216, 0.4);
 }
 
 .btn-primary:disabled {
@@ -283,8 +283,8 @@
 
 .btn-secondary {
   background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #5b6fd8;
+  border: 2px solid #5b6fd8;
 }
 
 .btn-secondary:hover:not(:disabled) {

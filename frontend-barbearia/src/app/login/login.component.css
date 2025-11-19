@@ -1,33 +1,33 @@
 .btn-entrar {
-  background: #6C63FF;
+  background: #5b6fd8;
   color: white;
   border: none;
 }
 
 .btn-entrar:hover {
-  background: #5a54f0;
+  background: #4f5acf;
 }
 
 .btn-cadastrar {
   background: white;
-  color: #6C63FF;
-  border: 2px solid #6C63FF;
+  color: #5b6fd8;
+  border: 2px solid #5b6fd8;
 }
 
 .btn-cadastrar:hover {
   background: #f2f2f2;
-  color: #5a54f0;
-  border-color: #5a54f0;
+  color: #4f5acf;
+  border-color: #4f5acf;
 }
 
 .btn-voltar {
-  background: #6C63FF;
+  background: #5b6fd8;
   color: white;
   border: none;
 }
 
 .btn-voltar:hover {
-  background: #5a54f0;
+  background: #4f5acf;
 }
 /* === Tela Bem-Vindo === */
 html, body {
@@ -102,8 +102,8 @@ p {
 
 .btn.branco {
   background: white;
-  border: 2px solid #6C63FF;
-  color: #6C63FF;
+  border: 2px solid #5b6fd8;
+  color: #5b6fd8;
 }
 
 .btn.branco:hover {
@@ -111,13 +111,13 @@ p {
 }
 
 .btn.azul {
-  background: #6C63FF;
+  background: #5b6fd8;
   color: white;
   border: none;
 }
 
 .btn.azul:hover {
-  background: #5a54f0;
+  background: #4f5acf;
 }
 
 /* === Tela de Login === */
@@ -160,14 +160,14 @@ p {
 }
 
 .login-box input:focus {
-  border-color: #6C63FF;
+  border-color: #5b6fd8;
 }
 
 .login-box button {
   width: 80%;
   margin: 10px auto 0 auto;
   padding: 10px 0;
-  background: #6C63FF;
+  background: #5b6fd8;
   border: none;
   border-radius: 6px;
   color: white;
@@ -178,14 +178,14 @@ p {
 }
 
 .login-box button:hover {
-  background: #5a54f0;
+  background: #4f5acf;
 }
 
 /* Botão de voltar */
 .voltar {
   background: transparent;
   border: none;
-  color: #6C63FF;
+  color: #5b6fd8;
   font-size: 16px;
   cursor: pointer;
   float: left;
