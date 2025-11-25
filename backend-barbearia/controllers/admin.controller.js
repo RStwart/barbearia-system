@@ -264,35 +264,65 @@ const atualizarUsuario = async (req, res) => {
 
 // ================ EXCLUIR USUÁRIO ================
 const excluirUsuario = async (req, res) => {
+  const connection = await db.getConnection();
+  
   try {
     const { id } = req.params;
     
+    await connection.beginTransaction();
+    
     // Verificar se usuário existe
-    const [usuarioExiste] = await db.execute(
+    const [usuarioExiste] = await connection.execute(
       "SELECT id FROM usuarios WHERE id = ?", 
       [id]
     );
     
     if (usuarioExiste.length === 0) {
+      await connection.rollback();
       return res.status(404).json({
         success: false,
         message: "Usuário não encontrado"
       });
     }
     
-    await db.execute("DELETE FROM usuarios WHERE id = ?", [id]);
+    // 1. Deletar venda_servicos relacionados às vendas onde o usuário é funcionário ou cliente
+    await connection.execute(`
+      DELETE vs FROM venda_servicos vs
+      INNER JOIN vendas v ON vs.venda_id = v.id
+      WHERE v.funcionario_id = ? OR v.cliente_id = ?
+    `, [id, id]);
+    
+    // 2. Deletar vendas onde o usuário é funcionário ou cliente
+    await connection.execute(
+      "DELETE FROM vendas WHERE funcionario_id = ? OR cliente_id = ?", 
+      [id, id]
+    );
+    
+    // 3. Deletar agendamentos onde o usuário é cliente ou funcionário
+    await connection.execute(
+      "DELETE FROM agendamentos WHERE funcionario_id = ? OR cliente_id = ?", 
+      [id, id]
+    );
+    
+    // 4. Deletar o usuário
+    await connection.execute("DELETE FROM usuarios WHERE id = ?", [id]);
+    
+    await connection.commit();
     
     res.json({
       success: true,
       message: "Usuário excluído com sucesso"
     });
   } catch (error) {
+    await connection.rollback();
     console.error("Erro ao excluir usuário:", error);
     res.status(500).json({
       success: false,
       message: "Erro interno do servidor",
       error: error.message
     });
+  } finally {
+    connection.release();
   }
 };
 
