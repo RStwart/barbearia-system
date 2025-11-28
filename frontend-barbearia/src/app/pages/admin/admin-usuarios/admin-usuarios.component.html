@@ -59,7 +59,16 @@
       👉 Deslize horizontalmente para ver mais colunas
     </div>
     
-    <table class="usuarios-table">
+    <div class="table-wrapper" 
+         #tableWrapper
+         (mousedown)="onMouseDown($event)"
+         (mousemove)="onMouseMove($event)"
+         (mouseup)="onMouseUp()"
+         (mouseleave)="onMouseLeave()"
+         (touchstart)="onTouchStart($event)"
+         (touchmove)="onTouchMove($event)"
+         (touchend)="onTouchEnd()">
+      <table class="usuarios-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -127,6 +136,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
 
     <!-- Mensagem quando não há usuários -->
     <div class="empty-state" *ngIf="usuariosPaginados.length === 0">

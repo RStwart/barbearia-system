@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -46,12 +46,19 @@ interface Unidade {
 export class AdminUsuariosComponent implements OnInit {
   Math = Math;
   
+  @ViewChild('tableWrapper') tableWrapper!: ElementRef;
+  
   usuarios: Usuario[] = [];
   usuariosFiltrados: Usuario[] = [];
   paginaAtual = 1;
   itensPorPagina = 10;
   totalPaginas = 0;
   carregando = false;
+  
+  // Propriedades para drag scroll
+  isDragging = false;
+  startX = 0;
+  scrollLeft = 0;
 
   filtros = {
     nome: '',
@@ -75,7 +82,7 @@ export class AdminUsuariosComponent implements OnInit {
 
   unidades: Unidade[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private renderer: Renderer2) {}
 
   ngOnInit() {
     this.carregarUsuarios();
@@ -303,5 +310,56 @@ export class AdminUsuariosComponent implements OnInit {
     
     this.usuarioForm.telefone = valor;
     event.target.value = valor;
+  }
+
+  // Métodos para drag scroll - Mouse
+  onMouseDown(e: MouseEvent) {
+    this.isDragging = true;
+    this.startX = e.pageX - this.tableWrapper.nativeElement.offsetLeft;
+    this.scrollLeft = this.tableWrapper.nativeElement.scrollLeft;
+    this.renderer.addClass(this.tableWrapper.nativeElement, 'dragging');
+    this.renderer.setStyle(document.body, 'cursor', 'grabbing');
+    this.renderer.setStyle(document.body, 'user-select', 'none');
+  }
+
+  onMouseMove(e: MouseEvent) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - this.tableWrapper.nativeElement.offsetLeft;
+    const walk = (x - this.startX) * 2;
+    this.tableWrapper.nativeElement.scrollLeft = this.scrollLeft - walk;
+  }
+
+  onMouseUp() {
+    this.isDragging = false;
+    this.renderer.removeClass(this.tableWrapper.nativeElement, 'dragging');
+    this.renderer.removeStyle(document.body, 'cursor');
+    this.renderer.removeStyle(document.body, 'user-select');
+  }
+
+  onMouseLeave() {
+    if (this.isDragging) {
+      this.onMouseUp();
+    }
+  }
+
+  // Métodos para drag scroll - Touch (mobile)
+  onTouchStart(e: TouchEvent) {
+    this.isDragging = true;
+    this.startX = e.touches[0].pageX - this.tableWrapper.nativeElement.offsetLeft;
+    this.scrollLeft = this.tableWrapper.nativeElement.scrollLeft;
+    this.renderer.addClass(this.tableWrapper.nativeElement, 'dragging');
+  }
+
+  onTouchMove(e: TouchEvent) {
+    if (!this.isDragging) return;
+    const x = e.touches[0].pageX - this.tableWrapper.nativeElement.offsetLeft;
+    const walk = (x - this.startX) * 2;
+    this.tableWrapper.nativeElement.scrollLeft = this.scrollLeft - walk;
+  }
+
+  onTouchEnd() {
+    this.isDragging = false;
+    this.renderer.removeClass(this.tableWrapper.nativeElement, 'dragging');
   }
 }

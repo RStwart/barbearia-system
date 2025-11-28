@@ -131,21 +131,82 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: visible;
+  overflow: hidden;
   width: 100%;
 }
 
 .scroll-hint {
   display: none;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 0.875rem;
+  text-align: center;
+  font-style: italic;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  cursor: grab;
+  position: relative;
+  
+  /* Scrollbar personalizada */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.table-wrapper.dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+}
+
+.table-wrapper.dragging * {
+  pointer-events: none;
+}
+
+.table-wrapper:not(.dragging) {
+  scroll-behavior: smooth;
 }
 
 .usuarios-table {
   width: 100%;
-  min-width: 100%;
+  min-width: 1400px; /* Força scroll horizontal em todas as resoluções */
   border-collapse: collapse;
   font-size: 0.9rem;
-  table-layout: auto;
+  table-layout: fixed;
 }
+
+.usuarios-table th:nth-child(1) { width: 60px; }   /* ID */
+.usuarios-table th:nth-child(2) { width: 200px; }  /* Nome */
+.usuarios-table th:nth-child(3) { width: 220px; }  /* Email */
+.usuarios-table th:nth-child(4) { width: 140px; }  /* Telefone */
+.usuarios-table th:nth-child(5) { width: 100px; }  /* Tipo */
+.usuarios-table th:nth-child(6) { width: 100px; }  /* Unidade ID */
+.usuarios-table th:nth-child(7) { width: 100px; }  /* Status */
+.usuarios-table th:nth-child(8) { width: 100px; }  /* 1º Acesso */
+.usuarios-table th:nth-child(9) { width: 140px; }  /* Criado em */
+.usuarios-table th:nth-child(10) { width: 120px; } /* Ações */
 
 .usuarios-table thead {
   background: #f9fafb;
@@ -163,9 +224,20 @@
 }
 
 .usuarios-table td {
-  padding: 1rem;
+  padding: 0.875rem 0.75rem;
   border-bottom: 1px solid #f3f4f6;
   color: #1f2937;
+  vertical-align: middle;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Permitir quebra de linha apenas em células específicas */
+.usuarios-table td:nth-child(2),  /* Nome */
+.usuarios-table td:nth-child(3) { /* Email */
+  white-space: normal;
+  word-break: break-word;
 }
 
 .usuarios-table tbody tr:hover {
@@ -500,7 +572,24 @@
   border-top: 1px solid #e5e7eb;
 }
 
+/* Sempre mostrar scroll hint quando tabela for maior que container */
+.scroll-hint {
+  display: block;
+  padding: 0.75rem 1rem;
+  background: #f0f9ff;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0369a1;
+  font-size: 0.875rem;
+  text-align: center;
+  font-style: italic;
+  font-weight: 500;
+}
+
 /* Responsive */
+@media (max-width: 1200px) {
+  /* Configurações específicas para telas médias se necessário */
+}
+
 @media (max-width: 768px) {
   .usuarios-page {
     padding: 1rem;
@@ -513,6 +602,7 @@
 
   .filtros-container {
     grid-template-columns: 1fr;
+    padding: 1rem;
   }
 
   .modal-content {
@@ -521,5 +611,87 @@
 
   .form-row {
     grid-template-columns: 1fr;
+  }
+  
+  .scroll-hint {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  .table-wrapper {
+    touch-action: pan-x;
+  }
+  
+  .usuarios-table {
+    font-size: 0.8rem;
+    min-width: 1600px;
+  }
+  
+  .usuarios-table th,
+  .usuarios-table td {
+    padding: 0.625rem 0.5rem;
+  }
+  
+  .user-info-cell {
+    gap: 0.5rem;
+  }
+  
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  
+  .badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .action-buttons {
+    gap: 0.25rem;
+  }
+  
+  .btn-action {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .pagination-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .usuarios-page {
+    padding: 0.5rem;
+  }
+  
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .filtros-container {
+    padding: 0.75rem;
+  }
+  
+  .usuarios-table {
+    font-size: 0.75rem;
+  }
+  
+  .usuarios-table th,
+  .usuarios-table td {
+    padding: 0.5rem 0.375rem;
   }
 }
