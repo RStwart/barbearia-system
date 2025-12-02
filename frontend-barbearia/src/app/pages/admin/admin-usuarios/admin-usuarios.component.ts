@@ -59,6 +59,7 @@ export class AdminUsuariosComponent implements OnInit {
   isDragging = false;
   startX = 0;
   scrollLeft = 0;
+  hasMoved = false;
 
   filtros = {
     nome: '',
@@ -218,27 +219,31 @@ export class AdminUsuariosComponent implements OnInit {
     request.subscribe({
       next: (response) => {
         console.log('Usuário salvo com sucesso!');
+        alert(`Usuário ${this.editando ? 'atualizado' : 'criado'} com sucesso!`);
         this.fecharModal();
         this.carregarUsuarios();
       },
       error: (error) => {
         console.error('Erro ao salvar usuário:', error);
-        alert('Erro ao salvar usuário. Verifique os dados e tente novamente.');
+        const mensagem = error.error?.message || 'Erro ao salvar usuário. Verifique os dados e tente novamente.';
+        alert(mensagem);
       }
     });
   }
 
   excluirUsuario(usuario: Usuario) {
-    if (confirm(`Tem certeza que deseja excluir o usuário ${usuario.nome}?`)) {
+    if (confirm(`Tem certeza que deseja excluir o usuário ${usuario.nome}?\n\nAtenção: Esta ação não pode ser desfeita e removerá também todos os agendamentos e vendas relacionados.`)) {
       this.http.delete(`${environment.apiUrl}/admin/usuarios/${usuario.id}`, { headers: this.getHeaders() })
         .subscribe({
           next: () => {
             console.log('Usuário excluído com sucesso!');
+            alert('Usuário excluído com sucesso!');
             this.carregarUsuarios();
           },
           error: (error) => {
             console.error('Erro ao excluir usuário:', error);
-            alert('Erro ao excluir usuário.');
+            const mensagem = error.error?.message || 'Erro ao excluir usuário.';
+            alert(mensagem);
           }
         });
     }
@@ -246,19 +251,25 @@ export class AdminUsuariosComponent implements OnInit {
 
   alternarStatus(usuario: Usuario) {
     const novoStatus = !usuario.ativo;
-    this.http.patch(`${environment.apiUrl}/admin/usuarios/${usuario.id}/status`, 
-      { ativo: novoStatus }, 
-      { headers: this.getHeaders() }
-    ).subscribe({
-      next: () => {
-        usuario.ativo = novoStatus;
-        console.log(`Status do usuário ${usuario.nome} alterado para ${novoStatus ? 'ativo' : 'inativo'}`);
-      },
-      error: (error) => {
-        console.error('Erro ao alterar status:', error);
-        alert('Erro ao alterar status do usuário.');
-      }
-    });
+    const statusTexto = novoStatus ? 'ativar' : 'desativar';
+    
+    if (confirm(`Deseja ${statusTexto} o usuário ${usuario.nome}?`)) {
+      this.http.patch(`${environment.apiUrl}/admin/usuarios/${usuario.id}/status`, 
+        { ativo: novoStatus }, 
+        { headers: this.getHeaders() }
+      ).subscribe({
+        next: () => {
+          usuario.ativo = novoStatus;
+          console.log(`Status do usuário ${usuario.nome} alterado para ${novoStatus ? 'ativo' : 'inativo'}`);
+          alert(`Usuário ${novoStatus ? 'ativado' : 'desativado'} com sucesso!`);
+        },
+        error: (error) => {
+          console.error('Erro ao alterar status:', error);
+          const mensagem = error.error?.message || 'Erro ao alterar status do usuário.';
+          alert(mensagem);
+        }
+      });
+    }
   }
 
   fecharModal() {
@@ -314,20 +325,33 @@ export class AdminUsuariosComponent implements OnInit {
 
   // Métodos para drag scroll - Mouse
   onMouseDown(e: MouseEvent) {
+    // Não iniciar drag se clicar em botão ou elemento interativo
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'INPUT' || target.tagName === 'SELECT') {
+      return;
+    }
+    
     this.isDragging = true;
+    this.hasMoved = false;
     this.startX = e.pageX - this.tableWrapper.nativeElement.offsetLeft;
     this.scrollLeft = this.tableWrapper.nativeElement.scrollLeft;
-    this.renderer.addClass(this.tableWrapper.nativeElement, 'dragging');
-    this.renderer.setStyle(document.body, 'cursor', 'grabbing');
     this.renderer.setStyle(document.body, 'user-select', 'none');
   }
 
   onMouseMove(e: MouseEvent) {
     if (!this.isDragging) return;
-    e.preventDefault();
+    
     const x = e.pageX - this.tableWrapper.nativeElement.offsetLeft;
     const walk = (x - this.startX) * 2;
-    this.tableWrapper.nativeElement.scrollLeft = this.scrollLeft - walk;
+    
+    // Só previne default e marca como moved se realmente arrastar
+    if (Math.abs(walk) > 5) {
+      e.preventDefault();
+      this.hasMoved = true;
+      this.renderer.addClass(this.tableWrapper.nativeElement, 'dragging');
+      this.renderer.setStyle(document.body, 'cursor', 'grabbing');
+      this.tableWrapper.nativeElement.scrollLeft = this.scrollLeft - walk;
+    }
   }
 
   onMouseUp() {
@@ -335,6 +359,13 @@ export class AdminUsuariosComponent implements OnInit {
     this.renderer.removeClass(this.tableWrapper.nativeElement, 'dragging');
     this.renderer.removeStyle(document.body, 'cursor');
     this.renderer.removeStyle(document.body, 'user-select');
+    
+    // Pequeno delay para evitar clicks acidentais após drag
+    if (this.hasMoved) {
+      setTimeout(() => {
+        this.hasMoved = false;
+      }, 100);
+    }
   }
 
   onMouseLeave() {
@@ -345,21 +376,46 @@ export class AdminUsuariosComponent implements OnInit {
 
   // Métodos para drag scroll - Touch (mobile)
   onTouchStart(e: TouchEvent) {
+    // Não iniciar drag se tocar em botão ou elemento interativo
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'BUTTON' || target.closest('button') || target.tagName === 'INPUT' || target.tagName === 'SELECT') {
+      return;
+    }
+    
     this.isDragging = true;
+    this.hasMoved = false;
     this.startX = e.touches[0].pageX - this.tableWrapper.nativeElement.offsetLeft;
     this.scrollLeft = this.tableWrapper.nativeElement.scrollLeft;
-    this.renderer.addClass(this.tableWrapper.nativeElement, 'dragging');
   }
 
   onTouchMove(e: TouchEvent) {
     if (!this.isDragging) return;
+    
     const x = e.touches[0].pageX - this.tableWrapper.nativeElement.offsetLeft;
     const walk = (x - this.startX) * 2;
-    this.tableWrapper.nativeElement.scrollLeft = this.scrollLeft - walk;
+    
+    if (Math.abs(walk) > 5) {
+      this.hasMoved = true;
+      this.renderer.addClass(this.tableWrapper.nativeElement, 'dragging');
+      this.tableWrapper.nativeElement.scrollLeft = this.scrollLeft - walk;
+    }
   }
 
   onTouchEnd() {
     this.isDragging = false;
     this.renderer.removeClass(this.tableWrapper.nativeElement, 'dragging');
+    
+    if (this.hasMoved) {
+      setTimeout(() => {
+        this.hasMoved = false;
+      }, 100);
+    }
+  }
+  
+  // Método auxiliar para verificar se deve prevenir ação
+  preventActionIfDragging(callback: () => void) {
+    if (!this.hasMoved) {
+      callback();
+    }
   }
 }

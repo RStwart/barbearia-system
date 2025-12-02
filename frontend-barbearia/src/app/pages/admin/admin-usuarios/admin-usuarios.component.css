@@ -181,8 +181,15 @@
   scroll-behavior: auto;
 }
 
-.table-wrapper.dragging * {
+/* N\u00c3O desabilitar pointer events em TODOS os elementos */
+.table-wrapper.dragging table {
   pointer-events: none;
+  user-select: none;
+}
+
+/* Reabilitar pointer events nos bot\u00f5es durante drag */
+.table-wrapper.dragging button {
+  pointer-events: auto;
 }
 
 .table-wrapper:not(.dragging) {
